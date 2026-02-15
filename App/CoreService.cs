@@ -125,6 +125,7 @@ namespace App
                     Long = server.longitude,
                     Port = server.port,
                     DNS = server.address,
+                    Players = server.players,
                     Usage = server.players / (double)server.maxPlayers,
                     AdminOnly = server.adminOnly,
                     UsageText = server.IsJustStarted() ? "- NEW!" : $"{server.players}/{server.maxPlayers}"

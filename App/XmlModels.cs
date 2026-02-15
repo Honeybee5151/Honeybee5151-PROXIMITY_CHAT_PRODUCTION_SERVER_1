@@ -24,6 +24,8 @@ namespace App
         public double Usage { get; set; }
         public bool AdminOnly { get; set; }
         public string UsageText { get; set; }
+        
+        public int Players { get; set; }
 
         public XElement ToXml()
         {
@@ -36,7 +38,8 @@ namespace App
                     new XElement("Long", Long),
                     new XElement("Usage", Usage),
                     new XElement("AdminOnly", AdminOnly),
-                    new XElement("UsageText", UsageText)
+                    new XElement("UsageText", UsageText),
+                    new XElement("Players", Players)
                 );
         }
     }
