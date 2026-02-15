@@ -8,6 +8,8 @@ services:
     restart: always
     depends_on:
       - redis
+    environment:
+      - IS_DOCKER=true
     ports:
       - "2050:2050"
       - "8888:8080"
