@@ -1,0 +1,13 @@
+services:
+  redis:
+    image: redis:7
+    restart: always
+
+  server:
+    build: .
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - "2050:2050"
+      - "8080:8080"
