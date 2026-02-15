@@ -102,7 +102,7 @@ namespace WorldServer.networking
             }
         }
         
-        public VoicePlayerInfo[] GetPlayersInRange(float speakerX, float speakerY, float range)
+        public VoicePlayerInfo[] GetPlayersInRange(float speakerX, float speakerY, float range, int speakerWorldId)
         {
             try
             {
@@ -114,6 +114,10 @@ namespace WorldServer.networking
                     var client = clientPair.Key;
                     if (client.Player != null && client.Player.World != null)
                     {
+                        // Only include players in the same world
+                        if (client.Player.World.Id != speakerWorldId)
+                            continue;
+
                         float distance = CalculateDistance(speakerX, speakerY, client.Player.X, client.Player.Y);
                         
                         if (distance <= range)
@@ -430,39 +434,22 @@ namespace WorldServer.networking
 {
     try
     {
-        // NEW: Voice packet format: [2 bytes playerId][Opus audio data]
+        // Voice packet format: [2 bytes playerId][Opus audio data]
         if (packet.Length < 2)
-        {
-            Console.WriteLine($"UDP: Packet too small ({packet.Length} bytes)");
             return;
-        }
         
         ushort playerIdShort = BitConverter.ToUInt16(packet, 0);
         string playerId = playerIdShort.ToString();
         
-        Console.WriteLine($"[UDP_ENDPOINT_DEBUG] Voice packet from {playerId}");
-        Console.WriteLine($"[UDP_ENDPOINT_DEBUG] OLD stored endpoint: {playerUdpEndpoints.GetValueOrDefault(playerId)}");
-        Console.WriteLine($"[UDP_ENDPOINT_DEBUG] NEW current endpoint: {clientEndpoint}");
-        Console.WriteLine($"UDP: Voice packet from player '{playerId}' at {clientEndpoint}");
-        Console.WriteLine($"UDP: Player authenticated? {authenticatedPlayers.ContainsKey(playerId)}");
-        
         // Security check: Player must be authenticated
         if (!authenticatedPlayers.ContainsKey(playerId))
-        {
-            Console.WriteLine($"UDP: Rejecting voice from unauthenticated player '{playerId}'");
-            Console.WriteLine($"UDP: Auth endpoint for {playerId}: {playerUdpEndpoints.GetValueOrDefault(playerId)}");
-            Console.WriteLine($"UDP: Voice endpoint: {clientEndpoint}");
-            Console.WriteLine($"UDP: Authenticated players: {string.Join(", ", authenticatedPlayers.Keys.Select(k => $"'{k}'"))}");
             return;
-        }
         
-        Console.WriteLine($"UDP: Voice packet ACCEPTED from player '{playerId}'");
-        
-        // Extract Opus audio data (starts at byte 2 now)
+        // Extract Opus audio data (starts at byte 2)
         byte[] opusAudio = new byte[packet.Length - 2];
         Array.Copy(packet, 2, opusAudio, 0, opusAudio.Length);
         
-        // Update activity tracking AFTER authentication check
+        // Update activity tracking
         playerUdpEndpoints[playerId] = clientEndpoint;
         lastUdpActivity[playerId] = DateTime.UtcNow;
         
@@ -475,10 +462,8 @@ namespace WorldServer.networking
             Timestamp = DateTime.UtcNow
         };
         
-        // Broadcast to nearby players with all features
+        // Broadcast to nearby players
         await BroadcastVoiceToNearbyPlayers(voiceData);
-        
-        Console.WriteLine($"UDP: Processed {opusAudio.Length} Opus bytes from player '{playerId}'");
     }
     catch (Exception ex)
     {
@@ -491,24 +476,17 @@ namespace WorldServer.networking
     {
         // Get speaker position using proximity system
         var speakerPosition = voiceUtils.GetPlayerPosition(voiceData.PlayerId);
-        if (speakerPosition == null) 
-        {
-            Console.WriteLine($"UDP: Could not find position for player {voiceData.PlayerId}");
+        if (speakerPosition == null)
             return;
-        }
         
-        // Find players in proximity range
-        var nearbyPlayers = voiceUtils.GetPlayersInRange(speakerPosition.X, speakerPosition.Y, PROXIMITY_RANGE);
+        // Find players in proximity range (filtered by same world)
+        var nearbyPlayers = voiceUtils.GetPlayersInRange(speakerPosition.X, speakerPosition.Y, PROXIMITY_RANGE, speakerPosition.WorldId);
         
         // Get priority settings for this world
         var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
         bool prioritySystemActive = voiceUtils.ShouldActivatePrioritySystem(speakerPosition.WorldId, nearbyPlayers.Length);
-
-        Console.WriteLine($"UDP: Broadcasting to {nearbyPlayers.Length} nearby players (Priority: {prioritySystemActive})");
         
         var sendTasks = new List<Task>();
-        int filteredPlayers = 0;
-        int sentPlayers = 0;
         
         foreach (var player in nearbyPlayers)
         {
@@ -516,59 +494,36 @@ namespace WorldServer.networking
             {
                 // Skip self-voice
                 if (voiceData.PlayerId == player.PlayerId)
-                {
-                    Console.WriteLine($"UDP: Skipping self-voice for player {voiceData.PlayerId}");
                     continue;
-                }
 
                 // Check ignore system
                 if (voiceUtils.ArePlayersVoiceIgnored(voiceData.PlayerId, player.PlayerId))
-                {
-                    Console.WriteLine($"UDP: Voice blocked {voiceData.PlayerId} -> {player.PlayerId} (ignored)");
-                    filteredPlayers++;
                     continue;
-                }
 
                 // Apply priority system EARLY (before expensive volume calculations)
                 if (prioritySystemActive)
                 {
                     bool hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
                     
-                    // ⚡ EARLY FILTERING: Check if we should filter this voice completely
                     if (prioritySettings.ShouldFilterVoice(hasPriority))
-                    {
-                        Console.WriteLine($"UDP: FILTERED {voiceData.PlayerId} -> {player.PlayerId}: {prioritySettings.GetFilterReason(hasPriority)}");
-                        filteredPlayers++;
-                        continue; // Skip all volume calculations and packet creation
-                    }
+                        continue;
                 }
 
-                // Calculate distance-based volume (only for non-filtered players)
-                
+                // Calculate final volume
                 float finalVolume = voiceData.Volume;
 
-                // Apply priority volume multiplier (only for non-filtered players)
+                // Apply priority volume multiplier
                 if (prioritySystemActive)
                 {
                     bool hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
                     float volumeMultiplier = prioritySettings.GetVolumeMultiplier(hasPriority);
                     finalVolume *= volumeMultiplier;
-
-                    Console.WriteLine($"UDP: {voiceData.PlayerId} -> {player.PlayerId}: Distance={player.Distance:F1}, Priority={hasPriority}, Volume={finalVolume:F2}");
-                }
-                else
-                {
-                    Console.WriteLine($"UDP: {voiceData.PlayerId} -> {player.PlayerId}: Distance={player.Distance:F1}, Volume={finalVolume:F2}");
                 }
 
                 // Send to player if they have UDP connection
                 if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
                 {
-                    Console.WriteLine($"[UDP_ENDPOINT_DEBUG] Sending to player {player.PlayerId}");
-                    Console.WriteLine($"[UDP_ENDPOINT_DEBUG] Stored endpoint: {targetEndpoint}");
-                    Console.WriteLine($"[UDP_ENDPOINT_DEBUG] Auth endpoint from dict: {playerUdpEndpoints.GetValueOrDefault(player.PlayerId)}");
-                    
-                    // NEW: Create packet without "VOIC" header: [2 bytes speakerId][4 bytes volume][2 bytes length][Opus audio]
+                    // Packet format: [2 bytes speakerId][4 bytes volume][2 bytes length][Opus audio]
                     ushort speakerIdShort = ushort.Parse(voiceData.PlayerId);
                     byte[] voicePacket = new byte[2 + 4 + 2 + voiceData.OpusAudioData.Length];
 
@@ -588,11 +543,6 @@ namespace WorldServer.networking
                     Array.Copy(voiceData.OpusAudioData, 0, voicePacket, 8, voiceData.OpusAudioData.Length);
                     
                     sendTasks.Add(SendUdpPacketSafe(voicePacket, targetEndpoint, player.PlayerId));
-                    sentPlayers++;
-                }
-                else
-                {
-                    Console.WriteLine($"UDP: No endpoint for {player.PlayerId} - player not connected via UDP");
                 }
             }
             catch (Exception ex)
@@ -602,14 +552,7 @@ namespace WorldServer.networking
         }
         
         if (sendTasks.Count > 0)
-        {
             await Task.WhenAll(sendTasks);
-            Console.WriteLine($"UDP: Sent voice from {voiceData.PlayerId} to {sentPlayers} players, filtered {filteredPlayers} players");
-        }
-        else
-        {
-            Console.WriteLine($"UDP: No players to receive voice from {voiceData.PlayerId} (filtered: {filteredPlayers})");
-        }
     }
     catch (Exception ex)
     {
@@ -671,7 +614,6 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
         
         private bool ValidateVoiceID(string playerId, string voiceId)
         {
-            return true;
             try
             {
                 var account = gameServer.Database.GetAccount(int.Parse(playerId));

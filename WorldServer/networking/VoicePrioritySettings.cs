@@ -7,46 +7,52 @@ namespace WorldServer.networking
     public class VoicePrioritySettings
     {
         public bool EnablePriority { get; set; } = false;
-        public int MaxPriorityPlayers { get; set; } = 10; // 10/20/30/40/50 slots
-        public float PriorityVolume { get; set; } = 1.0f; // 100% volume for priority players
-        public float NonPriorityVolume { get; set; } = 0.2f; // 20% volume (80% reduction)
+        public int MaxPriorityPlayers { get; set; } = 10;
+        public float PriorityVolume { get; set; } = 1.0f;
+        public float NonPriorityVolume { get; set; } = 0.2f;
         public bool GuildMembersGetPriority { get; set; } = true;
         public bool LockedPlayersGetPriority { get; set; } = true;
-//
         public int ActivationThreshold { get; set; } = 8;
         public HashSet<int> ManualPriorityList { get; set; } = new HashSet<int>();
+        private readonly object _priorityLock = new object();
 
         public VoicePrioritySettings()
         {
-            // Default constructor with sensible defaults
         }
 
-        // Helper method to check if a player is in manual priority list
         public bool HasManualPriority(int accountId)
         {
-            return ManualPriorityList.Contains(accountId);
+            lock (_priorityLock)
+            {
+                return ManualPriorityList.Contains(accountId);
+            }
         }
 
-        // Helper method to add player to manual priority (with validation)
         public bool AddManualPriority(int accountId)
         {
-            if (ManualPriorityList.Count >= MaxPriorityPlayers)
-                return false; // Priority list full
-
-            ManualPriorityList.Add(accountId);
-            return true;
+            lock (_priorityLock)
+            {
+                if (ManualPriorityList.Count >= MaxPriorityPlayers)
+                    return false;
+                ManualPriorityList.Add(accountId);
+                return true;
+            }
         }
 
-        // Helper method to remove player from manual priority
         public bool RemoveManualPriority(int accountId)
         {
-            return ManualPriorityList.Remove(accountId);
+            lock (_priorityLock)
+            {
+                return ManualPriorityList.Remove(accountId);
+            }
         }
 
-        // Get current manual priority count
         public int GetManualPriorityCount()
         {
-            return ManualPriorityList.Count;
+            lock (_priorityLock)
+            {
+                return ManualPriorityList.Count;
+            }
         }
 
         // Clone settings (useful for database operations)
@@ -109,12 +115,14 @@ namespace WorldServer.networking
             if (ActivationThreshold > 30) ActivationThreshold = 30;
 
             // Trim manual priority list if it exceeds max
-            while (ManualPriorityList.Count > MaxPriorityPlayers)
+            lock (_priorityLock)
             {
-                // Remove oldest entries (this is a simplification)
-                var enumerator = ManualPriorityList.GetEnumerator();
-                enumerator.MoveNext();
-                ManualPriorityList.Remove(enumerator.Current);
+                while (ManualPriorityList.Count > MaxPriorityPlayers)
+                {
+                    var enumerator = ManualPriorityList.GetEnumerator();
+                    enumerator.MoveNext();
+                    ManualPriorityList.Remove(enumerator.Current);
+                }
             }
         }
     }
