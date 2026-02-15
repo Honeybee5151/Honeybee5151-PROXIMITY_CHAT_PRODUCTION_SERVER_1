@@ -2,6 +2,8 @@ services:
   redis:
     image: redis:7
     restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
 
   server:
     build: .
@@ -12,4 +14,5 @@ services:
       - IS_DOCKER=true
     ports:
       - "2050:2050"
-      - "8888:8080"
+      - "2051:2051"
+      - "8088:8080"
