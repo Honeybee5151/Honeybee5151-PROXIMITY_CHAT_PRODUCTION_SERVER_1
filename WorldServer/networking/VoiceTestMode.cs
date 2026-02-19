@@ -1,6 +1,6 @@
 // ============================================================
 // VOICE TEST MODE - Delete this file for production builds
-// Allows test bots (player IDs >= 90000) to bypass auth
+// Allows test bots (player IDs >= 60000) to bypass auth
 // and appear as nearby players for stress testing voice chat.
 // ============================================================
 
@@ -15,7 +15,7 @@ namespace WorldServer.networking
         // Set to false (or delete this file) for production
         public const bool ENABLED = true;
 
-        public const int MIN_BOT_ID = 90000;
+        public const int MIN_BOT_ID = 60000;
 
         // Fake positions for test bots
         private static readonly ConcurrentDictionary<string, PlayerPosition> BotPositions = new();
