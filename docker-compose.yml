@@ -19,6 +19,7 @@ services:
     ports:
       - "2050:2050"
       - "2051:2051"
+      - "2051:2051/udp"
 
   appserver:
     build:
