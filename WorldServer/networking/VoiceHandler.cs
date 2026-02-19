@@ -93,6 +93,9 @@ namespace WorldServer.networking
                         }
                     }
                 }
+                // [TEST_BOT_HOOK] Check test bot positions
+                var botPos = VoiceTestMode.GetBotPosition(playerId);
+                if (botPos != null) return botPos;
                 return null;
             }
             catch (Exception ex)
@@ -101,7 +104,7 @@ namespace WorldServer.networking
                 return null;
             }
         }
-        
+
         public VoicePlayerInfo[] GetPlayersInRange(float speakerX, float speakerY, float range, int speakerWorldId)
         {
             try
@@ -131,7 +134,9 @@ namespace WorldServer.networking
                         }
                     }
                 }
-                
+
+                // [TEST_BOT_HOOK] Include test bots in range
+                nearbyPlayers.AddRange(VoiceTestMode.GetBotsInRange(speakerX, speakerY, range, speakerWorldId));
                 return nearbyPlayers.ToArray();
             }
             catch (Exception ex)
@@ -140,7 +145,7 @@ namespace WorldServer.networking
                 return new VoicePlayerInfo[0];
             }
         }
-        
+
         public VoicePrioritySettings GetPrioritySettings(int worldId)
         {
             return worldPrioritySettings.GetOrAdd(worldId, _ => new VoicePrioritySettings());
@@ -289,7 +294,20 @@ namespace WorldServer.networking
                 var authRequest = JsonSerializer.Deserialize<UdpAuthRequest>(jsonData);
                 
                 Console.WriteLine($"UDP: Authentication request from {authRequest.PlayerId}");
-                
+
+                // [TEST_BOT_HOOK] Skip auth for test bots
+                if (VoiceTestMode.ShouldSkipAuth(authRequest.PlayerId))
+                {
+                    Console.WriteLine($"[TEST_BOT] Bypassing auth for bot {authRequest.PlayerId}");
+                    string botId = authRequest.PlayerId.Trim();
+                    authenticatedPlayers[botId] = true;
+                    playerUdpEndpoints[botId] = clientEndpoint;
+                    lastUdpActivity[botId] = DateTime.UtcNow;
+                    VoiceTestMode.RegisterBot(botId, voiceUtils);
+                    await SendAuthResponse(clientEndpoint, "ACCEPTED", "Test bot authenticated");
+                    return;
+                }
+
                 // Validate VoiceID
                 if (!ValidateVoiceID(authRequest.PlayerId, authRequest.VoiceId))
                 {
