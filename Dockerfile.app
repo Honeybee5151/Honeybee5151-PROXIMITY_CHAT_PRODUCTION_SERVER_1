@@ -9,5 +9,4 @@ WORKDIR /app
 COPY --from=build /out .
 RUN mkdir -p /data
 COPY --from=build /app/App/server.json /data/server.json
-COPY --from=build /app/WorldServer/wServer.json /data/wServer.json
-CMD dotnet WorldServer.dll & dotnet App.dll & wait
+CMD ["dotnet", "App.dll"]

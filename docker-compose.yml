@@ -2,9 +2,15 @@ services:
   redis:
     image: redis:7
     restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
 
-  server:
-    build: .
+  worldserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.world
     restart: always
     depends_on:
       - redis
@@ -12,4 +18,17 @@ services:
       - IS_DOCKER=true
     ports:
       - "2050:2050"
+      - "2051:2051"
+
+  appserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    restart: always
+    depends_on:
+      - redis
+    ports:
       - "8888:8080"
+
+volumes:
+  redis-data:
