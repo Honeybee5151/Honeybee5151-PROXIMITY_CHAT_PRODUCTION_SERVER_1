@@ -105,6 +105,40 @@ namespace WorldServer.networking
             }
         }
 
+        // [TEST_BOT_HOOK] Returns the first real connected player's position (any account ID)
+        public PlayerPosition GetFirstConnectedPlayerPosition()
+        {
+            try
+            {
+                var clients = gameServer.ConnectionManager.Clients;
+                foreach (var clientPair in clients)
+                {
+                    var client = clientPair.Key;
+                    if (client.Player != null && client.Player.World != null)
+                    {
+                        int accountId = client.Player.AccountId;
+                        if (accountId < VoiceTestMode.MIN_BOT_ID) // Skip bots
+                        {
+                            Console.WriteLine($"[TEST_BOT] Found real player {accountId} at ({client.Player.X:F1}, {client.Player.Y:F1}) in world {client.Player.World.Id}");
+                            return new PlayerPosition
+                            {
+                                X = client.Player.X,
+                                Y = client.Player.Y,
+                                WorldId = client.Player.World.Id
+                            };
+                        }
+                    }
+                }
+                Console.WriteLine("[TEST_BOT] No real players found in any world");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TEST_BOT] Error finding player: {ex.Message}");
+                return null;
+            }
+        }
+
         public VoicePlayerInfo[] GetPlayersInRange(float speakerX, float speakerY, float range, int speakerWorldId)
         {
             try

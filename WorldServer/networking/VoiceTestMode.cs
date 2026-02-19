@@ -109,14 +109,8 @@ namespace WorldServer.networking
 
         private static PlayerPosition FindFirstRealPlayerPosition(VoiceHandler voiceUtils)
         {
-            // Try to find any real player (ID < 90000) that has a position
-            // We check a range of common low IDs
-            for (int i = 1; i < 1000; i++)
-            {
-                var pos = voiceUtils.GetPlayerPosition(i.ToString());
-                if (pos != null) return pos;
-            }
-            return null;
+            // Use the direct method that iterates all connected clients
+            return voiceUtils.GetFirstConnectedPlayerPosition();
         }
     }
 }
