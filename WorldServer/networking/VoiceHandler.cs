@@ -544,9 +544,9 @@ namespace WorldServer.networking
         {
             try
             {
-                // Skip self-voice
-                if (voiceData.PlayerId == player.PlayerId)
-                    continue;
+                // Self-voice loopback enabled for testing
+                // if (voiceData.PlayerId == player.PlayerId)
+                //     continue;
 
                 // Check ignore system
                 if (voiceUtils.ArePlayersVoiceIgnored(voiceData.PlayerId, player.PlayerId))
