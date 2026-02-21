@@ -291,6 +291,9 @@ namespace WorldServer.core.objects
                 Size = gameData.Skins[skinType].Size;
             }
 
+            if (account.Size > 0)
+                Size = account.Size;
+
             var guild = GameServer.Database.GetGuild(account.GuildId);
             if (guild?.Name != null)
             {
