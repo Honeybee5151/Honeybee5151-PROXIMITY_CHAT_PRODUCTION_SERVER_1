@@ -53,7 +53,7 @@ namespace WorldServer.core.net.handlers
 
             // set skin
             client.Player.Skin = skinType;
-            client.Player.Size = client.Account.Size > 0 ? client.Account.Size : skinSize;
+            client.Player.Size = skinSize;
         }
     }
 }
