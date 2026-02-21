@@ -47,21 +47,19 @@ function showApp() {
     loadStatus();
 }
 
-// Auto-login if token exists
-if (token) {
-    fetch('/api/auth/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-    }).then(r => r.json()).then(d => {
-        if (d.valid) showApp();
-        else doLogout();
-    }).catch(() => doLogout());
-} else {
-    document.getElementById('login-token').addEventListener('keydown', e => {
-        if (e.key === 'Enter') doLogin();
-    });
-}
+// Auto-login: try saved token or blank (auto-enters when no ADMIN_TOKEN is configured)
+fetch('/api/auth/validate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token || '' })
+}).then(r => r.json()).then(d => {
+    if (d.valid) showApp();
+    else doLogout();
+}).catch(() => doLogout());
+
+document.getElementById('login-token').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+});
 
 // ========== Navigation ==========
 let currentPage = 'status';
