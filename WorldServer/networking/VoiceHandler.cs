@@ -357,13 +357,14 @@ namespace WorldServer.networking
         private const int MAX_PACKETS_PER_SECOND = 75; // Opus sends ~50 pps at 20ms frames, headroom for bursts
         private readonly ConcurrentDictionary<string, (int Count, long SecondTick)> endpointPacketRates = new();
 
-        // Admin dashboard stats — Interlocked for zero-lock overhead
+        // Admin dashboard stats — only active when ADMIN_DASHBOARD=true
+        private readonly bool _adminStatsEnabled = Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true";
         private long _totalPacketsThisSecond;
         private long _lastSecondPacketCount;
         private long _rateLimitHits;
         private long _speakerCapHits;
         private readonly ConcurrentDictionary<string, DateTime> _recentSpeakers = new();
-        
+
         public UdpVoiceHandler(GameServer server, VoiceHandler voiceHandler)
         {
             gameServer = server;
@@ -414,7 +415,7 @@ namespace WorldServer.networking
                 _ = Task.Run(ProcessUdpVoicePackets);
                 _ = Task.Run(CleanupInactiveUdpConnections);
                 _ = Task.Run(RefreshSpatialGridLoop);
-                _ = Task.Run(StatsTickLoop);
+                if (_adminStatsEnabled) _ = Task.Run(StatsTickLoop);
             }
             catch (Exception ex)
             {
@@ -442,7 +443,7 @@ namespace WorldServer.networking
                             : (1, currentSecond));
                     if (rate.Count > MAX_PACKETS_PER_SECOND)
                     {
-                        System.Threading.Interlocked.Increment(ref _rateLimitHits);
+                        if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _rateLimitHits);
                         continue;
                     }
 
@@ -655,9 +656,11 @@ namespace WorldServer.networking
         if (VoiceHandler.IsSilencePacket(opusAudio))
             return;
 
-        // Admin stats tracking
-        System.Threading.Interlocked.Increment(ref _totalPacketsThisSecond);
-        _recentSpeakers[playerId] = DateTime.UtcNow;
+        if (_adminStatsEnabled)
+        {
+            System.Threading.Interlocked.Increment(ref _totalPacketsThisSecond);
+            _recentSpeakers[playerId] = DateTime.UtcNow;
+        }
 
         // Create voice data object
         var voiceData = new UdpVoiceData
@@ -740,7 +743,7 @@ namespace WorldServer.networking
             {
                 if (!hasPriority)
                 {
-                    System.Threading.Interlocked.Increment(ref _speakerCapHits);
+                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits);
                     continue; // Non-priority dropped first
                 }
 
@@ -748,7 +751,7 @@ namespace WorldServer.networking
                 // speakers that could be displaced. Otherwise hard cap.
                 if (nonPriorityCount == 0)
                 {
-                    System.Threading.Interlocked.Increment(ref _speakerCapHits);
+                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits);
                     continue; // All slots are priority — hard cap reached
                 }
             }
