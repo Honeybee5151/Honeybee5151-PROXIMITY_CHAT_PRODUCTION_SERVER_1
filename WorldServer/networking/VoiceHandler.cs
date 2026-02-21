@@ -426,7 +426,6 @@ namespace WorldServer.networking
                         }
                         else if (packetType == "PRIO")
                         {
-                            Console.WriteLine($"[PRIO_DEBUG] Received PRIO packet from {clientEndpoint}, length={packet.Length}");
                             await ProcessPriorityPacket(packet, clientEndpoint);
                             continue;
                         }
@@ -530,7 +529,6 @@ namespace WorldServer.networking
                 
                 // Get player's world position
                 var playerPosition = voiceUtils.GetPlayerPosition(clientPlayerId);
-                Console.WriteLine($"[PRIO_DEBUG] ProcessPriority: clientId={clientPlayerId} position={playerPosition?.WorldId.ToString() ?? "NULL"} setting={priorityCommand?.SettingType}={priorityCommand?.Value}");
                 if (playerPosition != null)
                 {
                     var settings = voiceUtils.GetPrioritySettings(playerPosition.WorldId);
@@ -585,6 +583,30 @@ namespace WorldServer.networking
                                 {
                                     Console.WriteLine($"UDP: Account {removeAccountId} was not in manual priority list");
                                 }
+                            }
+                            break;
+
+                        case "GUILD_PRIORITY":
+                            if (bool.TryParse(priorityCommand.Value, out bool guildPrio))
+                            {
+                                settings.GuildMembersGetPriority = guildPrio;
+                                Console.WriteLine($"UDP: Guild priority {(guildPrio ? "enabled" : "disabled")} for world {playerPosition.WorldId}");
+                            }
+                            break;
+
+                        case "LOCKED_PRIORITY":
+                            if (bool.TryParse(priorityCommand.Value, out bool lockedPrio))
+                            {
+                                settings.LockedPlayersGetPriority = lockedPrio;
+                                Console.WriteLine($"UDP: Locked player priority {(lockedPrio ? "enabled" : "disabled")} for world {playerPosition.WorldId}");
+                            }
+                            break;
+
+                        case "MAX_PRIORITY_SLOTS":
+                            if (int.TryParse(priorityCommand.Value, out int maxSlots))
+                            {
+                                settings.MaxPriorityPlayers = maxSlots;
+                                Console.WriteLine($"UDP: Max priority slots set to {maxSlots} for world {playerPosition.WorldId}");
                             }
                             break;
                     }
@@ -658,7 +680,6 @@ namespace WorldServer.networking
         Console.WriteLine($"UDP voice data processing error: {ex.Message}");
     }
 }
-       private static DateTime _lastPriorityDebugLog = DateTime.MinValue;
        private async Task BroadcastVoiceToNearbyPlayers(UdpVoiceData voiceData)
 {
     try
@@ -671,14 +692,6 @@ namespace WorldServer.networking
         // Get priority settings for this world
         var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
         bool prioritySystemActive = voiceUtils.ShouldActivatePrioritySystem(speakerPosition.WorldId, nearbyPlayers.Length);
-
-        // Debug logging (throttled to once per 3 seconds)
-        bool shouldLog = (DateTime.UtcNow - _lastPriorityDebugLog).TotalSeconds >= 3;
-        if (shouldLog)
-        {
-            _lastPriorityDebugLog = DateTime.UtcNow;
-            Console.WriteLine($"[PRIO_DEBUG] Speaker={voiceData.PlayerId} World={speakerPosition.WorldId} Nearby={nearbyPlayers.Length} PriorityEnabled={prioritySettings.EnablePriority} Threshold={prioritySettings.ActivationThreshold} Active={prioritySystemActive} ManualList=[{string.Join(",", prioritySettings.ManualPriorityList)}]");
-        }
 
         // Build list of eligible listeners with their computed volumes
         var candidates = new List<(VoicePlayerInfo Player, float Volume, bool HasPriority)>();
@@ -697,8 +710,6 @@ namespace WorldServer.networking
                 if (prioritySystemActive)
                 {
                     hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
-                    if (shouldLog)
-                        Console.WriteLine($"[PRIO_DEBUG]   -> Listener={player.PlayerId} HasPriority={hasPriority} Filter={prioritySettings.ShouldFilterVoice(hasPriority)} Vol={prioritySettings.GetVolumeMultiplier(hasPriority):F2}");
                     if (prioritySettings.ShouldFilterVoice(hasPriority))
                         continue;
                 }
