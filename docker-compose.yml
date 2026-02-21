@@ -31,5 +31,20 @@ services:
     ports:
       - "8888:8080"
 
+  admindashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    restart: always
+    depends_on:
+      - redis
+      - worldserver
+      - appserver
+    environment:
+      - IS_DOCKER=true
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
+    ports:
+      - "8889:8080"
+
 volumes:
   redis-data:

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>Admin Dashboard</h1>
+            <p>Enter your admin token to continue</p>
+            <input type="password" id="login-token" placeholder="Admin Token" autofocus>
+            <button onclick="doLogin()">Login</button>
+            <div id="login-error">Invalid token</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app">
+        <div class="sidebar">
+            <div class="sidebar-header">Admin Panel</div>
+            <nav class="sidebar-nav">
+                <a class="nav-item active" data-page="status">Server Status</a>
+                <a class="nav-item" data-page="voice">Voice Chat</a>
+                <a class="nav-item" data-page="players">Players</a>
+                <a class="nav-item" data-page="redis">Redis Browser</a>
+                <a class="nav-item" data-page="admin">Admin Commands</a>
+                <a class="nav-item" data-page="logs">Logs</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a onclick="doLogout()">Logout</a>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Server Status Page -->
+            <div class="page active" id="page-status">
+                <h2 class="page-title">Server Status</h2>
+                <div class="refresh-indicator" id="status-refresh">Auto-refresh: 5s</div>
+                <div class="cards" id="status-cards">
+                    <div class="card" id="card-redis">
+                        <div class="card-header">
+                            <span class="card-title">Redis</span>
+                            <span class="status-dot yellow"></span>
+                        </div>
+                        <div class="card-value">--</div>
+                        <div class="card-detail">Loading...</div>
+                    </div>
+                    <div class="card" id="card-worldserver">
+                        <div class="card-header">
+                            <span class="card-title">WorldServer</span>
+                            <span class="status-dot yellow"></span>
+                        </div>
+                        <div class="card-value">--</div>
+                        <div class="card-detail">Loading...</div>
+                    </div>
+                    <div class="card" id="card-appserver">
+                        <div class="card-header">
+                            <span class="card-title">AppServer</span>
+                            <span class="status-dot yellow"></span>
+                        </div>
+                        <div class="card-value">--</div>
+                        <div class="card-detail">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Chat Page -->
+            <div class="page" id="page-voice">
+                <h2 class="page-title">Voice Chat</h2>
+                <div class="refresh-indicator" id="voice-refresh">Auto-refresh: 3s</div>
+                <div class="cards" id="voice-cards">
+                    <div class="card"><div class="card-title">Authenticated Players</div><div class="card-value" id="v-auth">--</div></div>
+                    <div class="card"><div class="card-title">Active Speakers</div><div class="card-value" id="v-speakers">--</div></div>
+                    <div class="card"><div class="card-title">Packets/sec</div><div class="card-value" id="v-pps">--</div></div>
+                    <div class="card"><div class="card-title">Rate Limit Hits</div><div class="card-value" id="v-ratelimit">--</div></div>
+                    <div class="card"><div class="card-title">Grid Cells</div><div class="card-value" id="v-cells">--</div></div>
+                    <div class="card"><div class="card-title">Grid Players</div><div class="card-value" id="v-gridplayers">--</div></div>
+                    <div class="card"><div class="card-title">Speaker Cap Hits</div><div class="card-value" id="v-caphits">--</div></div>
+                </div>
+            </div>
+
+            <!-- Players Page -->
+            <div class="page" id="page-players">
+                <h2 class="page-title">Players</h2>
+                <div class="search-bar">
+                    <input type="text" id="player-search" placeholder="Search by name or account ID...">
+                    <button class="btn btn-primary" onclick="loadPlayers()">Search</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Account ID</th>
+                                <th>World</th>
+                                <th>Voice</th>
+                                <th>Speaking</th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Redis Browser Page -->
+            <div class="page" id="page-redis">
+                <h2 class="page-title">Redis Browser</h2>
+                <div class="search-bar">
+                    <input type="text" id="redis-pattern" placeholder="Key pattern (e.g. account.* or *)" value="*">
+                    <button class="btn btn-primary" onclick="loadRedisKeys()">Search</button>
+                </div>
+                <div style="display: flex; gap: 16px;">
+                    <div style="flex: 1;">
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Key</th><th>Type</th><th>TTL</th></tr></thead>
+                                <tbody id="redis-keys-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top: 8px; text-align: center;">
+                            <button class="btn btn-secondary" id="redis-load-more" onclick="loadMoreRedisKeys()" style="display:none;">Load More</button>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="card-title" style="margin-bottom: 8px;">Key Value</div>
+                        <div class="key-value-viewer" id="redis-value-viewer">Select a key to view its value</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Commands Page -->
+            <div class="page" id="page-admin">
+                <h2 class="page-title">Admin Commands</h2>
+
+                <div class="admin-section">
+                    <h3>Kick Player</h3>
+                    <div class="form-row">
+                        <input type="number" id="kick-account-id" placeholder="Account ID">
+                        <button class="btn btn-danger" onclick="kickPlayer()">Kick</button>
+                    </div>
+                    <div class="feedback" id="kick-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Server Announcement</h3>
+                    <textarea id="announce-message" placeholder="Enter announcement message..."></textarea>
+                    <button class="btn btn-warning" onclick="sendAnnouncement()">Send Announcement</button>
+                    <div class="feedback" id="announce-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Voice System</h3>
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <button class="btn btn-warning" onclick="restartVoice()">Restart Voice System</button>
+                        <div class="toggle-row">
+                            <span>Test Mode:</span>
+                            <div class="toggle" id="testmode-toggle" onclick="toggleTestMode()"></div>
+                        </div>
+                    </div>
+                    <div class="feedback" id="voice-admin-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Logs Page -->
+            <div class="page" id="page-logs">
+                <h2 class="page-title">Logs</h2>
+                <div class="tab-bar">
+                    <div class="tab active" data-log="worldserver">WorldServer</div>
+                    <div class="tab" data-log="appserver">AppServer</div>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="log-filter" placeholder="Filter logs...">
+                    <select id="log-lines">
+                        <option value="100">100 lines</option>
+                        <option value="500">500 lines</option>
+                        <option value="1000">1000 lines</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadLogs()">Refresh</button>
+                </div>
+                <div class="log-viewer" id="log-output">No logs loaded.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-dialog">
+            <p id="confirm-text">Are you sure?</p>
+            <button class="btn btn-danger" id="confirm-yes">Yes</button>
+            <button class="btn btn-secondary" onclick="hideConfirm()">Cancel</button>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -134,8 +134,12 @@ namespace WorldServer.core
             MarketSweeper.Start();
             ConnectionListener.Start();
             //777592
-            //_ = Task.Run(StartVoiceListener); 
+            //_ = Task.Run(StartVoiceListener);
             InterServerManager.JoinNetwork();
+
+            // Admin dashboard stats publisher
+            var adminStats = new AdminStatsPublisher(this);
+            adminStats.Start();
 
             var timeout = TimeSpan.FromHours(Configuration.serverSettings.restartTime);
 

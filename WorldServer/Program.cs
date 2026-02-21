@@ -6,7 +6,12 @@ namespace WorldServer
     {
         private static void Main(string[] args)
         {
-            new GameServer(args).Run();
+            var server = new GameServer(args);
+
+            // Install console interceptor for admin dashboard logs
+            RedisConsoleWriter.Install(server.Database.Conn, "admin:logs:worldserver");
+
+            server.Run();
         }
     }
 }

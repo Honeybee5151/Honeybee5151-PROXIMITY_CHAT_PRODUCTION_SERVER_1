@@ -95,7 +95,9 @@ namespace WorldServer.core.connection
         private Semaphore MaxConnectionsEnforcer;
         //777592
         private VoiceHandler voiceHandler;
-        private UdpVoiceHandler udpVoiceHandler; 
+        private UdpVoiceHandler udpVoiceHandler;
+        public UdpVoiceHandler UdpVoiceHandler => udpVoiceHandler;
+        public VoiceHandler VoiceHandler => voiceHandler;
 
         public ConnectionListener(GameServer gameServer)
         {
@@ -152,7 +154,7 @@ namespace WorldServer.core.connection
     
             try 
             {
-                var udpVoiceHandler = new UdpVoiceHandler(GameServer, voiceHandler);
+                udpVoiceHandler = new UdpVoiceHandler(GameServer, voiceHandler);
                 await udpVoiceHandler.StartUdpVoiceServer(2051);
         
                 Console.WriteLine("=== DEBUG: UDP Voice Server started successfully! ===");

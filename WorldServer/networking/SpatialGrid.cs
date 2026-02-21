@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 //777592
 namespace WorldServer.networking
 {
@@ -123,5 +124,9 @@ namespace WorldServer.networking
                     cells.TryRemove(kvp.Key, out _);
             }
         }
+
+        // Admin dashboard stats
+        public int GetOccupiedCellCount() => cells.Values.Count(c => !c.IsEmpty);
+        public int GetTrackedPlayerCount() => playerCells.Count;
     }
 }

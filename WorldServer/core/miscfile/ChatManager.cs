@@ -84,6 +84,7 @@ namespace WorldServer.core.miscfile
         {
             GameServer.InterServerManager.AddHandler<ChatMsg>(Channel.Chat, HandleChat);
             GameServer.InterServerManager.AddHandler<AnnounceMsg>(Channel.Announce, HandleAnnounce);
+            GameServer.InterServerManager.AddHandler<AdminMsg>(Channel.Admin, HandleAdminCommand);
             GameServer.InterServerManager.NewServer += AnnounceNewServer;
             GameServer.InterServerManager.ServerQuit += AnnounceServerQuit;
         }
@@ -214,6 +215,50 @@ namespace WorldServer.core.miscfile
             });
 
             return true;
+        }
+
+        private void HandleAdminCommand(object sender, InterServerEventArgs<AdminMsg> e)
+        {
+            var cmd = e.Content.Command;
+            var param = e.Content.Parameter ?? "";
+
+            Console.WriteLine($"[Admin] Received command: {cmd} param: {param}");
+
+            switch (cmd)
+            {
+                case "kick":
+                    if (int.TryParse(param, out int accountId))
+                    {
+                        var target = GameServer.ConnectionManager.Clients
+                            .Keys.FirstOrDefault(c => c.Player != null && c.Account.AccountId == accountId);
+                        if (target != null)
+                        {
+                            target.Disconnect();
+                            Console.WriteLine($"[Admin] Kicked account {accountId}");
+                        }
+                        else
+                            Console.WriteLine($"[Admin] Account {accountId} not found on this server");
+                    }
+                    break;
+
+                case "announce":
+                    ServerAnnounce(param);
+                    Console.WriteLine($"[Admin] Announced: {param}");
+                    break;
+
+                case "voice_restart":
+                    var udpVoice = GameServer.ConnectionListener?.UdpVoiceHandler;
+                    if (udpVoice != null)
+                    {
+                        Console.WriteLine("[Admin] Voice restart requested (restart not implemented - would require stop/start cycle)");
+                    }
+                    break;
+
+                case "voice_testmode":
+                    // VoiceTestMode.ENABLED is const so can't toggle at runtime
+                    Console.WriteLine($"[Admin] VoiceTestMode is compile-time const (currently {networking.VoiceTestMode.ENABLED}). Rebuild to change.");
+                    break;
+            }
         }
 
         public void Dispose()

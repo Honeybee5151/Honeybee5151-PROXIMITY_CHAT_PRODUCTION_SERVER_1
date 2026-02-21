@@ -356,6 +356,13 @@ namespace WorldServer.networking
         // UDP rate limiting — per-endpoint packet counter
         private const int MAX_PACKETS_PER_SECOND = 75; // Opus sends ~50 pps at 20ms frames, headroom for bursts
         private readonly ConcurrentDictionary<string, (int Count, long SecondTick)> endpointPacketRates = new();
+
+        // Admin dashboard stats — Interlocked for zero-lock overhead
+        private long _totalPacketsThisSecond;
+        private long _lastSecondPacketCount;
+        private long _rateLimitHits;
+        private long _speakerCapHits;
+        private readonly ConcurrentDictionary<string, DateTime> _recentSpeakers = new();
         
         public UdpVoiceHandler(GameServer server, VoiceHandler voiceHandler)
         {
@@ -407,6 +414,7 @@ namespace WorldServer.networking
                 _ = Task.Run(ProcessUdpVoicePackets);
                 _ = Task.Run(CleanupInactiveUdpConnections);
                 _ = Task.Run(RefreshSpatialGridLoop);
+                _ = Task.Run(StatsTickLoop);
             }
             catch (Exception ex)
             {
@@ -433,7 +441,10 @@ namespace WorldServer.networking
                             ? (prev.Count + 1, currentSecond)
                             : (1, currentSecond));
                     if (rate.Count > MAX_PACKETS_PER_SECOND)
+                    {
+                        System.Threading.Interlocked.Increment(ref _rateLimitHits);
                         continue;
+                    }
 
                     // Check packet type by examining first 4 bytes
                     if (packet.Length >= 4)  // ← FIXED: Was "packet.Length 2"
@@ -644,6 +655,10 @@ namespace WorldServer.networking
         if (VoiceHandler.IsSilencePacket(opusAudio))
             return;
 
+        // Admin stats tracking
+        System.Threading.Interlocked.Increment(ref _totalPacketsThisSecond);
+        _recentSpeakers[playerId] = DateTime.UtcNow;
+
         // Create voice data object
         var voiceData = new UdpVoiceData
         {
@@ -724,12 +739,18 @@ namespace WorldServer.networking
             if (activeCount >= MAX_SPEAKERS_PER_LISTENER)
             {
                 if (!hasPriority)
+                {
+                    System.Threading.Interlocked.Increment(ref _speakerCapHits);
                     continue; // Non-priority dropped first
+                }
 
                 // Priority speaker — only get through if there are non-priority
                 // speakers that could be displaced. Otherwise hard cap.
                 if (nonPriorityCount == 0)
+                {
+                    System.Threading.Interlocked.Increment(ref _speakerCapHits);
                     continue; // All slots are priority — hard cap reached
+                }
             }
 
             if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
@@ -901,6 +922,30 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             }
         }
 
+        /// <summary>
+        /// Rotates per-second packet counter every 1 second for admin stats.
+        /// </summary>
+        private async Task StatsTickLoop()
+        {
+            while (isRunning)
+            {
+                try
+                {
+                    await Task.Delay(1000);
+                    _lastSecondPacketCount = System.Threading.Interlocked.Exchange(ref _totalPacketsThisSecond, 0);
+
+                    // Clean stale speakers (older than 1 second)
+                    var cutoff = DateTime.UtcNow.AddSeconds(-1);
+                    foreach (var kvp in _recentSpeakers)
+                    {
+                        if (kvp.Value < cutoff)
+                            _recentSpeakers.TryRemove(kvp.Key, out _);
+                    }
+                }
+                catch { }
+            }
+        }
+
         public void Stop()
         {
             isRunning = false;
@@ -908,17 +953,23 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             udpServer?.Dispose();
             Console.WriteLine("UDP Voice Server stopped");
         }
-        
+
         // Public status methods
         public int GetConnectedPlayerCount()
         {
             return authenticatedPlayers.Count;
         }
-        
+
         public string[] GetConnectedPlayerIds()
         {
             return authenticatedPlayers.Keys.ToArray();
         }
+
+        // Admin dashboard stats getters
+        public long GetPacketsPerSecond() => System.Threading.Interlocked.Read(ref _lastSecondPacketCount);
+        public long GetRateLimitHits() => System.Threading.Interlocked.Read(ref _rateLimitHits);
+        public long GetSpeakerCapHits() => System.Threading.Interlocked.Read(ref _speakerCapHits);
+        public int GetActiveSpeakerCount() => _recentSpeakers.Count;
     }
     
     // Helper classes
