@@ -426,6 +426,7 @@ namespace WorldServer.networking
                         }
                         else if (packetType == "PRIO")
                         {
+                            Console.WriteLine($"[PRIO_DEBUG] Received PRIO packet from {clientEndpoint}, length={packet.Length}");
                             await ProcessPriorityPacket(packet, clientEndpoint);
                             continue;
                         }
@@ -529,7 +530,7 @@ namespace WorldServer.networking
                 
                 // Get player's world position
                 var playerPosition = voiceUtils.GetPlayerPosition(clientPlayerId);
-                // SHOULD BE != NULL BUT NULL FOR TESTING
+                Console.WriteLine($"[PRIO_DEBUG] ProcessPriority: clientId={clientPlayerId} position={playerPosition?.WorldId.ToString() ?? "NULL"} setting={priorityCommand?.SettingType}={priorityCommand?.Value}");
                 if (playerPosition != null)
                 {
                     var settings = voiceUtils.GetPrioritySettings(playerPosition.WorldId);
