@@ -42,7 +42,6 @@ services:
       - appserver
     environment:
       - IS_DOCKER=true
-      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
     ports:
       - "8889:8080"
 
