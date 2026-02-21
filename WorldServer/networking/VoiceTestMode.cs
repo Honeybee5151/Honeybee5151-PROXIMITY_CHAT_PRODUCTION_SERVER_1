@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WorldServer.networking
 {
@@ -22,6 +23,10 @@ namespace WorldServer.networking
 
         // Track which world bots are "in"
         private static int botWorldId = -1;
+
+        // Priority test: first 2 bots (60000, 60001) get priority, rest don't
+        private static bool prioritySetupDone = false;
+        public const int PRIORITY_BOT_COUNT = 2; // first N bots get priority
 
         /// <summary>Returns true if this player ID is a test bot and test mode is enabled.</summary>
         public static bool IsTestBot(string playerId)
@@ -55,6 +60,20 @@ namespace WorldServer.networking
                 };
                 botWorldId = nearPos.WorldId;
                 Console.WriteLine($"[TEST_BOT] Bot {playerId} placed at ({BotPositions[playerId].X:F1}, {BotPositions[playerId].Y:F1}) in world {nearPos.WorldId}");
+
+                // Auto-setup priority for testing on first bot registration
+                if (!prioritySetupDone)
+                {
+                    prioritySetupDone = true;
+                    var settings = voiceUtils.GetPrioritySettings(nearPos.WorldId);
+                    settings.EnablePriority = true;
+                    settings.ActivationThreshold = 3;
+                    settings.NonPriorityVolume = 0.1f;
+                    // Mark first N bots as priority
+                    for (int i = 0; i < PRIORITY_BOT_COUNT; i++)
+                        settings.AddManualPriority(MIN_BOT_ID + i);
+                    Console.WriteLine($"[TEST_BOT] Priority auto-configured for world {nearPos.WorldId}: enabled=true threshold=3 nonPrioVol=0.1 priorityBots=[{string.Join(",", Enumerable.Range(MIN_BOT_ID, PRIORITY_BOT_COUNT))}]");
+                }
             }
             else
             {
