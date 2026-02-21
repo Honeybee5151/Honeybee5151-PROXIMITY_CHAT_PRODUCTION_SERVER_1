@@ -657,6 +657,7 @@ namespace WorldServer.networking
         Console.WriteLine($"UDP voice data processing error: {ex.Message}");
     }
 }
+       private static DateTime _lastPriorityDebugLog = DateTime.MinValue;
        private async Task BroadcastVoiceToNearbyPlayers(UdpVoiceData voiceData)
 {
     try
@@ -669,6 +670,14 @@ namespace WorldServer.networking
         // Get priority settings for this world
         var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
         bool prioritySystemActive = voiceUtils.ShouldActivatePrioritySystem(speakerPosition.WorldId, nearbyPlayers.Length);
+
+        // Debug logging (throttled to once per 3 seconds)
+        bool shouldLog = (DateTime.UtcNow - _lastPriorityDebugLog).TotalSeconds >= 3;
+        if (shouldLog)
+        {
+            _lastPriorityDebugLog = DateTime.UtcNow;
+            Console.WriteLine($"[PRIO_DEBUG] Speaker={voiceData.PlayerId} World={speakerPosition.WorldId} Nearby={nearbyPlayers.Length} PriorityEnabled={prioritySettings.EnablePriority} Threshold={prioritySettings.ActivationThreshold} Active={prioritySystemActive} ManualList=[{string.Join(",", prioritySettings.ManualPriorityList)}]");
+        }
 
         // Build list of eligible listeners with their computed volumes
         var candidates = new List<(VoicePlayerInfo Player, float Volume, bool HasPriority)>();
@@ -687,6 +696,8 @@ namespace WorldServer.networking
                 if (prioritySystemActive)
                 {
                     hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
+                    if (shouldLog)
+                        Console.WriteLine($"[PRIO_DEBUG]   -> Listener={player.PlayerId} HasPriority={hasPriority} Filter={prioritySettings.ShouldFilterVoice(hasPriority)} Vol={prioritySettings.GetVolumeMultiplier(hasPriority):F2}");
                     if (prioritySettings.ShouldFilterVoice(hasPriority))
                         continue;
                 }
