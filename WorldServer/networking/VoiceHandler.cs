@@ -715,19 +715,13 @@ namespace WorldServer.networking
                         continue;
                 }
 
-                // Distance fade: full volume up close, fades to 0 at max range
-                float distanceVolume = VoiceHandler.CalculateDistanceVolume(player.Distance);
-                float finalVolume = voiceData.Volume * distanceVolume;
+                float finalVolume = voiceData.Volume;
 
                 if (prioritySystemActive)
                 {
                     float volumeMultiplier = prioritySettings.GetVolumeMultiplier(hasPriority);
                     finalVolume *= volumeMultiplier;
                 }
-
-                // Skip if effectively silent after all volume adjustments
-                if (finalVolume < 0.01f)
-                    continue;
 
                 candidates.Add((player, finalVolume, hasPriority));
             }
