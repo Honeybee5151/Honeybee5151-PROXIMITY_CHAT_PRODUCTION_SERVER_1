@@ -31,10 +31,12 @@ namespace AdminDashboard
             app.Urls.Clear();
             app.Urls.Add($"http://{bindAddress}:{port}");
 
-            // Token auth middleware — set ADMIN_TOKEN in Coolify env vars (NOT in docker-compose since repo is public)
+            // Token auth middleware — if ADMIN_TOKEN is set, require it. Otherwise open access.
             var adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "";
             if (string.IsNullOrEmpty(adminToken))
-                Console.WriteLine("[AdminDashboard] WARNING: ADMIN_TOKEN not set! All API requests will be blocked. Set it in Coolify environment variables.");
+                Console.WriteLine("[AdminDashboard] No ADMIN_TOKEN set — running without auth. Set ADMIN_TOKEN env var to enable token auth.");
+            else
+                Console.WriteLine("[AdminDashboard] Token auth enabled.");
 
             app.Use(async (context, next) =>
             {
@@ -54,11 +56,10 @@ namespace AdminDashboard
                     return;
                 }
 
-                // Require a token to be configured
+                // If no token configured, allow all requests (secure via network/firewall instead)
                 if (string.IsNullOrEmpty(adminToken))
                 {
-                    context.Response.StatusCode = 503;
-                    await context.Response.WriteAsync("ADMIN_TOKEN not configured");
+                    await next();
                     return;
                 }
 
