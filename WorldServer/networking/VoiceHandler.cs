@@ -352,6 +352,10 @@ namespace WorldServer.networking
         // Tracks active speakers per listener: listenerId -> { speakerId -> (distance, timestamp, isPriority) }
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, (float Distance, DateTime Time, bool IsPriority)>> listenerSpeakerSlots = new();
         private volatile bool isRunning = false;
+
+        // UDP rate limiting — per-endpoint packet counter
+        private const int MAX_PACKETS_PER_SECOND = 75; // Opus sends ~50 pps at 20ms frames, headroom for bursts
+        private readonly ConcurrentDictionary<string, (int Count, long SecondTick)> endpointPacketRates = new();
         
         public UdpVoiceHandler(GameServer server, VoiceHandler voiceHandler)
         {
@@ -419,7 +423,18 @@ namespace WorldServer.networking
                     var result = await udpServer.ReceiveAsync();
                     var packet = result.Buffer;
                     var clientEndpoint = result.RemoteEndPoint;
-    
+
+                    // Rate limit per endpoint
+                    string epKey = clientEndpoint.ToString();
+                    long currentSecond = Environment.TickCount64 / 1000;
+                    var rate = endpointPacketRates.AddOrUpdate(epKey,
+                        _ => (1, currentSecond),
+                        (_, prev) => prev.SecondTick == currentSecond
+                            ? (prev.Count + 1, currentSecond)
+                            : (1, currentSecond));
+                    if (rate.Count > MAX_PACKETS_PER_SECOND)
+                        continue;
+
                     // Check packet type by examining first 4 bytes
                     if (packet.Length >= 4)  // ← FIXED: Was "packet.Length 2"
                     {
@@ -854,6 +869,14 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
                         voiceUtils.RemoveNearbyCache(playerId);
                         voiceUtils.RemovePlayerPrioritySettings(playerId);
                         listenerSpeakerSlots.TryRemove(playerId, out _);
+                    }
+
+                    // Clean stale rate limit entries (older than 10 seconds)
+                    long nowTick = Environment.TickCount64 / 1000;
+                    foreach (var ep in endpointPacketRates)
+                    {
+                        if (nowTick - ep.Value.SecondTick > 10)
+                            endpointPacketRates.TryRemove(ep.Key, out _);
                     }
             
                     await Task.Delay(3600000); // Check once per hour
