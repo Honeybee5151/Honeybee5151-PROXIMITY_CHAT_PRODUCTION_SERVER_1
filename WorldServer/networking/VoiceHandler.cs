@@ -315,55 +315,31 @@ namespace WorldServer.networking
         }
 
         /// <summary>
-        /// Returns true if this speaker is allowed to send to this listener.
-        /// Each listener can hear at most MAX_SPEAKERS_PER_LISTENER at once (closest by distance).
+        /// Tracks that a speaker is actively talking to a listener.
+        /// Called after sending a packet so we can count active speakers per listener.
         /// </summary>
-        private bool TryClaimSpeakerSlot(string listenerId, string speakerId, float distance)
+        private void TrackActiveSpeaker(string listenerId, string speakerId, float distance)
         {
             var slots = listenerSpeakerSlots.GetOrAdd(listenerId, _ => new ConcurrentDictionary<string, (float, DateTime)>());
-            var now = DateTime.UtcNow;
+            slots[speakerId] = (distance, DateTime.UtcNow);
+        }
 
-            // Clean stale entries (>500ms old = speaker stopped talking)
+        /// <summary>
+        /// Returns the number of speakers currently active for this listener (within last 500ms).
+        /// Also cleans up stale entries.
+        /// </summary>
+        private int GetActiveSpeakerCount(string listenerId)
+        {
+            if (!listenerSpeakerSlots.TryGetValue(listenerId, out var slots))
+                return 0;
+
+            var now = DateTime.UtcNow;
             foreach (var kvp in slots)
             {
                 if ((now - kvp.Value.Time).TotalMilliseconds > 500)
                     slots.TryRemove(kvp.Key, out _);
             }
-
-            // Already has a slot — just update
-            if (slots.ContainsKey(speakerId))
-            {
-                slots[speakerId] = (distance, now);
-                return true;
-            }
-
-            // Under the cap — take a slot
-            if (slots.Count < MAX_SPEAKERS_PER_LISTENER)
-            {
-                slots[speakerId] = (distance, now);
-                return true;
-            }
-
-            // At cap — replace farthest speaker if we're closer
-            string farthestId = null;
-            float farthestDist = 0f;
-            foreach (var kvp in slots)
-            {
-                if (kvp.Value.Distance > farthestDist)
-                {
-                    farthestDist = kvp.Value.Distance;
-                    farthestId = kvp.Key;
-                }
-            }
-
-            if (farthestId != null && distance < farthestDist)
-            {
-                slots.TryRemove(farthestId, out _);
-                slots[speakerId] = (distance, now);
-                return true;
-            }
-
-            return false; // Too far — listener is already hearing 10 closer people
+            return slots.Count;
         }
         
         public async Task StartUdpVoiceServer(int port = 2051)
@@ -642,80 +618,84 @@ namespace WorldServer.networking
         var (speakerPosition, nearbyPlayers) = voiceUtils.GetCachedNearbyPlayers(voiceData.PlayerId);
         if (speakerPosition == null)
             return;
-        
+
         // Get priority settings for this world
         var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
         bool prioritySystemActive = voiceUtils.ShouldActivatePrioritySystem(speakerPosition.WorldId, nearbyPlayers.Length);
-        
-        var sendTasks = new List<Task>();
-        
+
+        // Build list of eligible listeners with their computed volumes
+        var candidates = new List<(VoicePlayerInfo Player, float Volume, bool HasPriority)>();
+
         foreach (var player in nearbyPlayers)
         {
             try
             {
-                // Skip self-voice
                 if (voiceData.PlayerId == player.PlayerId)
                     continue;
 
-                // Check ignore system
                 if (voiceUtils.ArePlayersVoiceIgnored(voiceData.PlayerId, player.PlayerId))
                     continue;
 
-                // Apply priority system EARLY (before expensive volume calculations)
+                bool hasPriority = false;
                 if (prioritySystemActive)
                 {
-                    bool hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
-                    
+                    hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
                     if (prioritySettings.ShouldFilterVoice(hasPriority))
                         continue;
                 }
 
-                // Calculate final volume
                 float finalVolume = voiceData.Volume;
-
-                // Apply priority volume multiplier
                 if (prioritySystemActive)
                 {
-                    bool hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
                     float volumeMultiplier = prioritySettings.GetVolumeMultiplier(hasPriority);
                     finalVolume *= volumeMultiplier;
                 }
 
-                // Per-listener speaker cap: only hear the closest 10 speakers
-                if (!TryClaimSpeakerSlot(player.PlayerId, voiceData.PlayerId, player.Distance))
-                    continue;
-
-                // Send to player if they have UDP connection
-                if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
-                {
-                    // Packet format: [2 bytes speakerId][4 bytes volume][2 bytes length][Opus audio]
-                    ushort speakerIdShort = ushort.Parse(voiceData.PlayerId);
-                    byte[] voicePacket = new byte[2 + 4 + 2 + voiceData.OpusAudioData.Length];
-
-                    // Speaker ID (2 bytes) - starts at offset 0
-                    byte[] speakerIdBytes = BitConverter.GetBytes(speakerIdShort);
-                    Array.Copy(speakerIdBytes, 0, voicePacket, 0, 2);
-
-                    // Volume (4 bytes) - at offset 2
-                    byte[] volumeBytes = BitConverter.GetBytes(finalVolume);
-                    Array.Copy(volumeBytes, 0, voicePacket, 2, 4);
-
-                    // Opus length (2 bytes) - at offset 6
-                    byte[] lengthBytes = BitConverter.GetBytes((ushort)voiceData.OpusAudioData.Length);
-                    Array.Copy(lengthBytes, 0, voicePacket, 6, 2);
-
-                    // Opus audio data - starts at byte 8
-                    Array.Copy(voiceData.OpusAudioData, 0, voicePacket, 8, voiceData.OpusAudioData.Length);
-                    
-                    sendTasks.Add(SendUdpPacketSafe(voicePacket, targetEndpoint, player.PlayerId));
-                }
+                candidates.Add((player, finalVolume, hasPriority));
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"UDP: Error processing voice for {player.PlayerId}: {ex.Message}");
             }
         }
-        
+
+        // Speaker cap per listener: for each listener, check if they're already
+        // hearing too many speakers. If so, only send if this speaker is among
+        // the closest 10 (priority speakers always pass through).
+        var sendTasks = new List<Task>();
+        ushort speakerIdShort = ushort.Parse(voiceData.PlayerId);
+
+        foreach (var (player, finalVolume, hasPriority) in candidates)
+        {
+            // Priority speakers always get through
+            if (!hasPriority)
+            {
+                int activeSpeakers = GetActiveSpeakerCount(player.PlayerId);
+                if (activeSpeakers >= MAX_SPEAKERS_PER_LISTENER)
+                    continue; // This listener already has 10+ speakers, drop the rest
+            }
+
+            if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
+            {
+                // Packet format: [2 bytes speakerId][4 bytes volume][2 bytes length][Opus audio]
+                byte[] voicePacket = new byte[2 + 4 + 2 + voiceData.OpusAudioData.Length];
+
+                byte[] speakerIdBytes = BitConverter.GetBytes(speakerIdShort);
+                Array.Copy(speakerIdBytes, 0, voicePacket, 0, 2);
+
+                byte[] volumeBytes = BitConverter.GetBytes(finalVolume);
+                Array.Copy(volumeBytes, 0, voicePacket, 2, 4);
+
+                byte[] lengthBytes = BitConverter.GetBytes((ushort)voiceData.OpusAudioData.Length);
+                Array.Copy(lengthBytes, 0, voicePacket, 6, 2);
+
+                Array.Copy(voiceData.OpusAudioData, 0, voicePacket, 8, voiceData.OpusAudioData.Length);
+
+                TrackActiveSpeaker(player.PlayerId, voiceData.PlayerId, player.Distance);
+                sendTasks.Add(SendUdpPacketSafe(voicePacket, targetEndpoint, player.PlayerId));
+            }
+        }
+
         if (sendTasks.Count > 0)
             await Task.WhenAll(sendTasks);
     }
