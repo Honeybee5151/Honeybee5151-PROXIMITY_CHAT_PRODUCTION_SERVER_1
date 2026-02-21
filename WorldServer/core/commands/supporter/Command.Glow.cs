@@ -33,7 +33,7 @@ namespace WorldServer.core.commands
 
         internal class Size : Command
         {
-            public override RankingType RankRequirement => RankingType.Donator;
+            public override RankingType RankRequirement => RankingType.Regular;
             public override string CommandName => "size";
 
             protected override bool Process(Player player, TickTime time, string args)
@@ -46,16 +46,8 @@ namespace WorldServer.core.commands
 
                 var size = Utils.FromString(args);
                 var min = 20;
-                var max = 0;
+                var max = 250;
                 var acc = player.Client.Account;
-
-                switch (acc.Rank)
-                {
-                    case 1: max = 120; break;
-                    case 2: max = 150; break;
-                    case 3: max = 200; break;
-                    default: max = 250; break;
-                }
 
                 if (size < min && size != 0 || size > max)
                 {
