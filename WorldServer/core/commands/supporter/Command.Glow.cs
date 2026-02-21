@@ -54,9 +54,7 @@ namespace WorldServer.core.commands
                     case 1: max = 120; break;
                     case 2: max = 150; break;
                     case 3: max = 200; break;
-                    case 4:
-                    case 5:
-                    case 6: max = 250; break;
+                    default: max = 250; break;
                 }
 
                 if (size < min && size != 0 || size > max)
