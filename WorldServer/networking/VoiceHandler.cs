@@ -44,6 +44,16 @@ namespace WorldServer.networking
         private const float PROXIMITY_RANGE = 15.0f;
         private readonly ConcurrentDictionary<int, VoicePrioritySettings> worldPrioritySettings = new();
 
+        // Spatial grid — O(1) nearby player lookups instead of iterating all clients
+        private readonly SpatialGrid spatialGrid = new SpatialGrid(PROXIMITY_RANGE);
+
+        // Distance fade model (Vivox-style)
+        private const float CONVERSATIONAL_DISTANCE = 3.0f; // Full volume within this range
+        private const float AUDIBLE_DISTANCE = PROXIMITY_RANGE;  // Zero volume at this range
+
+        // Silence gating — skip forwarding DTX silence packets
+        private const int SILENCE_PACKET_THRESHOLD = 3; // Opus DTX packets are typically 1-3 bytes
+
         // Account data cache — avoids DB lookups on every voice packet
         private readonly ConcurrentDictionary<int, CachedAccount> accountCache = new();
         private const int ACCOUNT_CACHE_TTL_SECONDS = 30;
@@ -56,6 +66,30 @@ namespace WorldServer.networking
         {
             gameServer = server;
         }
+
+        /// <summary>
+        /// Vivox-style distance fade: full volume up close, linear fade to 0 at max range.
+        /// </summary>
+        public static float CalculateDistanceVolume(float distance)
+        {
+            if (distance <= CONVERSATIONAL_DISTANCE)
+                return 1.0f; // Full volume up close
+            if (distance >= AUDIBLE_DISTANCE)
+                return 0.0f; // Silent at max range
+
+            // Linear fade between conversational and audible distance
+            return 1.0f - (distance - CONVERSATIONAL_DISTANCE) / (AUDIBLE_DISTANCE - CONVERSATIONAL_DISTANCE);
+        }
+
+        /// <summary>
+        /// Returns true if this Opus packet is likely a DTX silence frame (skip forwarding).
+        /// </summary>
+        public static bool IsSilencePacket(byte[] opusData)
+        {
+            return opusData.Length <= SILENCE_PACKET_THRESHOLD;
+        }
+
+        public SpatialGrid GetSpatialGrid() => spatialGrid;
 
         public DbAccount GetCachedAccountPublic(int accountId) => GetCachedAccount(accountId);
 
@@ -106,6 +140,39 @@ namespace WorldServer.networking
         public void RemoveNearbyCache(string playerId)
         {
             nearbyPlayersCache.TryRemove(playerId, out _);
+            spatialGrid.RemovePlayer(playerId);
+        }
+
+        /// <summary>
+        /// Refresh all connected players' positions in the spatial grid.
+        /// Called periodically to keep grid in sync with game state.
+        /// </summary>
+        public void RefreshAllPlayerPositions()
+        {
+            try
+            {
+                var clients = gameServer.ConnectionManager.Clients;
+                foreach (var clientPair in clients)
+                {
+                    var client = clientPair.Key;
+                    if (client.Player != null && client.Player.World != null)
+                    {
+                        string playerId = client.Player.AccountId.ToString();
+                        var pos = new PlayerPosition
+                        {
+                            X = client.Player.X,
+                            Y = client.Player.Y,
+                            WorldId = client.Player.World.Id
+                        };
+                        spatialGrid.UpdatePlayer(playerId, pos);
+                    }
+                }
+                spatialGrid.CleanupEmptyCells();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error refreshing spatial grid: {ex.Message}");
+            }
         }
         
         public bool ArePlayersVoiceIgnored(string speakerId, string listenerId)
@@ -138,23 +205,29 @@ namespace WorldServer.networking
                 foreach (var clientPair in clients)
                 {
                     var client = clientPair.Key;
-                    if (client.Account?.AccountId.ToString() == playerId || 
+                    if (client.Account?.AccountId.ToString() == playerId ||
                         client.Player?.AccountId.ToString() == playerId)
                     {
                         if (client.Player != null && client.Player.World != null)
                         {
-                            return new PlayerPosition
+                            var pos = new PlayerPosition
                             {
                                 X = client.Player.X,
                                 Y = client.Player.Y,
                                 WorldId = client.Player.World.Id
                             };
+                            spatialGrid.UpdatePlayer(playerId, pos);
+                            return pos;
                         }
                     }
                 }
                 // [TEST_BOT_HOOK] Check test bot positions
                 var botPos = VoiceTestMode.GetBotPosition(playerId);
-                if (botPos != null) return botPos;
+                if (botPos != null)
+                {
+                    spatialGrid.UpdatePlayer(playerId, botPos);
+                    return botPos;
+                }
                 return null;
             }
             catch (Exception ex)
@@ -203,29 +276,17 @@ namespace WorldServer.networking
             try
             {
                 var nearbyPlayers = new List<VoicePlayerInfo>();
-                var clients = gameServer.ConnectionManager.Clients;
-                
-                foreach (var clientPair in clients)
-                {
-                    var client = clientPair.Key;
-                    if (client.Player != null && client.Player.World != null)
-                    {
-                        // Only include players in the same world
-                        if (client.Player.World.Id != speakerWorldId)
-                            continue;
 
-                        float distance = CalculateDistance(speakerX, speakerY, client.Player.X, client.Player.Y);
-                        
-                        if (distance <= range)
-                        {
-                            nearbyPlayers.Add(new VoicePlayerInfo
-                            {
-                                PlayerId = client.Player.AccountId.ToString(),
-                                Client = client,
-                                Distance = distance
-                            });
-                        }
-                    }
+                // Use spatial grid for O(1) lookup instead of iterating all clients
+                var gridResults = spatialGrid.GetNearbyPlayers(speakerX, speakerY, range, speakerWorldId);
+                foreach (var (playerId, pos, distance) in gridResults)
+                {
+                    nearbyPlayers.Add(new VoicePlayerInfo
+                    {
+                        PlayerId = playerId,
+                        Client = null, // Grid doesn't track Client refs — not needed for voice
+                        Distance = distance
+                    });
                 }
 
                 // [TEST_BOT_HOOK] Include test bots in range
@@ -355,10 +416,11 @@ namespace WorldServer.networking
                 isRunning = true;
                 
                 Console.WriteLine($"UDP Voice Server started on port {port} with full feature set");
-                Console.WriteLine("Features: Proximity Chat, Priority System, Ignore System, Distance-based Volume, Authentication");
-                
+                Console.WriteLine("Features: Proximity Chat, Priority System, Ignore System, Distance Fade, Spatial Grid, Speaker Cap");
+
                 _ = Task.Run(ProcessUdpVoicePackets);
                 _ = Task.Run(CleanupInactiveUdpConnections);
+                _ = Task.Run(RefreshSpatialGridLoop);
             }
             catch (Exception ex)
             {
@@ -598,6 +660,10 @@ namespace WorldServer.networking
         playerUdpEndpoints[playerId] = clientEndpoint;
         lastUdpActivity[playerId] = DateTime.UtcNow;
         
+        // Silence gating: skip forwarding DTX silence packets (saves bandwidth + speaker cap slots)
+        if (VoiceHandler.IsSilencePacket(opusAudio))
+            return;
+
         // Create voice data object
         var voiceData = new UdpVoiceData
         {
@@ -606,7 +672,7 @@ namespace WorldServer.networking
             Volume = 1.0f,
             Timestamp = DateTime.UtcNow
         };
-        
+
         // Broadcast to nearby players
         await BroadcastVoiceToNearbyPlayers(voiceData);
     }
@@ -649,12 +715,19 @@ namespace WorldServer.networking
                         continue;
                 }
 
-                float finalVolume = voiceData.Volume;
+                // Distance fade: full volume up close, fades to 0 at max range
+                float distanceVolume = VoiceHandler.CalculateDistanceVolume(player.Distance);
+                float finalVolume = voiceData.Volume * distanceVolume;
+
                 if (prioritySystemActive)
                 {
                     float volumeMultiplier = prioritySettings.GetVolumeMultiplier(hasPriority);
                     finalVolume *= volumeMultiplier;
                 }
+
+                // Skip if effectively silent after all volume adjustments
+                if (finalVolume < 0.01f)
+                    continue;
 
                 candidates.Add((player, finalVolume, hasPriority));
             }
@@ -832,6 +905,22 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             }
         }
         
+        /// <summary>
+        /// Refreshes all player positions in the spatial grid every 200ms.
+        /// </summary>
+        private async Task RefreshSpatialGridLoop()
+        {
+            while (isRunning)
+            {
+                try
+                {
+                    voiceUtils.RefreshAllPlayerPositions();
+                    await Task.Delay(200);
+                }
+                catch { }
+            }
+        }
+
         public void Stop()
         {
             isRunning = false;
