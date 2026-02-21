@@ -47,10 +47,6 @@ namespace WorldServer.networking
         // Spatial grid — O(1) nearby player lookups instead of iterating all clients
         private readonly SpatialGrid spatialGrid = new SpatialGrid(PROXIMITY_RANGE);
 
-        // Distance fade model (Vivox-style)
-        private const float CONVERSATIONAL_DISTANCE = 3.0f; // Full volume within this range
-        private const float AUDIBLE_DISTANCE = PROXIMITY_RANGE;  // Zero volume at this range
-
         // Silence gating — skip forwarding DTX silence packets
         private const int SILENCE_PACKET_THRESHOLD = 3; // Opus DTX packets are typically 1-3 bytes
 
@@ -65,20 +61,6 @@ namespace WorldServer.networking
         public VoiceHandler(GameServer server)
         {
             gameServer = server;
-        }
-
-        /// <summary>
-        /// Vivox-style distance fade: full volume up close, linear fade to 0 at max range.
-        /// </summary>
-        public static float CalculateDistanceVolume(float distance)
-        {
-            if (distance <= CONVERSATIONAL_DISTANCE)
-                return 1.0f; // Full volume up close
-            if (distance >= AUDIBLE_DISTANCE)
-                return 0.0f; // Silent at max range
-
-            // Linear fade between conversational and audible distance
-            return 1.0f - (distance - CONVERSATIONAL_DISTANCE) / (AUDIBLE_DISTANCE - CONVERSATIONAL_DISTANCE);
         }
 
         /// <summary>
@@ -349,12 +331,6 @@ namespace WorldServer.networking
             }
         }
         
-        private float CalculateDistance(float x1, float y1, float x2, float y2)
-        {
-            float dx = x1 - x2;
-            float dy = y1 - y2;
-            return (float)Math.Sqrt(dx * dx + dy * dy);
-        }
     }
 
     public class UdpVoiceHandler
@@ -895,10 +871,10 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             
                     await Task.Delay(3600000); // Check once per hour
                 }
-                catch { }
+                catch (Exception ex) { Console.WriteLine($"UDP cleanup error: {ex.Message}"); }
             }
         }
-        
+
         /// <summary>
         /// Refreshes all player positions in the spatial grid every 200ms.
         /// </summary>
@@ -911,7 +887,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
                     voiceUtils.RefreshAllPlayerPositions();
                     await Task.Delay(200);
                 }
-                catch { }
+                catch (Exception ex) { Console.WriteLine($"Spatial grid refresh error: {ex.Message}"); }
             }
         }
 
