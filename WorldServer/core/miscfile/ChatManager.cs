@@ -84,7 +84,8 @@ namespace WorldServer.core.miscfile
         {
             GameServer.InterServerManager.AddHandler<ChatMsg>(Channel.Chat, HandleChat);
             GameServer.InterServerManager.AddHandler<AnnounceMsg>(Channel.Announce, HandleAnnounce);
-            GameServer.InterServerManager.AddHandler<AdminMsg>(Channel.Admin, HandleAdminCommand);
+            if (Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
+                GameServer.InterServerManager.AddHandler<AdminMsg>(Channel.Admin, HandleAdminCommand);
             GameServer.InterServerManager.NewServer += AnnounceNewServer;
             GameServer.InterServerManager.ServerQuit += AnnounceServerQuit;
         }

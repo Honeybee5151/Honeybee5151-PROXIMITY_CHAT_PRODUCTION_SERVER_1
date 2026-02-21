@@ -16,6 +16,7 @@ services:
       - redis
     environment:
       - IS_DOCKER=true
+      - ADMIN_DASHBOARD=true
     ports:
       - "2050:2050"
       - "2051:2051"

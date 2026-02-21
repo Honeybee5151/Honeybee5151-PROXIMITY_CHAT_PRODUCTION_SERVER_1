@@ -8,8 +8,9 @@ namespace WorldServer
         {
             var server = new GameServer(args);
 
-            // Install console interceptor for admin dashboard logs
-            RedisConsoleWriter.Install(server.Database.Conn, "admin:logs:worldserver");
+            // Optional: install console interceptor for admin dashboard logs
+            if (System.Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
+                RedisConsoleWriter.Install(server.Database.Conn, "admin:logs:worldserver");
 
             server.Run();
         }

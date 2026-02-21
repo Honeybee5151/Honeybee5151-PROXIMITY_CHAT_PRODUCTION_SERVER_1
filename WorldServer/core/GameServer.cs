@@ -137,9 +137,12 @@ namespace WorldServer.core
             //_ = Task.Run(StartVoiceListener);
             InterServerManager.JoinNetwork();
 
-            // Admin dashboard stats publisher
-            var adminStats = new AdminStatsPublisher(this);
-            adminStats.Start();
+            // Optional: admin dashboard stats publisher
+            if (Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
+            {
+                var adminStats = new AdminStatsPublisher(this);
+                adminStats.Start();
+            }
 
             var timeout = TimeSpan.FromHours(Configuration.serverSettings.restartTime);
 
