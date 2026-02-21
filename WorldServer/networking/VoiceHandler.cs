@@ -57,6 +57,8 @@ namespace WorldServer.networking
             gameServer = server;
         }
 
+        public DbAccount GetCachedAccountPublic(int accountId) => GetCachedAccount(accountId);
+
         private DbAccount GetCachedAccount(int accountId)
         {
             if (accountCache.TryGetValue(accountId, out var cached) &&
@@ -304,8 +306,8 @@ namespace WorldServer.networking
         private readonly ConcurrentDictionary<string, bool> authenticatedPlayers = new();
         private const float PROXIMITY_RANGE = 15.0f;
         private const int MAX_SPEAKERS_PER_LISTENER = 10;
-        // Tracks active speakers per listener: listenerId -> { speakerId -> (distance, timestamp) }
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, (float Distance, DateTime Time)>> listenerSpeakerSlots = new();
+        // Tracks active speakers per listener: listenerId -> { speakerId -> (distance, timestamp, isPriority) }
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, (float Distance, DateTime Time, bool IsPriority)>> listenerSpeakerSlots = new();
         private volatile bool isRunning = false;
         
         public UdpVoiceHandler(GameServer server, VoiceHandler voiceHandler)
@@ -318,28 +320,31 @@ namespace WorldServer.networking
         /// Tracks that a speaker is actively talking to a listener.
         /// Called after sending a packet so we can count active speakers per listener.
         /// </summary>
-        private void TrackActiveSpeaker(string listenerId, string speakerId, float distance)
+        private void TrackActiveSpeaker(string listenerId, string speakerId, float distance, bool isPriority)
         {
-            var slots = listenerSpeakerSlots.GetOrAdd(listenerId, _ => new ConcurrentDictionary<string, (float, DateTime)>());
-            slots[speakerId] = (distance, DateTime.UtcNow);
+            var slots = listenerSpeakerSlots.GetOrAdd(listenerId, _ => new ConcurrentDictionary<string, (float, DateTime, bool)>());
+            slots[speakerId] = (distance, DateTime.UtcNow, isPriority);
         }
 
         /// <summary>
-        /// Returns the number of speakers currently active for this listener (within last 500ms).
-        /// Also cleans up stale entries.
+        /// Returns (totalActive, nonPriorityCount) for this listener (within last 500ms).
+        /// Cleans up stale entries.
         /// </summary>
-        private int GetActiveSpeakerCount(string listenerId)
+        private (int Total, int NonPriority) GetActiveSpeakerCounts(string listenerId)
         {
             if (!listenerSpeakerSlots.TryGetValue(listenerId, out var slots))
-                return 0;
+                return (0, 0);
 
             var now = DateTime.UtcNow;
+            int nonPriority = 0;
             foreach (var kvp in slots)
             {
                 if ((now - kvp.Value.Time).TotalMilliseconds > 500)
                     slots.TryRemove(kvp.Key, out _);
+                else if (!kvp.Value.IsPriority)
+                    nonPriority++;
             }
-            return slots.Count;
+            return (slots.Count, nonPriority);
         }
         
         public async Task StartUdpVoiceServer(int port = 2051)
@@ -659,25 +664,28 @@ namespace WorldServer.networking
             }
         }
 
-        // Speaker cap per listener: for each listener, check if they're already
-        // hearing too many speakers. If so, only send if this speaker is among
-        // the closest 10 (priority speakers always pass through).
+        // Speaker cap per listener: each listener hears at most 10 speakers.
+        // Non-priority speakers are dropped first, then priority if still over cap.
         var sendTasks = new List<Task>();
         ushort speakerIdShort = ushort.Parse(voiceData.PlayerId);
 
         foreach (var (player, finalVolume, hasPriority) in candidates)
         {
-            // Priority speakers always get through
-            if (!hasPriority)
+            var (activeCount, nonPriorityCount) = GetActiveSpeakerCounts(player.PlayerId);
+
+            if (activeCount >= MAX_SPEAKERS_PER_LISTENER)
             {
-                int activeSpeakers = GetActiveSpeakerCount(player.PlayerId);
-                if (activeSpeakers >= MAX_SPEAKERS_PER_LISTENER)
-                    continue; // This listener already has 10+ speakers, drop the rest
+                if (!hasPriority)
+                    continue; // Non-priority dropped first
+
+                // Priority speaker — only get through if there are non-priority
+                // speakers that could be displaced. Otherwise hard cap.
+                if (nonPriorityCount == 0)
+                    continue; // All slots are priority — hard cap reached
             }
 
             if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
             {
-                // Packet format: [2 bytes speakerId][4 bytes volume][2 bytes length][Opus audio]
                 byte[] voicePacket = new byte[2 + 4 + 2 + voiceData.OpusAudioData.Length];
 
                 byte[] speakerIdBytes = BitConverter.GetBytes(speakerIdShort);
@@ -691,7 +699,7 @@ namespace WorldServer.networking
 
                 Array.Copy(voiceData.OpusAudioData, 0, voicePacket, 8, voiceData.OpusAudioData.Length);
 
-                TrackActiveSpeaker(player.PlayerId, voiceData.PlayerId, player.Distance);
+                TrackActiveSpeaker(player.PlayerId, voiceData.PlayerId, player.Distance, hasPriority);
                 sendTasks.Add(SendUdpPacketSafe(voicePacket, targetEndpoint, player.PlayerId));
             }
         }
@@ -761,7 +769,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
         {
             try
             {
-                var account = gameServer.Database.GetAccount(int.Parse(playerId));
+                var account = voiceUtils.GetCachedAccountPublic(int.Parse(playerId));
                 return account != null && account.VoiceID == voiceId;
             }
             catch (Exception ex)
