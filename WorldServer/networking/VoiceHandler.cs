@@ -43,25 +43,82 @@ namespace WorldServer.networking
         private readonly GameServer gameServer;
         private const float PROXIMITY_RANGE = 15.0f;
         private readonly ConcurrentDictionary<int, VoicePrioritySettings> worldPrioritySettings = new();
-     
+
+        // Account data cache — avoids DB lookups on every voice packet
+        private readonly ConcurrentDictionary<int, CachedAccount> accountCache = new();
+        private const int ACCOUNT_CACHE_TTL_SECONDS = 30;
+
+        // Nearby players cache — recalculated every 200ms instead of per packet
+        private readonly ConcurrentDictionary<string, CachedNearbyPlayers> nearbyPlayersCache = new();
+        private const int NEARBY_CACHE_TTL_MS = 200;
+
         public VoiceHandler(GameServer server)
         {
             gameServer = server;
+        }
+
+        private DbAccount GetCachedAccount(int accountId)
+        {
+            if (accountCache.TryGetValue(accountId, out var cached) &&
+                (DateTime.UtcNow - cached.FetchedAt).TotalSeconds < ACCOUNT_CACHE_TTL_SECONDS)
+            {
+                return cached.Account;
+            }
+
+            var account = gameServer.Database.GetAccount(accountId);
+            accountCache[accountId] = new CachedAccount { Account = account, FetchedAt = DateTime.UtcNow };
+            return account;
+        }
+
+        public void InvalidateAccountCache(int accountId)
+        {
+            accountCache.TryRemove(accountId, out _);
+        }
+
+        public (PlayerPosition Position, VoicePlayerInfo[] NearbyPlayers) GetCachedNearbyPlayers(string playerId)
+        {
+            if (nearbyPlayersCache.TryGetValue(playerId, out var cached) &&
+                (DateTime.UtcNow - cached.FetchedAt).TotalMilliseconds < NEARBY_CACHE_TTL_MS)
+            {
+                return (cached.SpeakerPosition, cached.Players);
+            }
+
+            var pos = GetPlayerPosition(playerId);
+            if (pos == null)
+            {
+                nearbyPlayersCache[playerId] = new CachedNearbyPlayers
+                {
+                    SpeakerPosition = null, Players = Array.Empty<VoicePlayerInfo>(), FetchedAt = DateTime.UtcNow
+                };
+                return (null, Array.Empty<VoicePlayerInfo>());
+            }
+
+            var players = GetPlayersInRange(pos.X, pos.Y, PROXIMITY_RANGE, pos.WorldId);
+            nearbyPlayersCache[playerId] = new CachedNearbyPlayers
+            {
+                SpeakerPosition = pos, Players = players, FetchedAt = DateTime.UtcNow
+            };
+            return (pos, players);
+        }
+
+        public void RemoveNearbyCache(string playerId)
+        {
+            nearbyPlayersCache.TryRemove(playerId, out _);
         }
         
         public bool ArePlayersVoiceIgnored(string speakerId, string listenerId)
         {
             try
             {
-                var speakerAccount = gameServer.Database.GetAccount(int.Parse(speakerId));
-                var listenerAccount = gameServer.Database.GetAccount(int.Parse(listenerId));
-        
+                var speakerAccount = GetCachedAccount(int.Parse(speakerId));
+                var listenerAccount = GetCachedAccount(int.Parse(listenerId));
+
                 if (speakerAccount == null || listenerAccount == null)
                     return false;
 
                 bool listenerIgnoresSpeaker = listenerAccount.IgnoreList.Contains(speakerAccount.AccountId);
                 bool speakerIgnoresListener = speakerAccount.IgnoreList.Contains(listenerAccount.AccountId);
-        
+
                 return listenerIgnoresSpeaker || speakerIgnoresListener;
             }
             catch (Exception ex)
@@ -203,8 +260,8 @@ namespace WorldServer.networking
                 if (settings.HasManualPriority(playerAccountId))
                     return true;
 
-                var playerAccount = gameServer.Database.GetAccount(playerAccountId);
-                var listenerAccount = gameServer.Database.GetAccount(listenerAccountId);
+                var playerAccount = GetCachedAccount(playerAccountId);
+                var listenerAccount = GetCachedAccount(listenerAccountId);
 
                 if (playerAccount == null || listenerAccount == null)
                     return false;
@@ -526,13 +583,10 @@ namespace WorldServer.networking
 {
     try
     {
-        // Get speaker position using proximity system
-        var speakerPosition = voiceUtils.GetPlayerPosition(voiceData.PlayerId);
+        // Use cached nearby players (recalculated every 200ms, not per packet)
+        var (speakerPosition, nearbyPlayers) = voiceUtils.GetCachedNearbyPlayers(voiceData.PlayerId);
         if (speakerPosition == null)
             return;
-        
-        // Find players in proximity range (filtered by same world)
-        var nearbyPlayers = voiceUtils.GetPlayersInRange(speakerPosition.X, speakerPosition.Y, PROXIMITY_RANGE, speakerPosition.WorldId);
         
         // Get priority settings for this world
         var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
@@ -720,6 +774,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
                         playerUdpEndpoints.TryRemove(playerId, out _);
                         authenticatedPlayers.TryRemove(playerId, out _);
                         lastUdpActivity.TryRemove(playerId, out _);
+                        voiceUtils.RemoveNearbyCache(playerId);
                         Console.WriteLine($"UDP: Memory cleanup for {playerId} (inactive 24h)");
                     }
             
@@ -757,10 +812,23 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
         public int WorldId { get; set; }
     }
     
-    public class VoicePlayerInfo 
+    public class VoicePlayerInfo
     {
         public string PlayerId { get; set; }
         public Client Client { get; set; }
         public float Distance { get; set; }
+    }
+
+    public class CachedAccount
+    {
+        public DbAccount Account { get; set; }
+        public DateTime FetchedAt { get; set; }
+    }
+
+    public class CachedNearbyPlayers
+    {
+        public PlayerPosition SpeakerPosition { get; set; }
+        public VoicePlayerInfo[] Players { get; set; }
+        public DateTime FetchedAt { get; set; }
     }
 }
