@@ -302,13 +302,68 @@ namespace WorldServer.networking
         private readonly ConcurrentDictionary<string, IPEndPoint> playerUdpEndpoints = new();
         private readonly ConcurrentDictionary<string, DateTime> lastUdpActivity = new();
         private readonly ConcurrentDictionary<string, bool> authenticatedPlayers = new();
-        private const float PROXIMITY_RANGE = 15.0f; // Add this line
+        private const float PROXIMITY_RANGE = 15.0f;
+        private const int MAX_SPEAKERS_PER_LISTENER = 10;
+        // Tracks active speakers per listener: listenerId -> { speakerId -> (distance, timestamp) }
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, (float Distance, DateTime Time)>> listenerSpeakerSlots = new();
         private volatile bool isRunning = false;
         
         public UdpVoiceHandler(GameServer server, VoiceHandler voiceHandler)
         {
             gameServer = server;
             voiceUtils = voiceHandler;
+        }
+
+        /// <summary>
+        /// Returns true if this speaker is allowed to send to this listener.
+        /// Each listener can hear at most MAX_SPEAKERS_PER_LISTENER at once (closest by distance).
+        /// </summary>
+        private bool TryClaimSpeakerSlot(string listenerId, string speakerId, float distance)
+        {
+            var slots = listenerSpeakerSlots.GetOrAdd(listenerId, _ => new ConcurrentDictionary<string, (float, DateTime)>());
+            var now = DateTime.UtcNow;
+
+            // Clean stale entries (>500ms old = speaker stopped talking)
+            foreach (var kvp in slots)
+            {
+                if ((now - kvp.Value.Time).TotalMilliseconds > 500)
+                    slots.TryRemove(kvp.Key, out _);
+            }
+
+            // Already has a slot — just update
+            if (slots.ContainsKey(speakerId))
+            {
+                slots[speakerId] = (distance, now);
+                return true;
+            }
+
+            // Under the cap — take a slot
+            if (slots.Count < MAX_SPEAKERS_PER_LISTENER)
+            {
+                slots[speakerId] = (distance, now);
+                return true;
+            }
+
+            // At cap — replace farthest speaker if we're closer
+            string farthestId = null;
+            float farthestDist = 0f;
+            foreach (var kvp in slots)
+            {
+                if (kvp.Value.Distance > farthestDist)
+                {
+                    farthestDist = kvp.Value.Distance;
+                    farthestId = kvp.Key;
+                }
+            }
+
+            if (farthestId != null && distance < farthestDist)
+            {
+                slots.TryRemove(farthestId, out _);
+                slots[speakerId] = (distance, now);
+                return true;
+            }
+
+            return false; // Too far — listener is already hearing 10 closer people
         }
         
         public async Task StartUdpVoiceServer(int port = 2051)
@@ -626,6 +681,10 @@ namespace WorldServer.networking
                     finalVolume *= volumeMultiplier;
                 }
 
+                // Per-listener speaker cap: only hear the closest 10 speakers
+                if (!TryClaimSpeakerSlot(player.PlayerId, voiceData.PlayerId, player.Distance))
+                    continue;
+
                 // Send to player if they have UDP connection
                 if (playerUdpEndpoints.TryGetValue(player.PlayerId, out var targetEndpoint))
                 {
@@ -775,6 +834,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
                         authenticatedPlayers.TryRemove(playerId, out _);
                         lastUdpActivity.TryRemove(playerId, out _);
                         voiceUtils.RemoveNearbyCache(playerId);
+                        listenerSpeakerSlots.TryRemove(playerId, out _);
                         Console.WriteLine($"UDP: Memory cleanup for {playerId} (inactive 24h)");
                     }
             
