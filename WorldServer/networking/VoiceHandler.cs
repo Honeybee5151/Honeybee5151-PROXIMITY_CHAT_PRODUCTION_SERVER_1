@@ -344,6 +344,7 @@ namespace WorldServer.networking
         private readonly VoiceHandler voiceUtils;
         private UdpClient udpServer;
         private readonly ConcurrentDictionary<string, IPEndPoint> playerUdpEndpoints = new();
+        private readonly ConcurrentDictionary<string, string> endpointToPlayerId = new(); // reverse lookup
         private readonly ConcurrentDictionary<string, DateTime> lastUdpActivity = new();
         private readonly ConcurrentDictionary<string, bool> authenticatedPlayers = new();
         private const float PROXIMITY_RANGE = 15.0f;
@@ -472,6 +473,7 @@ namespace WorldServer.networking
                     string botId = authRequest.PlayerId.Trim();
                     authenticatedPlayers[botId] = true;
                     playerUdpEndpoints[botId] = clientEndpoint;
+                    endpointToPlayerId[clientEndpoint.ToString()] = botId;
                     lastUdpActivity[botId] = DateTime.UtcNow;
                     VoiceTestMode.RegisterBot(botId, voiceUtils);
                     await SendAuthResponse(clientEndpoint, "ACCEPTED", "Test bot authenticated");
@@ -504,6 +506,7 @@ namespace WorldServer.networking
                 string trimmedPlayerId = authRequest.PlayerId.Trim();
                 authenticatedPlayers[trimmedPlayerId] = true;
                 playerUdpEndpoints[trimmedPlayerId] = clientEndpoint;
+                endpointToPlayerId[clientEndpoint.ToString()] = trimmedPlayerId;
                 lastUdpActivity[trimmedPlayerId] = DateTime.UtcNow;
                 
                 await SendAuthResponse(clientEndpoint, "ACCEPTED", "Voice authenticated");
@@ -658,6 +661,7 @@ namespace WorldServer.networking
         
         // Update activity tracking
         playerUdpEndpoints[playerId] = clientEndpoint;
+        endpointToPlayerId[clientEndpoint.ToString()] = playerId;
         lastUdpActivity[playerId] = DateTime.UtcNow;
         
         // Silence gating: skip forwarding DTX silence packets (saves bandwidth + speaker cap slots)
@@ -825,12 +829,8 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
         
         private string GetPlayerIdFromEndpoint(IPEndPoint endpoint)
         {
-            foreach (var kvp in playerUdpEndpoints)
-            {
-                if (kvp.Value.Equals(endpoint))
-                    return kvp.Key;
-            }
-            return null;
+            endpointToPlayerId.TryGetValue(endpoint.ToString(), out var playerId);
+            return playerId;
         }
         
         private bool ValidateVoiceID(string playerId, string voiceId)
@@ -886,7 +886,8 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             
                     foreach (var playerId in oldPlayers)
                     {
-                        playerUdpEndpoints.TryRemove(playerId, out _);
+                        if (playerUdpEndpoints.TryRemove(playerId, out var oldEndpoint))
+                            endpointToPlayerId.TryRemove(oldEndpoint.ToString(), out _);
                         authenticatedPlayers.TryRemove(playerId, out _);
                         lastUdpActivity.TryRemove(playerId, out _);
                         voiceUtils.RemoveNearbyCache(playerId);
