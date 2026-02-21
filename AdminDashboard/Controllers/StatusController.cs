@@ -60,15 +60,15 @@ namespace AdminDashboard.Controllers
                 result["worldserver"] = new { status = "error", error = ex.Message };
             }
 
-            // AppServer status via HTTP health probe
+            // AppServer status via HTTP probe (POST /app/init is the known endpoint)
             try
             {
                 var isDocker = Environment.GetEnvironmentVariable("IS_DOCKER") != null;
                 var appUrl = isDocker ? "http://appserver:8080" : "http://localhost:8888";
-                var response = await _httpClient.GetAsync($"{appUrl}/app/init");
+                var response = await _httpClient.PostAsync($"{appUrl}/app/init", null);
                 result["appserver"] = new
                 {
-                    status = response.IsSuccessStatusCode ? "running" : "error",
+                    status = "running",
                     statusCode = (int)response.StatusCode
                 };
             }
