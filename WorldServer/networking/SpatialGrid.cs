@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-
+//777592
 namespace WorldServer.networking
 {
     /// <summary>
@@ -12,6 +12,8 @@ namespace WorldServer.networking
     {
         private readonly float cellSize;
         private readonly ConcurrentDictionary<long, ConcurrentDictionary<string, PlayerPosition>> cells = new();
+        // Track which cell each player is in for O(1) removal
+        private readonly ConcurrentDictionary<string, long> playerCells = new();
 
         public SpatialGrid(float cellSize)
         {
@@ -34,12 +36,27 @@ namespace WorldServer.networking
         /// </summary>
         public void UpdatePlayer(string playerId, PlayerPosition position)
         {
-            // Remove from any existing cell first
-            RemovePlayer(playerId);
+            var newKey = GetCellKey(position.X, position.Y);
 
-            var key = GetCellKey(position.X, position.Y);
-            var cell = cells.GetOrAdd(key, _ => new ConcurrentDictionary<string, PlayerPosition>());
+            // Remove from old cell only if cell changed
+            if (playerCells.TryGetValue(playerId, out long oldKey))
+            {
+                if (oldKey == newKey)
+                {
+                    // Same cell — just update position in place
+                    if (cells.TryGetValue(oldKey, out var existingCell))
+                        existingCell[playerId] = position;
+                    return;
+                }
+                // Different cell — remove from old
+                if (cells.TryGetValue(oldKey, out var oldCell))
+                    oldCell.TryRemove(playerId, out _);
+            }
+
+            // Add to new cell
+            var cell = cells.GetOrAdd(newKey, _ => new ConcurrentDictionary<string, PlayerPosition>());
             cell[playerId] = position;
+            playerCells[playerId] = newKey;
         }
 
         /// <summary>
@@ -47,9 +64,10 @@ namespace WorldServer.networking
         /// </summary>
         public void RemovePlayer(string playerId)
         {
-            foreach (var cell in cells.Values)
+            if (playerCells.TryRemove(playerId, out long cellKey))
             {
-                cell.TryRemove(playerId, out _);
+                if (cells.TryGetValue(cellKey, out var cell))
+                    cell.TryRemove(playerId, out _);
             }
         }
 
