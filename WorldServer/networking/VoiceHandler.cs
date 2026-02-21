@@ -42,7 +42,8 @@ namespace WorldServer.networking
     {
         private readonly GameServer gameServer;
         private const float PROXIMITY_RANGE = 15.0f;
-        private readonly ConcurrentDictionary<int, VoicePrioritySettings> worldPrioritySettings = new();
+        // Per-listener priority settings (keyed by player account ID, not world)
+        private readonly ConcurrentDictionary<string, VoicePrioritySettings> playerPrioritySettings = new();
 
         // Spatial grid — O(1) nearby player lookups instead of iterating all clients
         private readonly SpatialGrid spatialGrid = new SpatialGrid(PROXIMITY_RANGE);
@@ -282,17 +283,21 @@ namespace WorldServer.networking
             }
         }
 
-        public VoicePrioritySettings GetPrioritySettings(int worldId)
+        public VoicePrioritySettings GetPrioritySettings(string listenerId)
         {
-            return worldPrioritySettings.GetOrAdd(worldId, _ => new VoicePrioritySettings());
+            return playerPrioritySettings.GetOrAdd(listenerId, _ => new VoicePrioritySettings());
         }
 
-        public bool ShouldActivatePrioritySystem(int worldId, int nearbyPlayerCount)
+        public bool ShouldActivatePrioritySystem(VoicePrioritySettings settings, int nearbyPlayerCount)
         {
-            var settings = GetPrioritySettings(worldId);
             if (!settings.EnablePriority) return false;
-            
+
             return nearbyPlayerCount >= settings.ActivationThreshold;
+        }
+
+        public void RemovePlayerPrioritySettings(string playerId)
+        {
+            playerPrioritySettings.TryRemove(playerId, out _);
         }
 
         public bool HasVoicePriority(string playerId, string listenerId, VoicePrioritySettings settings)
@@ -527,93 +532,89 @@ namespace WorldServer.networking
                     return;
                 }
                 
-                // Get player's world position
-                var playerPosition = voiceUtils.GetPlayerPosition(clientPlayerId);
-                if (playerPosition != null)
+                // Get this player's personal priority settings
+                var settings = voiceUtils.GetPrioritySettings(clientPlayerId);
+                switch (priorityCommand.SettingType)
                 {
-                    var settings = voiceUtils.GetPrioritySettings(playerPosition.WorldId);
-                    switch (priorityCommand.SettingType)
-                    {
-                        case "ENABLED":
-                            if (bool.TryParse(priorityCommand.Value, out bool enabled))
-                            {
-                                settings.EnablePriority = enabled;
-                                Console.WriteLine($"UDP: Priority system {(enabled ? "enabled" : "disabled")} for world {playerPosition.WorldId}");
-                            }
-                            break;
-                            
-                        case "THRESHOLD":
-                            if (int.TryParse(priorityCommand.Value, out int threshold))
-                            {
-                                settings.ActivationThreshold = threshold;
-                                Console.WriteLine($"UDP: Priority threshold set to {threshold} for world {playerPosition.WorldId}");
-                            }
-                            break;
-                            
-                        case "NON_PRIORITY_VOLUME":
-                            if (float.TryParse(priorityCommand.Value, out float volume))
-                            {
-                                settings.NonPriorityVolume = volume;
-                                Console.WriteLine($"UDP: Non-priority volume set to {volume} for world {playerPosition.WorldId}");
-                            }
-                            break;
-                            
-                        case "ADD_MANUAL":
-                            if (int.TryParse(priorityCommand.Value, out int addAccountId))
-                            {
-                                if (settings.AddManualPriority(addAccountId))
-                                {
-                                    Console.WriteLine($"UDP: Added manual priority for account {addAccountId} in world {playerPosition.WorldId}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"UDP: Failed to add manual priority - list full ({settings.GetManualPriorityCount()}/{settings.MaxPriorityPlayers})");
-                                }
-                            }
-                            break;
-                            
-                        case "REMOVE_MANUAL":
-                            if (int.TryParse(priorityCommand.Value, out int removeAccountId))
-                            {
-                                if (settings.RemoveManualPriority(removeAccountId))
-                                {
-                                    Console.WriteLine($"UDP: Removed manual priority for account {removeAccountId} in world {playerPosition.WorldId}");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"UDP: Account {removeAccountId} was not in manual priority list");
-                                }
-                            }
-                            break;
+                    case "ENABLED":
+                        if (bool.TryParse(priorityCommand.Value, out bool enabled))
+                        {
+                            settings.EnablePriority = enabled;
+                            Console.WriteLine($"UDP: Priority system {(enabled ? "enabled" : "disabled")} for player {clientPlayerId}");
+                        }
+                        break;
 
-                        case "GUILD_PRIORITY":
-                            if (bool.TryParse(priorityCommand.Value, out bool guildPrio))
-                            {
-                                settings.GuildMembersGetPriority = guildPrio;
-                                Console.WriteLine($"UDP: Guild priority {(guildPrio ? "enabled" : "disabled")} for world {playerPosition.WorldId}");
-                            }
-                            break;
+                    case "THRESHOLD":
+                        if (int.TryParse(priorityCommand.Value, out int threshold))
+                        {
+                            settings.ActivationThreshold = threshold;
+                            Console.WriteLine($"UDP: Priority threshold set to {threshold} for player {clientPlayerId}");
+                        }
+                        break;
 
-                        case "LOCKED_PRIORITY":
-                            if (bool.TryParse(priorityCommand.Value, out bool lockedPrio))
-                            {
-                                settings.LockedPlayersGetPriority = lockedPrio;
-                                Console.WriteLine($"UDP: Locked player priority {(lockedPrio ? "enabled" : "disabled")} for world {playerPosition.WorldId}");
-                            }
-                            break;
+                    case "NON_PRIORITY_VOLUME":
+                        if (float.TryParse(priorityCommand.Value, out float volume))
+                        {
+                            settings.NonPriorityVolume = volume;
+                            Console.WriteLine($"UDP: Non-priority volume set to {volume} for player {clientPlayerId}");
+                        }
+                        break;
 
-                        case "MAX_PRIORITY_SLOTS":
-                            if (int.TryParse(priorityCommand.Value, out int maxSlots))
+                    case "ADD_MANUAL":
+                        if (int.TryParse(priorityCommand.Value, out int addAccountId))
+                        {
+                            if (settings.AddManualPriority(addAccountId))
                             {
-                                settings.MaxPriorityPlayers = maxSlots;
-                                Console.WriteLine($"UDP: Max priority slots set to {maxSlots} for world {playerPosition.WorldId}");
+                                Console.WriteLine($"UDP: Added manual priority for account {addAccountId} by player {clientPlayerId}");
                             }
-                            break;
-                    }
-                    
-                    settings.ValidateSettings();
-                    await SendPriorityResponse(clientEndpoint, "SUCCESS", $"Priority setting {priorityCommand.SettingType} updated");
+                            else
+                            {
+                                Console.WriteLine($"UDP: Failed to add manual priority - list full ({settings.GetManualPriorityCount()}/{settings.MaxPriorityPlayers})");
+                            }
+                        }
+                        break;
+
+                    case "REMOVE_MANUAL":
+                        if (int.TryParse(priorityCommand.Value, out int removeAccountId))
+                        {
+                            if (settings.RemoveManualPriority(removeAccountId))
+                            {
+                                Console.WriteLine($"UDP: Removed manual priority for account {removeAccountId} by player {clientPlayerId}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"UDP: Account {removeAccountId} was not in manual priority list");
+                            }
+                        }
+                        break;
+
+                    case "GUILD_PRIORITY":
+                        if (bool.TryParse(priorityCommand.Value, out bool guildPrio))
+                        {
+                            settings.GuildMembersGetPriority = guildPrio;
+                            Console.WriteLine($"UDP: Guild priority {(guildPrio ? "enabled" : "disabled")} for player {clientPlayerId}");
+                        }
+                        break;
+
+                    case "LOCKED_PRIORITY":
+                        if (bool.TryParse(priorityCommand.Value, out bool lockedPrio))
+                        {
+                            settings.LockedPlayersGetPriority = lockedPrio;
+                            Console.WriteLine($"UDP: Locked player priority {(lockedPrio ? "enabled" : "disabled")} for player {clientPlayerId}");
+                        }
+                        break;
+
+                    case "MAX_PRIORITY_SLOTS":
+                        if (int.TryParse(priorityCommand.Value, out int maxSlots))
+                        {
+                            settings.MaxPriorityPlayers = maxSlots;
+                            Console.WriteLine($"UDP: Max priority slots set to {maxSlots} for player {clientPlayerId}");
+                        }
+                        break;
                 }
+
+                settings.ValidateSettings();
+                await SendPriorityResponse(clientEndpoint, "SUCCESS", $"Priority setting {priorityCommand.SettingType} updated");
             }
             catch (Exception ex)
             {
@@ -689,11 +690,8 @@ namespace WorldServer.networking
         if (speakerPosition == null)
             return;
 
-        // Get priority settings for this world
-        var prioritySettings = voiceUtils.GetPrioritySettings(speakerPosition.WorldId);
-        bool prioritySystemActive = voiceUtils.ShouldActivatePrioritySystem(speakerPosition.WorldId, nearbyPlayers.Length);
-
         // Build list of eligible listeners with their computed volumes
+        // Each listener has their OWN priority settings
         var candidates = new List<(VoicePlayerInfo Player, float Volume, bool HasPriority)>();
 
         foreach (var player in nearbyPlayers)
@@ -706,19 +704,23 @@ namespace WorldServer.networking
                 if (voiceUtils.ArePlayersVoiceIgnored(voiceData.PlayerId, player.PlayerId))
                     continue;
 
+                // Get THIS listener's personal priority settings
+                var listenerSettings = voiceUtils.GetPrioritySettings(player.PlayerId);
+                bool priorityActive = voiceUtils.ShouldActivatePrioritySystem(listenerSettings, nearbyPlayers.Length);
+
                 bool hasPriority = false;
-                if (prioritySystemActive)
+                if (priorityActive)
                 {
-                    hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, prioritySettings);
-                    if (prioritySettings.ShouldFilterVoice(hasPriority))
+                    hasPriority = voiceUtils.HasVoicePriority(voiceData.PlayerId, player.PlayerId, listenerSettings);
+                    if (listenerSettings.ShouldFilterVoice(hasPriority))
                         continue;
                 }
 
                 float finalVolume = voiceData.Volume;
 
-                if (prioritySystemActive)
+                if (priorityActive)
                 {
-                    float volumeMultiplier = prioritySettings.GetVolumeMultiplier(hasPriority);
+                    float volumeMultiplier = listenerSettings.GetVolumeMultiplier(hasPriority);
                     finalVolume *= volumeMultiplier;
                 }
 
@@ -888,6 +890,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
                         authenticatedPlayers.TryRemove(playerId, out _);
                         lastUdpActivity.TryRemove(playerId, out _);
                         voiceUtils.RemoveNearbyCache(playerId);
+                        voiceUtils.RemovePlayerPrioritySettings(playerId);
                         listenerSpeakerSlots.TryRemove(playerId, out _);
                         Console.WriteLine($"UDP: Memory cleanup for {playerId} (inactive 24h)");
                     }

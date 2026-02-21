@@ -62,17 +62,21 @@ namespace WorldServer.networking
                 Console.WriteLine($"[TEST_BOT] Bot {playerId} placed at ({BotPositions[playerId].X:F1}, {BotPositions[playerId].Y:F1}) in world {nearPos.WorldId}");
 
                 // Auto-setup priority for testing on first bot registration
+                // Note: priority is now per-listener, so for test mode we configure each bot's settings
                 if (!prioritySetupDone)
                 {
                     prioritySetupDone = true;
-                    var settings = voiceUtils.GetPrioritySettings(nearPos.WorldId);
-                    settings.EnablePriority = true;
-                    settings.ActivationThreshold = 3;
-                    settings.NonPriorityVolume = 0.1f;
-                    // Mark first N bots as priority
-                    for (int i = 0; i < PRIORITY_BOT_COUNT; i++)
-                        settings.AddManualPriority(MIN_BOT_ID + i);
-                    Console.WriteLine($"[TEST_BOT] Priority auto-configured for world {nearPos.WorldId}: enabled=true threshold=3 nonPrioVol=0.1 priorityBots=[{string.Join(",", Enumerable.Range(MIN_BOT_ID, PRIORITY_BOT_COUNT))}]");
+                    // Configure priority settings for each bot (as listener)
+                    foreach (var botId in BotPositions.Keys)
+                    {
+                        var settings = voiceUtils.GetPrioritySettings(botId);
+                        settings.EnablePriority = true;
+                        settings.ActivationThreshold = 3;
+                        settings.NonPriorityVolume = 0.1f;
+                        for (int i = 0; i < PRIORITY_BOT_COUNT; i++)
+                            settings.AddManualPriority(MIN_BOT_ID + i);
+                    }
+                    Console.WriteLine($"[TEST_BOT] Priority auto-configured for bots: enabled=true threshold=3 nonPrioVol=0.1 priorityBots=[{string.Join(",", Enumerable.Range(MIN_BOT_ID, PRIORITY_BOT_COUNT))}]");
                 }
             }
             else
