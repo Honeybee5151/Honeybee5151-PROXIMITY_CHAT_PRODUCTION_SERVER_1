@@ -37,7 +37,7 @@ namespace AdminDashboard.Controllers
                 if (lines < 1) lines = 1;
 
                 var entries = _redis.Database.ListRange(key, 0, lines - 1);
-                var logLines = entries.Select(e => e.ToString()).ToList();
+                var logLines = entries.Select(e => e.ToString()).Reverse().ToList();
 
                 if (!string.IsNullOrEmpty(filter))
                 {
