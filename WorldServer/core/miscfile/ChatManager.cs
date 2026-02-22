@@ -307,36 +307,31 @@ namespace WorldServer.core.miscfile
                     break;
 
                 case "gift_all":
-                    var parts = param.Split(',');
-                    if (parts.Length == 2 && int.TryParse(parts[0], out int giftCredits) && int.TryParse(parts[1], out int giftFame))
+                    var giftItemName = param.Trim();
+                    if (string.IsNullOrEmpty(giftItemName))
                     {
-                        int count = 0;
-                        foreach (var c in GameServer.ConnectionManager.Clients.Keys.ToList())
-                        {
-                            if (c.Player != null && c.Account != null)
-                            {
-                                if (giftCredits != 0)
-                                {
-                                    c.Account.Credits += giftCredits;
-                                    if (giftCredits > 0) c.Account.TotalCredits += giftCredits;
-                                }
-                                if (giftFame != 0)
-                                {
-                                    c.Account.Fame += giftFame;
-                                    if (giftFame > 0) c.Account.TotalFame += giftFame;
-                                }
-                                c.Account.FlushAsync();
-                                c.Player.Credits = c.Account.Credits;
-                                c.Player.Fame = c.Account.Fame;
-                                count++;
-                            }
-                        }
-                        var giftParts = new System.Collections.Generic.List<string>();
-                        if (giftCredits != 0) giftParts.Add($"{giftCredits} credits");
-                        if (giftFame != 0) giftParts.Add($"{giftFame} fame");
-                        ServerAnnounce($"All players received {string.Join(" and ", giftParts)}!");
-                        Console.WriteLine($"[Admin] Gifted {string.Join(", ", giftParts)} to {count} online players");
+                        Console.WriteLine("[Admin] gift_all: no item name provided");
+                        break;
                     }
+                    var giftGameData = GameServer.Resources.GameData;
+                    if (!giftGameData.IdToObjectType.TryGetValue(giftItemName, out var giftItemType) || !giftGameData.Items.ContainsKey(giftItemType))
+                    {
+                        Console.WriteLine($"[Admin] gift_all: item '{giftItemName}' not found");
+                        break;
+                    }
+                    var giftItem = giftGameData.Items[giftItemType];
+                    int giftCount = 0;
+                    foreach (var c in GameServer.ConnectionManager.Clients.Keys.ToList())
+                    {
+                        if (c.Player != null && c.Account != null)
+                        {
+                            GameServer.Database.AddGift(c.Account, giftItemType);
+                            c.Player.SendInfo($"You received a gift: {giftItem.DisplayName}!");
+                            giftCount++;
+                        }
+                    }
+                    ServerAnnounce($"All players received a gift: {giftItem.DisplayName}!");
+                    Console.WriteLine($"[Admin] Gifted {giftItem.DisplayName} (0x{giftItemType:X4}) to {giftCount} online players");
                     break;
             }
         }

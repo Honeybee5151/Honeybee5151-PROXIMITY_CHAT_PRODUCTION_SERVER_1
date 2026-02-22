@@ -117,17 +117,13 @@ namespace AdminDashboard.Controllers
         {
             try
             {
-                if (request.Credits == 0 && request.Fame == 0)
-                    return BadRequest(new { error = "Specify credits and/or fame amount" });
+                if (string.IsNullOrWhiteSpace(request.ItemName))
+                    return BadRequest(new { error = "Item name is required" });
 
-                // Send via pub/sub so WorldServer gives to all online players
-                var param = $"{request.Credits},{request.Fame}";
-                PublishAdmin("gift_all", param);
+                // Send item name via pub/sub — WorldServer looks it up in game data
+                PublishAdmin("gift_all", request.ItemName.Trim());
 
-                var parts = new List<string>();
-                if (request.Credits != 0) parts.Add($"{request.Credits} credits");
-                if (request.Fame != 0) parts.Add($"{request.Fame} fame");
-                return Ok(new { success = true, message = $"Gifting {string.Join(" and ", parts)} to all online players" });
+                return Ok(new { success = true, message = $"Gifting '{request.ItemName.Trim()}' to all online players" });
             }
             catch (Exception ex)
             {
@@ -306,7 +302,7 @@ namespace AdminDashboard.Controllers
     public class AnnounceRequest { public string Message { get; set; } }
     public class MaintenanceRequest { public bool Enabled { get; set; } }
     public class EventBoostRequest { public double Percent { get; set; } }
-    public class GiftAllRequest { public int Credits { get; set; } public int Fame { get; set; } }
+    public class GiftAllRequest { public string ItemName { get; set; } }
     public class KickRequest { public int AccountId { get; set; } }
     public class BanRequest { public int AccountId { get; set; } public string Reason { get; set; } public int? LiftTime { get; set; } }
     public class UnbanRequest { public int AccountId { get; set; } }

@@ -769,18 +769,14 @@ async function clearExpEvent() {
     }
 }
 
-//8812938 — gift all online players
+//8812938 — gift all online players (items)
 async function giftAll() {
-    const credits = parseInt(document.getElementById('giftall-credits').value) || 0;
-    const fame = parseInt(document.getElementById('giftall-fame').value) || 0;
-    if (credits === 0 && fame === 0) { showFeedback('giftall-feedback', 'Enter credits and/or fame amount', 'error'); return; }
-    const parts = [];
-    if (credits) parts.push(`${credits} credits`);
-    if (fame) parts.push(`${fame} fame`);
-    showConfirm(`Gift ${parts.join(' and ')} to ALL online players?`, async () => {
+    const itemName = document.getElementById('giftall-item').value.trim();
+    if (!itemName) { showFeedback('giftall-feedback', 'Enter an item name', 'error'); return; }
+    showConfirm(`Gift "${itemName}" to ALL online players?`, async () => {
         try {
             const data = await apiFetch('/api/admin/giftall', {
-                method: 'POST', body: JSON.stringify({ credits, fame })
+                method: 'POST', body: JSON.stringify({ itemName })
             });
             showFeedback('giftall-feedback', data.message, 'success');
         } catch (e) {
