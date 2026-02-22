@@ -323,7 +323,17 @@ async function loadRedisKeys(append = false) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">No keys found</td></tr>';
         }
 
-        data.keys.forEach(key => {
+        // Sort: non-account keys first, then account-related keys
+        const accountPrefixes = ['account.', 'vault.', 'char.', 'classStats.', 'alive.', 'dead.'];
+        const isAccountKey = k => accountPrefixes.some(p => k.startsWith(p));
+        const sorted = [...data.keys].sort((a, b) => {
+            const aIsAcc = isAccountKey(a);
+            const bIsAcc = isAccountKey(b);
+            if (aIsAcc !== bIsAcc) return aIsAcc ? 1 : -1;
+            return a.localeCompare(b);
+        });
+
+        sorted.forEach(key => {
             const tr = document.createElement('tr');
             tr.style.cursor = 'pointer';
             tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
