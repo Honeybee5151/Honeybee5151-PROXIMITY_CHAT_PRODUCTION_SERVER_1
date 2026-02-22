@@ -188,6 +188,47 @@ namespace AdminDashboard.Services
             _db.HashSet(key, field, value);
         }
 
+        //8812938 — player lookup for Redis browser
+
+        /// <summary>Resolve a player name to account ID via the 'names' hash</summary>
+        public string ResolveAccountId(string name)
+        {
+            var val = _db.HashGet("names", name.ToUpperInvariant());
+            return val.IsNullOrEmpty ? null : val.ToString();
+        }
+
+        /// <summary>Get a single hash field value</summary>
+        public string HashGet(string key, string field)
+        {
+            var val = _db.HashGet(key, field);
+            return val.IsNullOrEmpty ? null : val.ToString();
+        }
+
+        /// <summary>Get all related keys for an account ID</summary>
+        public List<string> GetAccountRelatedKeys(string accountId)
+        {
+            var keys = new List<string>();
+            // account hash
+            if (_db.KeyExists($"account.{accountId}"))
+                keys.Add($"account.{accountId}");
+            // vault
+            if (_db.KeyExists($"vault.{accountId}"))
+                keys.Add($"vault.{accountId}");
+            // class stats
+            if (_db.KeyExists($"classStats.{accountId}"))
+                keys.Add($"classStats.{accountId}");
+            // alive characters set
+            if (_db.KeyExists($"alive.{accountId}"))
+                keys.Add($"alive.{accountId}");
+            // dead characters list
+            if (_db.KeyExists($"dead.{accountId}"))
+                keys.Add($"dead.{accountId}");
+            // scan for char.{id}.* keys
+            foreach (var key in _server.Keys(pattern: $"char.{accountId}.*", pageSize: 50))
+                keys.Add(key.ToString());
+            return keys;
+        }
+
         /// <summary>
         /// Get Redis memory usage summary
         /// </summary>

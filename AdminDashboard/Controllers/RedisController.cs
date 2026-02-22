@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AdminDashboard.Services;
 using System;
+using System.Collections.Generic;
 
 namespace AdminDashboard.Controllers
 {
@@ -71,6 +72,56 @@ namespace AdminDashboard.Controllers
                     type,
                     value,
                     ttl
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        //8812938 — player lookup
+        [HttpGet("player")]
+        public IActionResult LookupPlayer([FromQuery] string search)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(search))
+                    return BadRequest(new { error = "Search term required" });
+
+                search = search.Trim();
+                string accountId = null;
+
+                // Try as account ID first (pure number)
+                if (int.TryParse(search, out _))
+                {
+                    // Verify account exists
+                    var nameField = _redis.HashGet($"account.{search}", "name");
+                    if (nameField != null)
+                        accountId = search;
+                }
+
+                // Try as player name
+                if (accountId == null)
+                    accountId = _redis.ResolveAccountId(search);
+
+                if (accountId == null)
+                    return Ok(new { found = false, message = "Player not found" });
+
+                // Get account data
+                var (type, value) = _redis.GetKeyValue($"account.{accountId}");
+                var relatedKeys = _redis.GetAccountRelatedKeys(accountId);
+                var name = "";
+                if (value is Dictionary<string, string> hash)
+                    hash.TryGetValue("name", out name);
+
+                return Ok(new
+                {
+                    found = true,
+                    accountId,
+                    name,
+                    accountData = value,
+                    relatedKeys
                 });
             }
             catch (Exception ex)

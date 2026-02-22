@@ -109,38 +109,84 @@
             <!-- Redis Browser Page -->
             <div class="page" id="page-redis">
                 <h2 class="page-title">Redis Browser</h2>
-                <div class="search-bar">
-                    <input type="text" id="redis-pattern" placeholder="Key pattern (e.g. account.* or *)" value="*">
-                    <button class="btn btn-primary" onclick="loadRedisKeys()">Search</button>
+                <div class="tab-bar" id="redis-tabs">
+                    <div class="tab active" data-rtab="players">Players</div>
+                    <div class="tab" data-rtab="allkeys">All Keys</div>
                 </div>
-                <div class="redis-layout">
-                    <div class="redis-keys-panel">
-                        <div class="table-container">
-                            <table>
-                                <thead><tr><th>Key</th><th>Type</th><th>TTL</th></tr></thead>
-                                <tbody id="redis-keys-tbody"></tbody>
-                            </table>
+
+                <!-- Players Tab -->
+                <div class="redis-tab-content active" id="rtab-players">
+                    <div class="search-bar">
+                        <input type="text" id="player-redis-search" placeholder="Search by player name or account ID...">
+                        <button class="btn btn-primary" onclick="searchPlayer()">Search</button>
+                    </div>
+                    <div id="player-lookup-result"></div>
+                    <div class="redis-layout">
+                        <div class="redis-keys-panel">
+                            <div class="table-container">
+                                <table>
+                                    <thead><tr><th>Related Keys</th></tr></thead>
+                                    <tbody id="player-keys-tbody">
+                                        <tr><td style="text-align:center;color:#555;">Search for a player above</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div style="margin-top: 8px; text-align: center;">
-                            <button class="btn btn-secondary" id="redis-load-more" onclick="loadMoreRedisKeys()" style="display:none;">Load More</button>
+                        <div class="redis-value-panel">
+                            <div id="redis-value-header" style="display:none;">
+                                <div class="redis-key-info">
+                                    <span class="redis-key-name" id="redis-current-key"></span>
+                                    <span class="redis-key-type" id="redis-current-type"></span>
+                                    <span class="redis-key-ttl" id="redis-current-ttl"></span>
+                                </div>
+                                <div class="redis-key-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="redisRefreshKey()">Refresh</button>
+                                    <button class="btn btn-danger btn-sm" onclick="redisDeleteKey()">Delete Key</button>
+                                </div>
+                            </div>
+                            <div id="redis-value-content">
+                                <div class="redis-empty-state">Search for a player, then click a key to edit</div>
+                            </div>
+                            <div class="feedback" id="redis-feedback"></div>
                         </div>
                     </div>
-                    <div class="redis-value-panel">
-                        <div id="redis-value-header" style="display:none;">
-                            <div class="redis-key-info">
-                                <span class="redis-key-name" id="redis-current-key"></span>
-                                <span class="redis-key-type" id="redis-current-type"></span>
-                                <span class="redis-key-ttl" id="redis-current-ttl"></span>
+                </div>
+
+                <!-- All Keys Tab -->
+                <div class="redis-tab-content" id="rtab-allkeys">
+                    <div class="search-bar">
+                        <input type="text" id="redis-pattern" placeholder="Key pattern (e.g. legends* or *)" value="*">
+                        <button class="btn btn-primary" onclick="loadRedisKeys()">Search</button>
+                    </div>
+                    <div class="redis-layout">
+                        <div class="redis-keys-panel">
+                            <div class="table-container">
+                                <table>
+                                    <thead><tr><th>Key</th><th>Type</th><th>TTL</th></tr></thead>
+                                    <tbody id="redis-keys-tbody"></tbody>
+                                </table>
                             </div>
-                            <div class="redis-key-actions">
-                                <button class="btn btn-primary btn-sm" onclick="redisRefreshKey()">Refresh</button>
-                                <button class="btn btn-danger btn-sm" onclick="redisDeleteKey()">Delete Key</button>
+                            <div style="margin-top: 8px; text-align: center;">
+                                <button class="btn btn-secondary" id="redis-load-more" onclick="loadMoreRedisKeys()" style="display:none;">Load More</button>
                             </div>
                         </div>
-                        <div id="redis-value-content">
-                            <div class="redis-empty-state">Select a key to view and edit its value</div>
+                        <div class="redis-value-panel">
+                            <div id="redis-value-header-all" style="display:none;">
+                                <div class="redis-key-info">
+                                    <span class="redis-key-name" id="redis-current-key-all"></span>
+                                    <span class="redis-key-type" id="redis-current-type-all"></span>
+                                    <span class="redis-key-ttl" id="redis-current-ttl-all"></span>
+                                </div>
+                                <div class="redis-key-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="redisRefreshKey()">Refresh</button>
+                                    <button class="btn btn-danger btn-sm" onclick="redisDeleteKey()">Delete Key</button>
+                                </div>
+                            </div>
+                            <div id="redis-value-content-all">
+                                <div class="redis-empty-state">Select a key to view and edit its value</div>
+                            </div>
+                            <div class="feedback" id="redis-feedback-all"></div>
                         </div>
-                        <div class="feedback" id="redis-feedback"></div>
                     </div>
                 </div>
             </div>

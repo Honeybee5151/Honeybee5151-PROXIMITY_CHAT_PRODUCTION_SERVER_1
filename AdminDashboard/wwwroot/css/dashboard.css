@@ -381,6 +381,58 @@ tr:hover td {
 .tab:hover { color: #e0e0e0; }
 .tab.active { color: #5b9bd5; border-bottom-color: #5b9bd5; }
 
+/* Redis tab content */
+.redis-tab-content { display: none; }
+.redis-tab-content.active { display: block; }
+
+/* Player lookup result banner */
+.player-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #1a2a1a;
+    border: 1px solid #2a4a2a;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.player-banner .player-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2ecc71;
+}
+
+.player-banner .player-id {
+    font-size: 12px;
+    color: #888;
+}
+
+.player-banner .player-stats {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.player-banner .player-stats span {
+    background: #1a1a1a;
+    padding: 3px 10px;
+    border-radius: 3px;
+    border: 1px solid #333;
+}
+
+.player-not-found {
+    padding: 12px 16px;
+    background: #3a1a1a;
+    border: 1px solid #4a2a2a;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    color: #e74c3c;
+    font-size: 13px;
+}
+
 /* Redis Browser layout */
 .redis-layout {
     display: flex;
