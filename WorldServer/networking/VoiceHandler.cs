@@ -501,7 +501,7 @@ namespace WorldServer.networking
                     playerUdpEndpoints[botId] = clientEndpoint;
                     endpointToPlayerId[clientEndpoint.ToString()] = botId;
                     lastUdpActivity[botId] = DateTime.UtcNow;
-                    VoiceTestMode.RegisterBot(botId, voiceUtils);
+                    VoiceTestMode.RegisterBot(botId, voiceUtils, gameServer);
                     await SendAuthResponse(clientEndpoint, "ACCEPTED", "Test bot authenticated");
                     return;
                 }
