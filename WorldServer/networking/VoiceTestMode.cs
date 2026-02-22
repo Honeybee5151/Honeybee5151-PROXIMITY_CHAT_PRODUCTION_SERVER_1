@@ -117,18 +117,26 @@ namespace WorldServer.networking
                 }
 
                 var gameData = gameServer.Resources.GameData;
-                if (!gameData.IdToObjectType.TryGetValue("Sheep", out ushort objType))
+                if (!gameData.IdToObjectType.TryGetValue("Sign", out ushort objType))
                 {
-                    Console.WriteLine($"[TEST_BOT] Cannot spawn entity — 'Sheep' not found in game data");
+                    Console.WriteLine($"[TEST_BOT] Cannot spawn entity — 'Sign' not found in game data");
                     return;
                 }
 
+                // Verify the tile exists on the map
+                int tileX = (int)x;
+                int tileY = (int)y;
+                var tile = world.Map[tileX, tileY];
+                Console.WriteLine($"[TEST_BOT] Tile at ({tileX}, {tileY}): {(tile != null ? $"type={tile.TileId}" : "NULL")} — map size: {world.Map.Width}x{world.Map.Height}");
+
                 var entity = Entity.Resolve(gameServer, objType);
                 entity.Move(x, y);
+                entity.Spawned = true;
                 world.EnterWorld(entity);
+                Console.WriteLine($"[TEST_BOT] Entity type: {entity.GetType().Name}, ObjectType: 0x{objType:X4}");
 
                 BotEntities[playerId] = entity;
-                Console.WriteLine($"[TEST_BOT] Spawned Sheep for bot {playerId} at ({x:F1}, {y:F1})");
+                Console.WriteLine($"[TEST_BOT] Spawned Sign for bot {playerId} at ({x:F1}, {y:F1})");
             }
             catch (Exception ex)
             {
