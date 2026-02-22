@@ -16,7 +16,7 @@ services:
       - redis
     environment:
       - IS_DOCKER=true
-      - ADMIN_DASHBOARD=true
+      - ADMIN_DASHBOARD=true #8812938
     ports:
       - "2050:2050"
       - "2051:2051"
@@ -31,11 +31,11 @@ services:
       - redis
     environment:
       - IS_DOCKER=true
-      - ADMIN_DASHBOARD=true
+      - ADMIN_DASHBOARD=true #8812938
     ports:
       - "8888:8080"
 
-  admindashboard:
+  admindashboard: #8812938
     build:
       context: .
       dockerfile: Dockerfile.admin

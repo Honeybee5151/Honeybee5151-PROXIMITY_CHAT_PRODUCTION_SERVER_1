@@ -24,7 +24,7 @@ namespace App
 
             var core = app.Services.GetService<CoreService>();
 
-            // Optional: install console interceptor for admin dashboard logs
+            //8812938
             if (System.Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
                 RedisConsoleWriter.Install(core.Database.Conn, "admin:logs:appserver");
 

@@ -96,8 +96,8 @@ namespace WorldServer.core.connection
         //777592
         private VoiceHandler voiceHandler;
         private UdpVoiceHandler udpVoiceHandler;
-        public UdpVoiceHandler UdpVoiceHandler => udpVoiceHandler;
-        public VoiceHandler VoiceHandler => voiceHandler;
+        public UdpVoiceHandler UdpVoiceHandler => udpVoiceHandler; //8812938
+        public VoiceHandler VoiceHandler => voiceHandler; //8812938
 
         public ConnectionListener(GameServer gameServer)
         {

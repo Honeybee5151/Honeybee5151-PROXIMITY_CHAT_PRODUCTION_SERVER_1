@@ -137,7 +137,7 @@ namespace WorldServer.core
             //_ = Task.Run(StartVoiceListener);
             InterServerManager.JoinNetwork();
 
-            // Optional: admin dashboard stats publisher
+            //8812938
             if (Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
             {
                 var adminStats = new AdminStatsPublisher(this);

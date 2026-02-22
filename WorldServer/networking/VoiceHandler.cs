@@ -72,7 +72,7 @@ namespace WorldServer.networking
             return opusData.Length <= SILENCE_PACKET_THRESHOLD;
         }
 
-        public SpatialGrid GetSpatialGrid() => spatialGrid;
+        public SpatialGrid GetSpatialGrid() => spatialGrid; //8812938
 
         public DbAccount GetCachedAccountPublic(int accountId) => GetCachedAccount(accountId);
 
@@ -357,7 +357,7 @@ namespace WorldServer.networking
         private const int MAX_PACKETS_PER_SECOND = 75; // Opus sends ~50 pps at 20ms frames, headroom for bursts
         private readonly ConcurrentDictionary<string, (int Count, long SecondTick)> endpointPacketRates = new();
 
-        // Admin dashboard stats — only active when ADMIN_DASHBOARD=true
+        //8812938
         private readonly bool _adminStatsEnabled = Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true";
         private long _totalPacketsThisSecond;
         private long _lastSecondPacketCount;
@@ -415,7 +415,7 @@ namespace WorldServer.networking
                 _ = Task.Run(ProcessUdpVoicePackets);
                 _ = Task.Run(CleanupInactiveUdpConnections);
                 _ = Task.Run(RefreshSpatialGridLoop);
-                if (_adminStatsEnabled) _ = Task.Run(StatsTickLoop);
+                if (_adminStatsEnabled) _ = Task.Run(StatsTickLoop); //8812938
             }
             catch (Exception ex)
             {
@@ -443,7 +443,7 @@ namespace WorldServer.networking
                             : (1, currentSecond));
                     if (rate.Count > MAX_PACKETS_PER_SECOND)
                     {
-                        if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _rateLimitHits);
+                        if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _rateLimitHits); //8812938
                         continue;
                     }
 
@@ -656,6 +656,7 @@ namespace WorldServer.networking
         if (VoiceHandler.IsSilencePacket(opusAudio))
             return;
 
+        //8812938
         if (_adminStatsEnabled)
         {
             System.Threading.Interlocked.Increment(ref _totalPacketsThisSecond);
@@ -743,7 +744,7 @@ namespace WorldServer.networking
             {
                 if (!hasPriority)
                 {
-                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits);
+                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits); //8812938
                     continue; // Non-priority dropped first
                 }
 
@@ -751,7 +752,7 @@ namespace WorldServer.networking
                 // speakers that could be displaced. Otherwise hard cap.
                 if (nonPriorityCount == 0)
                 {
-                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits);
+                    if (_adminStatsEnabled) System.Threading.Interlocked.Increment(ref _speakerCapHits); //8812938
                     continue; // All slots are priority — hard cap reached
                 }
             }
@@ -925,9 +926,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             }
         }
 
-        /// <summary>
-        /// Rotates per-second packet counter every 1 second for admin stats.
-        /// </summary>
+        //8812938
         private async Task StatsTickLoop()
         {
             while (isRunning)
@@ -968,7 +967,7 @@ private async Task SendUdpPacketSafe(byte[] data, IPEndPoint endpoint, string pl
             return authenticatedPlayers.Keys.ToArray();
         }
 
-        // Admin dashboard stats getters
+        //8812938
         public long GetPacketsPerSecond() => System.Threading.Interlocked.Read(ref _lastSecondPacketCount);
         public long GetRateLimitHits() => System.Threading.Interlocked.Read(ref _rateLimitHits);
         public long GetSpeakerCapHits() => System.Threading.Interlocked.Read(ref _speakerCapHits);

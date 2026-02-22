@@ -125,7 +125,7 @@ namespace WorldServer.networking
             }
         }
 
-        // Admin dashboard stats
+        //8812938
         public int GetOccupiedCellCount() => cells.Values.Count(c => !c.IsEmpty);
         public int GetTrackedPlayerCount() => playerCells.Count;
     }

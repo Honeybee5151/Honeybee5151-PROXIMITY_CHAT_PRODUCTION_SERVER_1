@@ -19,7 +19,7 @@ namespace Shared.isc
         [Description("Announce")]
         Announce,
 
-        [Description("Admin")]
+        [Description("Admin")] //8812938
         Admin
     }
 }
