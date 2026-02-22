@@ -13,8 +13,8 @@ namespace WorldServer.networking
 {
     public static class VoiceTestMode
     {
-        // Set to false (or delete this file) for production
-        public const bool ENABLED = false;
+        // Toggleable at runtime via admin dashboard
+        public static volatile bool ENABLED = false;
 
         public const int MIN_BOT_ID = 60000;
 

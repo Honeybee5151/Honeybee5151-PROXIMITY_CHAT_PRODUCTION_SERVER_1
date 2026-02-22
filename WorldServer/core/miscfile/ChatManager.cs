@@ -84,6 +84,7 @@ namespace WorldServer.core.miscfile
         {
             GameServer.InterServerManager.AddHandler<ChatMsg>(Channel.Chat, HandleChat);
             GameServer.InterServerManager.AddHandler<AnnounceMsg>(Channel.Announce, HandleAnnounce);
+            //8812938
             if (Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
                 GameServer.InterServerManager.AddHandler<AdminMsg>(Channel.Admin, HandleAdminCommand);
             GameServer.InterServerManager.NewServer += AnnounceNewServer;
@@ -218,6 +219,7 @@ namespace WorldServer.core.miscfile
             return true;
         }
 
+        //8812938
         private void HandleAdminCommand(object sender, InterServerEventArgs<AdminMsg> e)
         {
             var cmd = e.Content.Command;
@@ -256,8 +258,9 @@ namespace WorldServer.core.miscfile
                     break;
 
                 case "voice_testmode":
-                    // VoiceTestMode.ENABLED is const so can't toggle at runtime
-                    Console.WriteLine($"[Admin] VoiceTestMode is compile-time const (currently {networking.VoiceTestMode.ENABLED}). Rebuild to change.");
+                    var enable = param == "true";
+                    networking.VoiceTestMode.ENABLED = enable;
+                    Console.WriteLine($"[Admin] VoiceTestMode set to {enable}");
                     break;
             }
         }

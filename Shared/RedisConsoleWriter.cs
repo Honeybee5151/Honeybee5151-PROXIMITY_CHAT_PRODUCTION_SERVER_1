@@ -1,3 +1,4 @@
+//8812938
 using System;
 using System.IO;
 using System.Text;
@@ -32,20 +33,63 @@ namespace Shared
             _flushTimer = new Timer(_ => Flush(), null, FLUSH_INTERVAL_MS, FLUSH_INTERVAL_MS);
         }
 
+        // Buffer for reconstructing lines from Write() calls (NLog ColoredConsole uses Write, not WriteLine)
+        private readonly StringBuilder _lineBuffer = new();
+        private readonly object _lineBufferLock = new();
+
         public override void WriteLine(string value)
         {
             _original.WriteLine(value);
 
-            if (_buffer.Count < MAX_BUFFER)
+            string line;
+            lock (_lineBufferLock)
             {
-                var line = $"[{DateTime.UtcNow:HH:mm:ss}] {value}";
-                _buffer.Enqueue(line);
+                if (_lineBuffer.Length > 0)
+                {
+                    _lineBuffer.Append(value);
+                    line = _lineBuffer.ToString();
+                    _lineBuffer.Clear();
+                }
+                else
+                {
+                    line = value;
+                }
             }
+
+            if (_buffer.Count < MAX_BUFFER)
+                _buffer.Enqueue($"[{DateTime.UtcNow:HH:mm:ss}] {line}");
         }
 
         public override void Write(string value)
         {
             _original.Write(value);
+            if (value == null) return;
+
+            if (value.Contains('\n'))
+            {
+                var parts = value.Split('\n');
+                lock (_lineBufferLock)
+                {
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        _lineBuffer.Append(parts[i]);
+                        if (i < parts.Length - 1)
+                        {
+                            var line = _lineBuffer.ToString().TrimEnd('\r');
+                            if (line.Length > 0 && _buffer.Count < MAX_BUFFER)
+                                _buffer.Enqueue($"[{DateTime.UtcNow:HH:mm:ss}] {line}");
+                            _lineBuffer.Clear();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                lock (_lineBufferLock)
+                {
+                    _lineBuffer.Append(value);
+                }
+            }
         }
 
         private void Flush()
