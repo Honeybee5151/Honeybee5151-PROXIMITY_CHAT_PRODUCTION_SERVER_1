@@ -1,4 +1,5 @@
 ﻿using Shared;
+using WorldServer.core;
 
 namespace WorldServer
 {
