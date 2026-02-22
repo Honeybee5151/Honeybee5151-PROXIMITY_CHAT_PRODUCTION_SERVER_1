@@ -1,5 +1,5 @@
-<!--8812938-->
 <Project Sdk="Microsoft.NET.Sdk.Web">
+	<!--8812938-->
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
