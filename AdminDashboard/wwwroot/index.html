@@ -113,8 +113,8 @@
                     <input type="text" id="redis-pattern" placeholder="Key pattern (e.g. account.* or *)" value="*">
                     <button class="btn btn-primary" onclick="loadRedisKeys()">Search</button>
                 </div>
-                <div style="display: flex; gap: 16px;">
-                    <div style="flex: 1;">
+                <div class="redis-layout">
+                    <div class="redis-keys-panel">
                         <div class="table-container">
                             <table>
                                 <thead><tr><th>Key</th><th>Type</th><th>TTL</th></tr></thead>
@@ -125,9 +125,22 @@
                             <button class="btn btn-secondary" id="redis-load-more" onclick="loadMoreRedisKeys()" style="display:none;">Load More</button>
                         </div>
                     </div>
-                    <div style="flex: 1;">
-                        <div class="card-title" style="margin-bottom: 8px;">Key Value</div>
-                        <div class="key-value-viewer" id="redis-value-viewer">Select a key to view its value</div>
+                    <div class="redis-value-panel">
+                        <div id="redis-value-header" style="display:none;">
+                            <div class="redis-key-info">
+                                <span class="redis-key-name" id="redis-current-key"></span>
+                                <span class="redis-key-type" id="redis-current-type"></span>
+                                <span class="redis-key-ttl" id="redis-current-ttl"></span>
+                            </div>
+                            <div class="redis-key-actions">
+                                <button class="btn btn-primary btn-sm" onclick="redisRefreshKey()">Refresh</button>
+                                <button class="btn btn-danger btn-sm" onclick="redisDeleteKey()">Delete Key</button>
+                            </div>
+                        </div>
+                        <div id="redis-value-content">
+                            <div class="redis-empty-state">Select a key to view and edit its value</div>
+                        </div>
+                        <div class="feedback" id="redis-feedback"></div>
                     </div>
                 </div>
             </div>

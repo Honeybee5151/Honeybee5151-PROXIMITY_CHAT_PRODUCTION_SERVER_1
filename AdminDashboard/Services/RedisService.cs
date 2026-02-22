@@ -114,6 +114,80 @@ namespace AdminDashboard.Services
             return ttl.HasValue ? (long)ttl.Value.TotalSeconds : -1;
         }
 
+        //8812938 — write operations for Redis browser
+
+        /// <summary>Set a string key value</summary>
+        public void StringSet(string key, string value)
+        {
+            _db.StringSet(key, value);
+        }
+
+        /// <summary>Set a single hash field</summary>
+        public void HashSet(string key, string field, string value)
+        {
+            _db.HashSet(key, field, value);
+        }
+
+        /// <summary>Delete a hash field</summary>
+        public bool HashDelete(string key, string field)
+        {
+            return _db.HashDelete(key, field);
+        }
+
+        /// <summary>Set a list element by index</summary>
+        public void ListSet(string key, int index, string value)
+        {
+            _db.ListSetByIndex(key, index, value);
+        }
+
+        /// <summary>Push to end of list</summary>
+        public void ListPush(string key, string value)
+        {
+            _db.ListRightPush(key, value);
+        }
+
+        /// <summary>Remove a list element by value</summary>
+        public long ListRemove(string key, string value)
+        {
+            return _db.ListRemove(key, value, 1);
+        }
+
+        /// <summary>Add a set member</summary>
+        public bool SetAdd(string key, string value)
+        {
+            return _db.SetAdd(key, value);
+        }
+
+        /// <summary>Remove a set member</summary>
+        public bool SetRemove(string key, string value)
+        {
+            return _db.SetRemove(key, value);
+        }
+
+        /// <summary>Add/update sorted set member</summary>
+        public bool SortedSetAdd(string key, string member, double score)
+        {
+            return _db.SortedSetAdd(key, member, score);
+        }
+
+        /// <summary>Remove sorted set member</summary>
+        public bool SortedSetRemove(string key, string member)
+        {
+            return _db.SortedSetRemove(key, member);
+        }
+
+        /// <summary>Delete an entire key</summary>
+        public bool DeleteKey(string key)
+        {
+            return _db.KeyDelete(key);
+        }
+
+        /// <summary>Add a new hash field</summary>
+        public void HashAddField(string key, string field, string value)
+        {
+            _db.HashSet(key, field, value);
+        }
+
         /// <summary>
         /// Get Redis memory usage summary
         /// </summary>

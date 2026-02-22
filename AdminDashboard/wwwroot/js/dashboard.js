@@ -204,6 +204,8 @@ document.getElementById('player-search')?.addEventListener('keydown', e => {
 
 // ========== Redis Browser ==========
 let redisCursor = 0;
+let redisCurrentKey = null;
+let redisCurrentType = null;
 
 async function loadRedisKeys(append = false) {
     try {
@@ -237,25 +239,275 @@ function loadMoreRedisKeys() { loadRedisKeys(true); }
 async function loadRedisKeyValue(key) {
     try {
         const data = await apiFetch(`/api/redis/key/${encodeURIComponent(key)}`);
-        const viewer = document.getElementById('redis-value-viewer');
-        let content = `Key: ${data.key}\nType: ${data.type}\nTTL: ${data.ttl === -1 ? 'No expiry' : data.ttl + 's'}\n\n`;
+        redisCurrentKey = data.key;
+        redisCurrentType = data.type;
+
+        // Update header
+        document.getElementById('redis-value-header').style.display = 'flex';
+        document.getElementById('redis-current-key').textContent = data.key;
+        document.getElementById('redis-current-type').textContent = data.type;
+        document.getElementById('redis-current-ttl').textContent = data.ttl === -1 ? 'No expiry' : data.ttl + 's TTL';
+
+        // Highlight selected row in keys list
+        document.querySelectorAll('#redis-keys-tbody tr').forEach(r => r.classList.remove('selected'));
+        document.querySelectorAll('#redis-keys-tbody tr').forEach(r => {
+            if (r.querySelector('td')?.textContent === data.key) r.classList.add('selected');
+        });
+
+        const content = document.getElementById('redis-value-content');
 
         if (data.type === 'hash' && typeof data.value === 'object') {
-            content += 'Fields:\n';
-            for (const [k, v] of Object.entries(data.value)) {
-                content += `  ${k}: ${v}\n`;
-            }
-        } else if (Array.isArray(data.value)) {
-            content += 'Values:\n';
-            data.value.forEach((v, i) => { content += `  [${i}] ${typeof v === 'object' ? JSON.stringify(v) : v}\n`; });
+            renderHashEditor(content, data.key, data.value);
+        } else if (data.type === 'list' && Array.isArray(data.value)) {
+            renderListEditor(content, data.key, data.value);
+        } else if (data.type === 'set' && Array.isArray(data.value)) {
+            renderSetEditor(content, data.key, data.value);
+        } else if (data.type === 'sortedset' && Array.isArray(data.value)) {
+            renderSortedSetEditor(content, data.key, data.value);
         } else {
-            content += 'Value:\n  ' + (data.value || '(empty)');
+            renderStringEditor(content, data.key, data.value);
         }
-
-        viewer.textContent = content;
     } catch (e) {
-        document.getElementById('redis-value-viewer').textContent = 'Error loading key: ' + e.message;
+        document.getElementById('redis-value-content').innerHTML = `<div class="redis-empty-state">Error: ${esc(e.message)}</div>`;
     }
+}
+
+function renderStringEditor(container, key, value) {
+    container.innerHTML = `
+        <div class="redis-editor">
+            <textarea class="redis-edit-textarea" id="redis-string-val">${esc(value || '')}</textarea>
+            <button class="btn btn-success btn-sm" onclick="redisSaveString()">Save</button>
+        </div>`;
+}
+
+function renderHashEditor(container, key, hash) {
+    const entries = Object.entries(hash);
+    let html = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Field</th><th>Value</th><th></th></tr></thead><tbody>`;
+    entries.forEach(([field, val]) => {
+        html += `<tr>
+            <td class="redis-field-name">${esc(field)}</td>
+            <td><input class="redis-edit-input" data-field="${esc(field)}" value="${esc(val)}" /></td>
+            <td class="redis-row-actions">
+                <button class="btn btn-success btn-xs" onclick="redisSaveHashField(this)" title="Save">&#10003;</button>
+                <button class="btn btn-danger btn-xs" onclick="redisDeleteHashField('${esc(field)}')" title="Delete">&#10005;</button>
+            </td></tr>`;
+    });
+    html += `</tbody></table>
+        <div class="redis-add-row">
+            <input class="redis-edit-input" id="redis-new-hash-field" placeholder="New field name" />
+            <input class="redis-edit-input" id="redis-new-hash-value" placeholder="Value" />
+            <button class="btn btn-primary btn-sm" onclick="redisAddHashField()">Add Field</button>
+        </div></div>`;
+    container.innerHTML = html;
+}
+
+function renderListEditor(container, key, items) {
+    let html = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>#</th><th>Value</th><th></th></tr></thead><tbody>`;
+    items.forEach((val, i) => {
+        html += `<tr>
+            <td class="redis-field-name">${i}</td>
+            <td><input class="redis-edit-input" data-index="${i}" value="${esc(val)}" /></td>
+            <td class="redis-row-actions">
+                <button class="btn btn-success btn-xs" onclick="redisSaveListItem(this)" title="Save">&#10003;</button>
+                <button class="btn btn-danger btn-xs" onclick="redisDeleteListItem('${esc(val)}')" title="Delete">&#10005;</button>
+            </td></tr>`;
+    });
+    html += `</tbody></table>
+        <div class="redis-add-row">
+            <input class="redis-edit-input" id="redis-new-list-value" placeholder="New value" style="flex:1" />
+            <button class="btn btn-primary btn-sm" onclick="redisAddListItem()">Push</button>
+        </div></div>`;
+    container.innerHTML = html;
+}
+
+function renderSetEditor(container, key, members) {
+    let html = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Member</th><th></th></tr></thead><tbody>`;
+    members.forEach(val => {
+        html += `<tr>
+            <td>${esc(val)}</td>
+            <td class="redis-row-actions">
+                <button class="btn btn-danger btn-xs" onclick="redisDeleteSetMember('${esc(val)}')" title="Remove">&#10005;</button>
+            </td></tr>`;
+    });
+    html += `</tbody></table>
+        <div class="redis-add-row">
+            <input class="redis-edit-input" id="redis-new-set-value" placeholder="New member" style="flex:1" />
+            <button class="btn btn-primary btn-sm" onclick="redisAddSetMember()">Add</button>
+        </div></div>`;
+    container.innerHTML = html;
+}
+
+function renderSortedSetEditor(container, key, entries) {
+    let html = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Member</th><th>Score</th><th></th></tr></thead><tbody>`;
+    entries.forEach(e => {
+        const member = e.member || e.Member || '';
+        const score = e.score ?? e.Score ?? 0;
+        html += `<tr>
+            <td>${esc(member)}</td>
+            <td><input class="redis-edit-input redis-score-input" data-member="${esc(member)}" value="${score}" type="number" step="any" /></td>
+            <td class="redis-row-actions">
+                <button class="btn btn-success btn-xs" onclick="redisSaveZSetScore(this)" title="Save">&#10003;</button>
+                <button class="btn btn-danger btn-xs" onclick="redisDeleteZSetMember('${esc(member)}')" title="Remove">&#10005;</button>
+            </td></tr>`;
+    });
+    html += `</tbody></table>
+        <div class="redis-add-row">
+            <input class="redis-edit-input" id="redis-new-zset-member" placeholder="Member" />
+            <input class="redis-edit-input redis-score-input" id="redis-new-zset-score" placeholder="Score" type="number" step="any" value="0" />
+            <button class="btn btn-primary btn-sm" onclick="redisAddZSetMember()">Add</button>
+        </div></div>`;
+    container.innerHTML = html;
+}
+
+// ---- Redis write operations ----
+
+async function redisSaveString() {
+    const val = document.getElementById('redis-string-val').value;
+    try {
+        await apiFetch(`/api/redis/key/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ value: val })
+        });
+        showFeedback('redis-feedback', 'Saved', 'success');
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisSaveHashField(btn) {
+    const input = btn.closest('tr').querySelector('input');
+    const field = input.dataset.field;
+    try {
+        await apiFetch(`/api/redis/hash/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ field, value: input.value })
+        });
+        showFeedback('redis-feedback', `Saved ${field}`, 'success');
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisDeleteHashField(field) {
+    if (!confirm(`Delete field "${field}"?`)) return;
+    try {
+        await apiFetch(`/api/redis/hash/${encodeURIComponent(redisCurrentKey)}?field=${encodeURIComponent(field)}`, { method: 'DELETE' });
+        showFeedback('redis-feedback', `Deleted ${field}`, 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisAddHashField() {
+    const field = document.getElementById('redis-new-hash-field').value;
+    const value = document.getElementById('redis-new-hash-value').value;
+    if (!field) return;
+    try {
+        await apiFetch(`/api/redis/hash/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ field, value })
+        });
+        showFeedback('redis-feedback', `Added ${field}`, 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisSaveListItem(btn) {
+    const input = btn.closest('tr').querySelector('input');
+    const index = parseInt(input.dataset.index);
+    try {
+        await apiFetch(`/api/redis/list/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ index, value: input.value })
+        });
+        showFeedback('redis-feedback', `Saved [${index}]`, 'success');
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisDeleteListItem(value) {
+    if (!confirm(`Remove item "${value.substring(0, 40)}"?`)) return;
+    try {
+        await apiFetch(`/api/redis/list/${encodeURIComponent(redisCurrentKey)}?value=${encodeURIComponent(value)}`, { method: 'DELETE' });
+        showFeedback('redis-feedback', 'Removed', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisAddListItem() {
+    const value = document.getElementById('redis-new-list-value').value;
+    try {
+        await apiFetch(`/api/redis/list/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ value })
+        });
+        showFeedback('redis-feedback', 'Pushed', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisDeleteSetMember(value) {
+    if (!confirm(`Remove "${value.substring(0, 40)}"?`)) return;
+    try {
+        await apiFetch(`/api/redis/set/${encodeURIComponent(redisCurrentKey)}?value=${encodeURIComponent(value)}`, { method: 'DELETE' });
+        showFeedback('redis-feedback', 'Removed', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisAddSetMember() {
+    const value = document.getElementById('redis-new-set-value').value;
+    if (!value) return;
+    try {
+        await apiFetch(`/api/redis/set/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ value })
+        });
+        showFeedback('redis-feedback', 'Added', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisSaveZSetScore(btn) {
+    const input = btn.closest('tr').querySelector('input');
+    const member = input.dataset.member;
+    const score = parseFloat(input.value) || 0;
+    try {
+        await apiFetch(`/api/redis/zset/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ member, score })
+        });
+        showFeedback('redis-feedback', `Saved ${member}`, 'success');
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisDeleteZSetMember(member) {
+    if (!confirm(`Remove "${member.substring(0, 40)}"?`)) return;
+    try {
+        await apiFetch(`/api/redis/zset/${encodeURIComponent(redisCurrentKey)}?member=${encodeURIComponent(member)}`, { method: 'DELETE' });
+        showFeedback('redis-feedback', 'Removed', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisAddZSetMember() {
+    const member = document.getElementById('redis-new-zset-member').value;
+    const score = parseFloat(document.getElementById('redis-new-zset-score').value) || 0;
+    if (!member) return;
+    try {
+        await apiFetch(`/api/redis/zset/${encodeURIComponent(redisCurrentKey)}`, {
+            method: 'PUT', body: JSON.stringify({ member, score })
+        });
+        showFeedback('redis-feedback', 'Added', 'success');
+        loadRedisKeyValue(redisCurrentKey);
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+async function redisDeleteKey() {
+    if (!confirm(`Delete entire key "${redisCurrentKey}"?`)) return;
+    try {
+        await apiFetch(`/api/redis/key/${encodeURIComponent(redisCurrentKey)}`, { method: 'DELETE' });
+        showFeedback('redis-feedback', 'Key deleted', 'success');
+        document.getElementById('redis-value-header').style.display = 'none';
+        document.getElementById('redis-value-content').innerHTML = '<div class="redis-empty-state">Key deleted</div>';
+        redisCurrentKey = null;
+        loadRedisKeys();
+    } catch (e) { showFeedback('redis-feedback', e.message, 'error'); }
+}
+
+function redisRefreshKey() {
+    if (redisCurrentKey) loadRedisKeyValue(redisCurrentKey);
 }
 
 document.getElementById('redis-pattern')?.addEventListener('keydown', e => {
