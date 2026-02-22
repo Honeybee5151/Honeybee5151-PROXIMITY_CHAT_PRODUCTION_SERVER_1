@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
+using AdminDashboard.Services;
 
 namespace AdminDashboard.Controllers
 {
@@ -7,12 +7,19 @@ namespace AdminDashboard.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly RedisService _redis;
+
+        public AuthController(RedisService redis)
+        {
+            _redis = redis;
+        }
+
         [HttpPost("validate")]
         public IActionResult Validate([FromBody] TokenRequest request)
         {
-            var adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "";
+            var adminToken = _redis.Database.StringGet("admin:token").ToString();
 
-            if (string.IsNullOrEmpty(adminToken) || request.Token == adminToken)
+            if (!string.IsNullOrEmpty(adminToken) && request.Token == adminToken)
                 return Ok(new { valid = true });
 
             return Unauthorized(new { valid = false });

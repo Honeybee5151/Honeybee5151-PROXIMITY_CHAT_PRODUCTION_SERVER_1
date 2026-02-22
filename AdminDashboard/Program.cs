@@ -31,12 +31,22 @@ namespace AdminDashboard
             app.Urls.Clear();
             app.Urls.Add($"http://{bindAddress}:{port}");
 
-            // Token auth middleware — if ADMIN_TOKEN is set, require it. Otherwise open access.
-            var adminToken = Environment.GetEnvironmentVariable("ADMIN_TOKEN") ?? "";
+            // Token auth — stored in Redis, auto-generated on first boot
+            var adminToken = redis.Database.StringGet("admin:token").ToString();
             if (string.IsNullOrEmpty(adminToken))
-                Console.WriteLine("[AdminDashboard] No ADMIN_TOKEN set — running without auth. Set ADMIN_TOKEN env var to enable token auth.");
+            {
+                adminToken = Guid.NewGuid().ToString("N");
+                redis.Database.StringSet("admin:token", adminToken);
+                Console.WriteLine("============================================================");
+                Console.WriteLine($"[AdminDashboard] Generated admin token: {adminToken}");
+                Console.WriteLine("[AdminDashboard] Save this token — you need it to log in.");
+                Console.WriteLine("[AdminDashboard] Token is stored in Redis key 'admin:token'");
+                Console.WriteLine("============================================================");
+            }
             else
-                Console.WriteLine("[AdminDashboard] Token auth enabled.");
+            {
+                Console.WriteLine($"[AdminDashboard] Using existing token from Redis (admin:token)");
+            }
 
             app.Use(async (context, next) =>
             {
@@ -51,13 +61,6 @@ namespace AdminDashboard
 
                 // Allow token validation endpoint
                 if (path == "/api/auth/validate")
-                {
-                    await next();
-                    return;
-                }
-
-                // If no token configured, allow all requests (secure via network/firewall instead)
-                if (string.IsNullOrEmpty(adminToken))
                 {
                     await next();
                     return;
