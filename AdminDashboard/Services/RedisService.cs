@@ -345,6 +345,75 @@ namespace AdminDashboard.Services
 
             return result;
         }
+
+        /// <summary>Execute a raw Redis command and return the result as a string</summary>
+        public string ExecuteCommand(string commandLine)
+        {
+            var parts = ParseCommandLine(commandLine);
+            if (parts.Length == 0) return "(error) empty command";
+
+            var cmd = parts[0].ToUpper();
+            var args = parts.Skip(1).Select(a => (object)a).ToArray();
+
+            try
+            {
+                var result = _db.Execute(cmd, args);
+                return FormatRedisResult(result);
+            }
+            catch (Exception ex)
+            {
+                return $"(error) {ex.Message}";
+            }
+        }
+
+        private string[] ParseCommandLine(string input)
+        {
+            var parts = new List<string>();
+            var current = "";
+            bool inQuote = false;
+            char quoteChar = '"';
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                var c = input[i];
+                if (inQuote)
+                {
+                    if (c == quoteChar) inQuote = false;
+                    else current += c;
+                }
+                else if (c == '"' || c == '\'')
+                {
+                    inQuote = true;
+                    quoteChar = c;
+                }
+                else if (c == ' ')
+                {
+                    if (current.Length > 0) { parts.Add(current); current = ""; }
+                }
+                else current += c;
+            }
+            if (current.Length > 0) parts.Add(current);
+            return parts.ToArray();
+        }
+
+        private string FormatRedisResult(StackExchange.Redis.RedisResult result)
+        {
+            if (result.IsNull) return "(nil)";
+            var type = result.Type;
+            if (type == StackExchange.Redis.ResultType.Integer) return $"(integer) {result}";
+            if (type == StackExchange.Redis.ResultType.BulkString) return result.ToString();
+            if (type == StackExchange.Redis.ResultType.SimpleString) return result.ToString();
+            if (type == StackExchange.Redis.ResultType.MultiBulk)
+            {
+                var arr = (StackExchange.Redis.RedisResult[])result;
+                if (arr.Length == 0) return "(empty array)";
+                var lines = new List<string>();
+                for (int i = 0; i < arr.Length; i++)
+                    lines.Add($"{i + 1}) {FormatRedisResult(arr[i])}");
+                return string.Join("\n", lines);
+            }
+            return result.ToString();
+        }
     }
 
     public class IpInfoDto

@@ -883,6 +883,55 @@ async function unmutePlayer() {
     }
 }
 
+//8812938 — admin command line
+async function sendAdminCommand() {
+    const command = document.getElementById('cmd-command').value.trim();
+    const parameter = document.getElementById('cmd-parameter').value.trim();
+    if (!command) { showFeedback('cmd-feedback', 'Enter a command', 'error'); return; }
+    try {
+        const data = await apiFetch('/api/admin/command', {
+            method: 'POST', body: JSON.stringify({ command, parameter })
+        });
+        showFeedback('cmd-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('cmd-feedback', e.message, 'error');
+    }
+}
+
+document.getElementById('cmd-command')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendAdminCommand();
+});
+document.getElementById('cmd-parameter')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendAdminCommand();
+});
+
+//8812938 — redis console
+async function executeRedisCommand() {
+    const cmd = document.getElementById('redis-cmd').value.trim();
+    if (!cmd) return;
+    const output = document.getElementById('redis-console-output');
+    // Append command
+    output.textContent += `\n> ${cmd}\n`;
+    try {
+        const data = await apiFetch('/api/admin/redis/execute', {
+            method: 'POST', body: JSON.stringify({ command: cmd })
+        });
+        output.textContent += (data.result || '(nil)') + '\n';
+    } catch (e) {
+        output.textContent += `(error) ${e.message}\n`;
+    }
+    output.scrollTop = output.scrollHeight;
+    document.getElementById('redis-cmd').value = '';
+}
+
+function clearRedisConsole() {
+    document.getElementById('redis-console-output').textContent = 'Ready.';
+}
+
+document.getElementById('redis-cmd')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') executeRedisCommand();
+});
+
 // ========== Logs ==========
 let currentLogSource = 'worldserver';
 

@@ -296,6 +296,28 @@
                     </div>
                     <div class="feedback" id="voice-admin-feedback"></div>
                 </div>
+
+                <!-- Admin Command Line -->
+                <div class="admin-section">
+                    <h3>Admin Command Line</h3>
+                    <div class="form-row">
+                        <input type="text" id="cmd-command" placeholder="Command (e.g. kick, announce, gift_all)">
+                        <input type="text" id="cmd-parameter" placeholder="Parameter (e.g. 123, Hello everyone)">
+                        <button class="btn btn-primary" onclick="sendAdminCommand()">Send</button>
+                    </div>
+                    <div class="feedback" id="cmd-feedback"></div>
+                </div>
+
+                <!-- Redis Console -->
+                <div class="admin-section">
+                    <h3>Redis Console</h3>
+                    <div class="form-row">
+                        <input type="text" id="redis-cmd" placeholder="Redis command (e.g. HGETALL account.1, GET admin:maintenance)">
+                        <button class="btn btn-primary" onclick="executeRedisCommand()">Execute</button>
+                        <button class="btn btn-secondary" onclick="clearRedisConsole()">Clear</button>
+                    </div>
+                    <div class="log-viewer" id="redis-console-output" style="margin-top:8px;min-height:120px;max-height:400px;">Ready.</div>
+                </div>
             </div>
 
             <!-- Logs Page -->

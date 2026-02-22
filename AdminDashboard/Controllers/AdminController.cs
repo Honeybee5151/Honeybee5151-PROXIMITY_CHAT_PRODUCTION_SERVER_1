@@ -297,6 +297,47 @@ namespace AdminDashboard.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+
+        //8812938 — admin command line (arbitrary pub/sub command)
+
+        [HttpPost("command")]
+        public IActionResult SendCommand([FromBody] CommandRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Command))
+                    return BadRequest(new { error = "Command is required" });
+
+                PublishAdmin(request.Command.Trim(), request.Parameter?.Trim() ?? "");
+                var display = string.IsNullOrWhiteSpace(request.Parameter)
+                    ? request.Command.Trim()
+                    : $"{request.Command.Trim()} {request.Parameter.Trim()}";
+                return Ok(new { success = true, message = $"Command sent: {display}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        //8812938 — raw Redis command execution
+
+        [HttpPost("redis/execute")]
+        public IActionResult ExecuteRedis([FromBody] RedisExecuteRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Command))
+                    return BadRequest(new { error = "Command is required" });
+
+                var result = _redis.ExecuteCommand(request.Command.Trim());
+                return Ok(new { success = true, result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
     }
 
     public class AnnounceRequest { public string Message { get; set; } }
@@ -311,4 +352,6 @@ namespace AdminDashboard.Controllers
     public class MuteRequest { public int AccountId { get; set; } public int Minutes { get; set; } }
     public class UnmuteRequest { public int AccountId { get; set; } }
     public class TestModeRequest { public bool Enabled { get; set; } }
+    public class CommandRequest { public string Command { get; set; } public string Parameter { get; set; } }
+    public class RedisExecuteRequest { public string Command { get; set; } }
 }
