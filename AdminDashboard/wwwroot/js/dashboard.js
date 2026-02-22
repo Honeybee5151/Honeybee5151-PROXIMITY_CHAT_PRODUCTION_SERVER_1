@@ -689,6 +689,106 @@ async function toggleTestMode() {
     }
 }
 
+//8812938 — maintenance mode
+async function toggleMaintenance() {
+    const toggle = document.getElementById('maintenance-toggle');
+    const enabled = !toggle.classList.contains('on');
+    showConfirm(enabled ? 'Enable maintenance mode? All non-admin players will be kicked.' : 'Disable maintenance mode?', async () => {
+        try {
+            const data = await apiFetch('/api/admin/maintenance', {
+                method: 'POST', body: JSON.stringify({ enabled })
+            });
+            toggle.classList.toggle('on', enabled);
+            showFeedback('maintenance-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('maintenance-feedback', e.message, 'error');
+        }
+    });
+}
+
+async function loadMaintenanceState() {
+    try {
+        const data = await apiFetch('/api/admin/maintenance');
+        document.getElementById('maintenance-toggle').classList.toggle('on', data.enabled);
+    } catch (e) { /* ignore */ }
+}
+
+//8812938 — server-wide loot event
+async function setLootEvent() {
+    const pct = parseInt(document.getElementById('loot-event-percent').value) || 0;
+    if (pct <= 0) { showFeedback('lootevent-feedback', 'Enter a percentage > 0', 'error'); return; }
+    showConfirm(`Set server-wide loot event to +${pct}%?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/lootevent', {
+                method: 'POST', body: JSON.stringify({ percent: pct / 100 })
+            });
+            showFeedback('lootevent-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('lootevent-feedback', e.message, 'error');
+        }
+    });
+}
+
+async function clearLootEvent() {
+    try {
+        const data = await apiFetch('/api/admin/lootevent', {
+            method: 'POST', body: JSON.stringify({ percent: 0 })
+        });
+        showFeedback('lootevent-feedback', data.message, 'success');
+        document.getElementById('loot-event-percent').value = '';
+    } catch (e) {
+        showFeedback('lootevent-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — server-wide XP/fame event
+async function setExpEvent() {
+    const pct = parseInt(document.getElementById('exp-event-percent').value) || 0;
+    if (pct <= 0) { showFeedback('expevent-feedback', 'Enter a percentage > 0', 'error'); return; }
+    showConfirm(`Set server-wide XP event to +${pct}%?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/expevent', {
+                method: 'POST', body: JSON.stringify({ percent: pct / 100 })
+            });
+            showFeedback('expevent-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('expevent-feedback', e.message, 'error');
+        }
+    });
+}
+
+async function clearExpEvent() {
+    try {
+        const data = await apiFetch('/api/admin/expevent', {
+            method: 'POST', body: JSON.stringify({ percent: 0 })
+        });
+        showFeedback('expevent-feedback', data.message, 'success');
+        document.getElementById('exp-event-percent').value = '';
+    } catch (e) {
+        showFeedback('expevent-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — gift all online players
+async function giftAll() {
+    const credits = parseInt(document.getElementById('giftall-credits').value) || 0;
+    const fame = parseInt(document.getElementById('giftall-fame').value) || 0;
+    if (credits === 0 && fame === 0) { showFeedback('giftall-feedback', 'Enter credits and/or fame amount', 'error'); return; }
+    const parts = [];
+    if (credits) parts.push(`${credits} credits`);
+    if (fame) parts.push(`${fame} fame`);
+    showConfirm(`Gift ${parts.join(' and ')} to ALL online players?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/giftall', {
+                method: 'POST', body: JSON.stringify({ credits, fame })
+            });
+            showFeedback('giftall-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('giftall-feedback', e.message, 'error');
+        }
+    });
+}
+
 //8812938 — ban/unban
 async function banPlayer() {
     const id = document.getElementById('ban-account-id').value;
@@ -775,94 +875,6 @@ async function unmutePlayer() {
     } catch (e) {
         showFeedback('mute-feedback', e.message, 'error');
     }
-}
-
-//8812938 — set rank
-async function setRank() {
-    const id = document.getElementById('rank-account-id').value;
-    const rank = parseInt(document.getElementById('rank-value').value);
-    if (!id) return;
-    showConfirm(`Set account ${id} rank to ${rank}?`, async () => {
-        try {
-            const data = await apiFetch('/api/admin/setrank', {
-                method: 'POST', body: JSON.stringify({ accountId: parseInt(id), rank })
-            });
-            showFeedback('rank-feedback', data.message, 'success');
-        } catch (e) {
-            showFeedback('rank-feedback', e.message, 'error');
-        }
-    });
-}
-
-//8812938 — gift credits/fame
-async function giftCurrency() {
-    const id = document.getElementById('gift-account-id').value;
-    const credits = parseInt(document.getElementById('gift-credits').value) || 0;
-    const fame = parseInt(document.getElementById('gift-fame').value) || 0;
-    if (!id) return;
-    if (credits === 0 && fame === 0) { showFeedback('gift-feedback', 'Enter credits and/or fame amount', 'error'); return; }
-    try {
-        const data = await apiFetch('/api/admin/gift', {
-            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), credits, fame })
-        });
-        showFeedback('gift-feedback', data.message, 'success');
-    } catch (e) {
-        showFeedback('gift-feedback', e.message, 'error');
-    }
-}
-
-//8812938 — boosts
-async function setLootBoost() {
-    const id = document.getElementById('lootboost-account-id').value;
-    const minutes = parseInt(document.getElementById('lootboost-minutes').value) || 0;
-    if (!id || minutes <= 0) { showFeedback('lootboost-feedback', 'Enter account ID and duration', 'error'); return; }
-    try {
-        const data = await apiFetch('/api/admin/lootboost', {
-            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), minutes })
-        });
-        showFeedback('lootboost-feedback', data.message, 'success');
-    } catch (e) {
-        showFeedback('lootboost-feedback', e.message, 'error');
-    }
-}
-
-async function setFameBoost() {
-    const id = document.getElementById('fameboost-account-id').value;
-    const minutes = parseInt(document.getElementById('fameboost-minutes').value) || 0;
-    if (!id || minutes <= 0) { showFeedback('fameboost-feedback', 'Enter account ID and duration', 'error'); return; }
-    try {
-        const data = await apiFetch('/api/admin/fameboost', {
-            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), minutes })
-        });
-        showFeedback('fameboost-feedback', data.message, 'success');
-    } catch (e) {
-        showFeedback('fameboost-feedback', e.message, 'error');
-    }
-}
-
-//8812938 — maintenance mode
-async function toggleMaintenance() {
-    const toggle = document.getElementById('maintenance-toggle');
-    const enabled = !toggle.classList.contains('on');
-    showConfirm(enabled ? 'Enable maintenance mode? All non-admin players will be kicked.' : 'Disable maintenance mode?', async () => {
-        try {
-            const data = await apiFetch('/api/admin/maintenance', {
-                method: 'POST', body: JSON.stringify({ enabled })
-            });
-            toggle.classList.toggle('on', enabled);
-            showFeedback('maintenance-feedback', data.message, 'success');
-        } catch (e) {
-            showFeedback('maintenance-feedback', e.message, 'error');
-        }
-    });
-}
-
-// Load maintenance toggle state on admin page open
-async function loadMaintenanceState() {
-    try {
-        const data = await apiFetch('/api/admin/maintenance');
-        document.getElementById('maintenance-toggle').classList.toggle('on', data.enabled);
-    } catch (e) { /* ignore */ }
 }
 
 // ========== Logs ==========

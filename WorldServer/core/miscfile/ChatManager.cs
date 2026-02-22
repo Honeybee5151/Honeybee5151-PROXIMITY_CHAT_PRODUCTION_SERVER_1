@@ -281,6 +281,63 @@ namespace WorldServer.core.miscfile
                         Console.WriteLine("[Admin] Non-admin players kicked for maintenance");
                     }
                     break;
+
+                case "loot_event":
+                    if (double.TryParse(param, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lootVal))
+                    {
+                        GameServer.Configuration.serverSettings.lootEvent = lootVal;
+                        Console.WriteLine($"[Admin] Loot event set to {lootVal * 100}%");
+                        if (lootVal > 0)
+                            ServerAnnounce($"A server-wide loot event has started! +{Math.Round(lootVal * 100)}% loot drop boost!");
+                        else
+                            ServerAnnounce("The server-wide loot event has ended.");
+                    }
+                    break;
+
+                case "exp_event":
+                    if (double.TryParse(param, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double expVal))
+                    {
+                        GameServer.Configuration.serverSettings.expEvent = expVal;
+                        Console.WriteLine($"[Admin] XP/Fame event set to {expVal * 100}%");
+                        if (expVal > 0)
+                            ServerAnnounce($"A server-wide XP event has started! +{Math.Round(expVal * 100)}% XP boost!");
+                        else
+                            ServerAnnounce("The server-wide XP event has ended.");
+                    }
+                    break;
+
+                case "gift_all":
+                    var parts = param.Split(',');
+                    if (parts.Length == 2 && int.TryParse(parts[0], out int giftCredits) && int.TryParse(parts[1], out int giftFame))
+                    {
+                        int count = 0;
+                        foreach (var c in GameServer.ConnectionManager.Clients.Keys.ToList())
+                        {
+                            if (c.Player != null && c.Account != null)
+                            {
+                                if (giftCredits != 0)
+                                {
+                                    c.Account.Credits += giftCredits;
+                                    if (giftCredits > 0) c.Account.TotalCredits += giftCredits;
+                                }
+                                if (giftFame != 0)
+                                {
+                                    c.Account.Fame += giftFame;
+                                    if (giftFame > 0) c.Account.TotalFame += giftFame;
+                                }
+                                c.Account.FlushAsync();
+                                c.Player.Credits = c.Account.Credits;
+                                c.Player.Fame = c.Account.Fame;
+                                count++;
+                            }
+                        }
+                        var giftParts = new System.Collections.Generic.List<string>();
+                        if (giftCredits != 0) giftParts.Add($"{giftCredits} credits");
+                        if (giftFame != 0) giftParts.Add($"{giftFame} fame");
+                        ServerAnnounce($"All players received {string.Join(" and ", giftParts)}!");
+                        Console.WriteLine($"[Admin] Gifted {string.Join(", ", giftParts)} to {count} online players");
+                    }
+                    break;
             }
         }
 

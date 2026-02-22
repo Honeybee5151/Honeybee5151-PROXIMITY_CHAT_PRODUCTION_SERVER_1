@@ -17,39 +17,25 @@ namespace AdminDashboard.Controllers
             _redis = redis;
         }
 
-        [HttpPost("kick")]
-        public IActionResult KickPlayer([FromBody] KickRequest request)
+        // Helper to publish admin command via Redis pub/sub
+        private void PublishAdmin(string command, string parameter = "")
         {
-            try
+            var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
             {
-                // Publish kick command to Redis pub/sub (WorldServer listens on "Admin" channel)
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "kick", Parameter = request.AccountId.ToString() }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
-
-                return Ok(new { success = true, message = $"Kick command sent for account {request.AccountId}" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+                InstId = "admin-dashboard",
+                Content = new { Command = command, Parameter = parameter }
+            });
+            _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
         }
+
+        //8812938 — server announcement
 
         [HttpPost("announce")]
         public IActionResult Announce([FromBody] AnnounceRequest request)
         {
             try
             {
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "announce", Parameter = request.Message }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
-
+                PublishAdmin("announce", request.Message);
                 return Ok(new { success = true, message = "Announcement sent" });
             }
             catch (Exception ex)
@@ -58,19 +44,17 @@ namespace AdminDashboard.Controllers
             }
         }
 
-        [HttpPost("voice/restart")]
-        public IActionResult RestartVoice()
+        //8812938 — maintenance mode (block non-admin)
+
+        [HttpPost("maintenance")]
+        public IActionResult ToggleMaintenance([FromBody] MaintenanceRequest request)
         {
             try
             {
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "voice_restart", Parameter = "" }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
+                PublishAdmin("maintenance", request.Enabled.ToString().ToLower());
+                _redis.Database.StringSet("admin:maintenance", request.Enabled.ToString().ToLower());
 
-                return Ok(new { success = true, message = "Voice restart command sent" });
+                return Ok(new { success = true, message = request.Enabled ? "Maintenance mode ON — non-admin players blocked" : "Maintenance mode OFF — all players allowed" });
             }
             catch (Exception ex)
             {
@@ -78,19 +62,88 @@ namespace AdminDashboard.Controllers
             }
         }
 
-        [HttpPost("voice/testmode")]
-        public IActionResult ToggleTestMode([FromBody] TestModeRequest request)
+        [HttpGet("maintenance")]
+        public IActionResult GetMaintenanceStatus()
         {
             try
             {
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "voice_testmode", Parameter = request.Enabled.ToString().ToLower() }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
+                var val = _redis.Database.StringGet("admin:maintenance");
+                var enabled = val == "true";
+                return Ok(new { enabled });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
 
-                return Ok(new { success = true, message = $"Voice test mode set to {request.Enabled}" });
+        //8812938 — server-wide loot event boost
+
+        [HttpPost("lootevent")]
+        public IActionResult SetLootEvent([FromBody] EventBoostRequest request)
+        {
+            try
+            {
+                // Value is a percentage like 0.25 = 25%, 0.5 = 50%, 0 = off
+                PublishAdmin("loot_event", request.Percent.ToString());
+                return Ok(new { success = true, message = request.Percent > 0 ? $"Loot event set to {Math.Round(request.Percent * 100)}%" : "Loot event disabled" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        //8812938 — server-wide XP/fame event boost
+
+        [HttpPost("expevent")]
+        public IActionResult SetExpEvent([FromBody] EventBoostRequest request)
+        {
+            try
+            {
+                PublishAdmin("exp_event", request.Percent.ToString());
+                return Ok(new { success = true, message = request.Percent > 0 ? $"XP/Fame event set to {Math.Round(request.Percent * 100)}%" : "XP/Fame event disabled" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        //8812938 — server-wide gift credits/fame to all online players
+
+        [HttpPost("giftall")]
+        public IActionResult GiftAll([FromBody] GiftAllRequest request)
+        {
+            try
+            {
+                if (request.Credits == 0 && request.Fame == 0)
+                    return BadRequest(new { error = "Specify credits and/or fame amount" });
+
+                // Send via pub/sub so WorldServer gives to all online players
+                var param = $"{request.Credits},{request.Fame}";
+                PublishAdmin("gift_all", param);
+
+                var parts = new List<string>();
+                if (request.Credits != 0) parts.Add($"{request.Credits} credits");
+                if (request.Fame != 0) parts.Add($"{request.Fame} fame");
+                return Ok(new { success = true, message = $"Gifting {string.Join(" and ", parts)} to all online players" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        //8812938 — kick player
+
+        [HttpPost("kick")]
+        public IActionResult KickPlayer([FromBody] KickRequest request)
+        {
+            try
+            {
+                PublishAdmin("kick", request.AccountId.ToString());
+                return Ok(new { success = true, message = $"Kick command sent for account {request.AccountId}" });
             }
             catch (Exception ex)
             {
@@ -109,14 +162,7 @@ namespace AdminDashboard.Controllers
                     return BadRequest(new { error = "Valid account ID required" });
 
                 _redis.BanAccount(request.AccountId, request.Reason ?? "Banned via admin dashboard", request.LiftTime ?? -1);
-
-                // Also kick if online
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "kick", Parameter = request.AccountId.ToString() }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
+                PublishAdmin("kick", request.AccountId.ToString());
 
                 return Ok(new { success = true, message = $"Account {request.AccountId} banned and kicked" });
             }
@@ -226,18 +272,15 @@ namespace AdminDashboard.Controllers
             }
         }
 
-        //8812938 — set rank
+        //8812938 — voice system
 
-        [HttpPost("setrank")]
-        public IActionResult SetRank([FromBody] SetRankRequest request)
+        [HttpPost("voice/restart")]
+        public IActionResult RestartVoice()
         {
             try
             {
-                if (request.AccountId <= 0)
-                    return BadRequest(new { error = "Valid account ID required" });
-
-                _redis.SetRank(request.AccountId, request.Rank);
-                return Ok(new { success = true, message = $"Account {request.AccountId} rank set to {request.Rank}" });
+                PublishAdmin("voice_restart");
+                return Ok(new { success = true, message = "Voice restart command sent" });
             }
             catch (Exception ex)
             {
@@ -245,113 +288,13 @@ namespace AdminDashboard.Controllers
             }
         }
 
-        //8812938 — gift credits/fame
-
-        [HttpPost("gift")]
-        public IActionResult GiftCurrency([FromBody] GiftRequest request)
+        [HttpPost("voice/testmode")]
+        public IActionResult ToggleTestMode([FromBody] TestModeRequest request)
         {
             try
             {
-                if (request.AccountId <= 0)
-                    return BadRequest(new { error = "Valid account ID required" });
-
-                var messages = new List<string>();
-
-                if (request.Credits != 0)
-                {
-                    _redis.AddCredits(request.AccountId, request.Credits);
-                    messages.Add($"{(request.Credits > 0 ? "+" : "")}{request.Credits} credits");
-                }
-                if (request.Fame != 0)
-                {
-                    _redis.AddFame(request.AccountId, request.Fame);
-                    messages.Add($"{(request.Fame > 0 ? "+" : "")}{request.Fame} fame");
-                }
-
-                if (messages.Count == 0)
-                    return BadRequest(new { error = "Specify credits and/or fame amount" });
-
-                return Ok(new { success = true, message = $"Account {request.AccountId}: {string.Join(", ", messages)}" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-
-        //8812938 — boosts
-
-        [HttpPost("lootboost")]
-        public IActionResult SetLootBoost([FromBody] BoostRequest request)
-        {
-            try
-            {
-                if (request.AccountId <= 0)
-                    return BadRequest(new { error = "Valid account ID required" });
-
-                int seconds = request.Minutes * 60;
-                int count = _redis.SetLootBoost(request.AccountId, seconds);
-
-                return Ok(new { success = true, message = $"Loot boost ({request.Minutes}min) set on {count} alive character(s)" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-
-        [HttpPost("fameboost")]
-        public IActionResult SetFameBoost([FromBody] BoostRequest request)
-        {
-            try
-            {
-                if (request.AccountId <= 0)
-                    return BadRequest(new { error = "Valid account ID required" });
-
-                int seconds = request.Minutes * 60;
-                int count = _redis.SetXpBoost(request.AccountId, seconds);
-
-                return Ok(new { success = true, message = $"Fame/XP boost ({request.Minutes}min) set on {count} alive character(s)" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-
-        //8812938 — maintenance mode (block non-admin)
-
-        [HttpPost("maintenance")]
-        public IActionResult ToggleMaintenance([FromBody] MaintenanceRequest request)
-        {
-            try
-            {
-                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new
-                {
-                    InstId = "admin-dashboard",
-                    Content = new { Command = "maintenance", Parameter = request.Enabled.ToString().ToLower() }
-                });
-                _redis.Multiplexer.GetSubscriber().Publish("Admin", msg);
-
-                // Also store in Redis so WorldServer can check on startup
-                _redis.Database.StringSet("admin:maintenance", request.Enabled.ToString().ToLower());
-
-                return Ok(new { success = true, message = request.Enabled ? "Maintenance mode ON — non-admin players blocked" : "Maintenance mode OFF — all players allowed" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
-        }
-
-        [HttpGet("maintenance")]
-        public IActionResult GetMaintenanceStatus()
-        {
-            try
-            {
-                var val = _redis.Database.StringGet("admin:maintenance");
-                var enabled = val == "true";
-                return Ok(new { enabled });
+                PublishAdmin("voice_testmode", request.Enabled.ToString().ToLower());
+                return Ok(new { success = true, message = $"Voice test mode set to {request.Enabled}" });
             }
             catch (Exception ex)
             {
@@ -360,17 +303,16 @@ namespace AdminDashboard.Controllers
         }
     }
 
-    public class KickRequest { public int AccountId { get; set; } }
     public class AnnounceRequest { public string Message { get; set; } }
-    public class TestModeRequest { public bool Enabled { get; set; } }
+    public class MaintenanceRequest { public bool Enabled { get; set; } }
+    public class EventBoostRequest { public double Percent { get; set; } }
+    public class GiftAllRequest { public int Credits { get; set; } public int Fame { get; set; } }
+    public class KickRequest { public int AccountId { get; set; } }
     public class BanRequest { public int AccountId { get; set; } public string Reason { get; set; } public int? LiftTime { get; set; } }
     public class UnbanRequest { public int AccountId { get; set; } }
     public class IpBanRequest { public string Ip { get; set; } public string Reason { get; set; } }
     public class IpUnbanRequest { public string Ip { get; set; } }
     public class MuteRequest { public int AccountId { get; set; } public int Minutes { get; set; } }
     public class UnmuteRequest { public int AccountId { get; set; } }
-    public class SetRankRequest { public int AccountId { get; set; } public int Rank { get; set; } }
-    public class GiftRequest { public int AccountId { get; set; } public int Credits { get; set; } public int Fame { get; set; } }
-    public class BoostRequest { public int AccountId { get; set; } public int Minutes { get; set; } }
-    public class MaintenanceRequest { public bool Enabled { get; set; } }
+    public class TestModeRequest { public bool Enabled { get; set; } }
 }

@@ -195,15 +195,7 @@
             <div class="page" id="page-admin">
                 <h2 class="page-title">Admin Commands</h2>
 
-                <div class="admin-section">
-                    <h3>Kick Player</h3>
-                    <div class="form-row">
-                        <input type="number" id="kick-account-id" placeholder="Account ID">
-                        <button class="btn btn-danger" onclick="kickPlayer()">Kick</button>
-                    </div>
-                    <div class="feedback" id="kick-feedback"></div>
-                </div>
-
+                <!-- Server-Wide -->
                 <div class="admin-section">
                     <h3>Server Announcement</h3>
                     <textarea id="announce-message" placeholder="Enter announcement message..."></textarea>
@@ -212,15 +204,52 @@
                 </div>
 
                 <div class="admin-section">
-                    <h3>Voice System</h3>
+                    <h3>Maintenance Mode</h3>
                     <div style="display: flex; gap: 16px; align-items: center;">
-                        <button class="btn btn-warning" onclick="restartVoice()">Restart Voice System</button>
-                        <div class="toggle-row">
-                            <span>Test Mode:</span>
-                            <div class="toggle" id="testmode-toggle" onclick="toggleTestMode()"></div>
-                        </div>
+                        <span>Block non-admin players:</span>
+                        <div class="toggle" id="maintenance-toggle" onclick="toggleMaintenance()"></div>
                     </div>
-                    <div class="feedback" id="voice-admin-feedback"></div>
+                    <div class="feedback" id="maintenance-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Loot Event (Server-Wide)</h3>
+                    <div class="form-row">
+                        <input type="number" id="loot-event-percent" placeholder="Boost % (e.g. 50)" step="5" min="0">
+                        <button class="btn btn-primary" onclick="setLootEvent()">Set Loot Event</button>
+                        <button class="btn btn-secondary" onclick="clearLootEvent()">Disable</button>
+                    </div>
+                    <div class="feedback" id="lootevent-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>XP / Fame Event (Server-Wide)</h3>
+                    <div class="form-row">
+                        <input type="number" id="exp-event-percent" placeholder="Boost % (e.g. 50)" step="5" min="0">
+                        <button class="btn btn-primary" onclick="setExpEvent()">Set XP Event</button>
+                        <button class="btn btn-secondary" onclick="clearExpEvent()">Disable</button>
+                    </div>
+                    <div class="feedback" id="expevent-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Gift All Players</h3>
+                    <div class="form-row">
+                        <input type="number" id="giftall-credits" placeholder="Credits">
+                        <input type="number" id="giftall-fame" placeholder="Fame">
+                        <button class="btn btn-primary" onclick="giftAll()">Gift All Online</button>
+                    </div>
+                    <div class="feedback" id="giftall-feedback"></div>
+                </div>
+
+                <!-- Player Actions -->
+                <div class="admin-section">
+                    <h3>Kick Player</h3>
+                    <div class="form-row">
+                        <input type="number" id="kick-account-id" placeholder="Account ID">
+                        <button class="btn btn-danger" onclick="kickPlayer()">Kick</button>
+                    </div>
+                    <div class="feedback" id="kick-feedback"></div>
                 </div>
 
                 <div class="admin-section">
@@ -256,62 +285,17 @@
                     <div class="feedback" id="mute-feedback"></div>
                 </div>
 
+                <!-- Voice System -->
                 <div class="admin-section">
-                    <h3>Set Rank</h3>
-                    <div class="form-row">
-                        <input type="number" id="rank-account-id" placeholder="Account ID">
-                        <select id="rank-value">
-                            <option value="0">Regular (0)</option>
-                            <option value="1">Donator (1)</option>
-                            <option value="2">Supporter (2)</option>
-                            <option value="3">Sponsor (3)</option>
-                            <option value="4">Sandbox (4)</option>
-                            <option value="5">Moderator (5)</option>
-                            <option value="6">Admin (6)</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="setRank()">Set Rank</button>
-                    </div>
-                    <div class="feedback" id="rank-feedback"></div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Gift Credits / Fame</h3>
-                    <div class="form-row">
-                        <input type="number" id="gift-account-id" placeholder="Account ID">
-                        <input type="number" id="gift-credits" placeholder="Credits">
-                        <input type="number" id="gift-fame" placeholder="Fame">
-                        <button class="btn btn-primary" onclick="giftCurrency()">Gift</button>
-                    </div>
-                    <div class="feedback" id="gift-feedback"></div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Loot Boost</h3>
-                    <div class="form-row">
-                        <input type="number" id="lootboost-account-id" placeholder="Account ID">
-                        <input type="number" id="lootboost-minutes" placeholder="Duration (minutes)">
-                        <button class="btn btn-primary" onclick="setLootBoost()">Set Loot Boost</button>
-                    </div>
-                    <div class="feedback" id="lootboost-feedback"></div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Fame / XP Boost</h3>
-                    <div class="form-row">
-                        <input type="number" id="fameboost-account-id" placeholder="Account ID">
-                        <input type="number" id="fameboost-minutes" placeholder="Duration (minutes)">
-                        <button class="btn btn-primary" onclick="setFameBoost()">Set Fame Boost</button>
-                    </div>
-                    <div class="feedback" id="fameboost-feedback"></div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>Maintenance Mode</h3>
+                    <h3>Voice System</h3>
                     <div style="display: flex; gap: 16px; align-items: center;">
-                        <span>Block non-admin players:</span>
-                        <div class="toggle" id="maintenance-toggle" onclick="toggleMaintenance()"></div>
+                        <button class="btn btn-warning" onclick="restartVoice()">Restart Voice System</button>
+                        <div class="toggle-row">
+                            <span>Test Mode:</span>
+                            <div class="toggle" id="testmode-toggle" onclick="toggleTestMode()"></div>
+                        </div>
                     </div>
-                    <div class="feedback" id="maintenance-feedback"></div>
+                    <div class="feedback" id="voice-admin-feedback"></div>
                 </div>
             </div>
 

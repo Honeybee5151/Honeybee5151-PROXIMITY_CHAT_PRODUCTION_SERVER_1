@@ -264,52 +264,6 @@ namespace AdminDashboard.Services
             return HashGet($"account.{accountId}", "ip");
         }
 
-        /// <summary>Set account rank</summary>
-        public void SetRank(int accountId, int rank)
-        {
-            _db.HashSet($"account.{accountId}", "rank", rank.ToString());
-        }
-
-        /// <summary>Add credits to an account</summary>
-        public void AddCredits(int accountId, int amount)
-        {
-            _db.HashIncrement($"account.{accountId}", "credits", amount);
-            if (amount > 0) _db.HashIncrement($"account.{accountId}", "totalCredits", amount);
-        }
-
-        /// <summary>Add fame to an account</summary>
-        public void AddFame(int accountId, int amount)
-        {
-            _db.HashIncrement($"account.{accountId}", "fame", amount);
-            if (amount > 0) _db.HashIncrement($"account.{accountId}", "totalFame", amount);
-        }
-
-        /// <summary>Set loot drop boost time on all alive characters for an account</summary>
-        public int SetLootBoost(int accountId, int seconds)
-        {
-            var alive = _db.SetMembers($"alive.{accountId}");
-            int count = 0;
-            foreach (var charId in alive)
-            {
-                _db.HashSet($"char.{accountId}.{charId}", "ldBoost", seconds.ToString());
-                count++;
-            }
-            return count;
-        }
-
-        /// <summary>Set XP/fame boost time on all alive characters for an account</summary>
-        public int SetXpBoost(int accountId, int seconds)
-        {
-            var alive = _db.SetMembers($"alive.{accountId}");
-            int count = 0;
-            foreach (var charId in alive)
-            {
-                _db.HashSet($"char.{accountId}.{charId}", "xpBoost", seconds.ToString());
-                count++;
-            }
-            return count;
-        }
-
         //8812938 — player lookup for Redis browser
 
         /// <summary>Resolve a player name to account ID via the 'names' hash</summary>
