@@ -130,6 +130,7 @@ namespace WorldServer.networking
                 Console.WriteLine($"[TEST_BOT] Tile at ({tileX}, {tileY}): {(tile != null ? $"type={tile.TileId}" : "NULL")} — map size: {world.Map.Width}x{world.Map.Height}");
 
                 var entity = Entity.Resolve(gameServer, objType);
+                entity.Name = $"Bot {playerId}";
                 entity.Move(x, y);
                 entity.Spawned = true;
                 world.EnterWorld(entity);
