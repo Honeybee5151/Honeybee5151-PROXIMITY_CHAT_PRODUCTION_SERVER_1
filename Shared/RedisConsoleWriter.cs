@@ -5,7 +5,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using StackExchange.Redis;
 
-namespace WorldServer.core
+namespace Shared
 {
     /// <summary>
     /// Intercepts Console.Out and pushes lines to a Redis list for the admin dashboard.

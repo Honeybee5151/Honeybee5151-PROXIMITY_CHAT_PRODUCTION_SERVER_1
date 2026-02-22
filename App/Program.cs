@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Shared;
 
 namespace App
 {
@@ -22,6 +23,10 @@ namespace App
             var app = builder.Build();
 
             var core = app.Services.GetService<CoreService>();
+
+            // Optional: install console interceptor for admin dashboard logs
+            if (System.Environment.GetEnvironmentVariable("ADMIN_DASHBOARD") == "true")
+                RedisConsoleWriter.Install(core.Database.Conn, "admin:logs:appserver");
 
             app.Urls.Clear();
             var address = core.Config.serverInfo.bindAddress;

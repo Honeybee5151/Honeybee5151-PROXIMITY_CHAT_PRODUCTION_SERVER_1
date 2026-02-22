@@ -29,6 +29,9 @@ services:
     restart: always
     depends_on:
       - redis
+    environment:
+      - IS_DOCKER=true
+      - ADMIN_DASHBOARD=true
     ports:
       - "8888:8080"
 
