@@ -222,6 +222,97 @@
                     </div>
                     <div class="feedback" id="voice-admin-feedback"></div>
                 </div>
+
+                <div class="admin-section">
+                    <h3>Ban / Unban Player</h3>
+                    <div class="form-row">
+                        <input type="number" id="ban-account-id" placeholder="Account ID">
+                        <input type="text" id="ban-reason" placeholder="Reason (optional)">
+                        <button class="btn btn-danger" onclick="banPlayer()">Ban</button>
+                        <button class="btn btn-success" onclick="unbanPlayer()">Unban</button>
+                    </div>
+                    <div class="feedback" id="ban-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>IP Ban / Unban</h3>
+                    <div class="form-row">
+                        <input type="text" id="ipban-ip" placeholder="IP Address">
+                        <input type="text" id="ipban-reason" placeholder="Reason (optional)">
+                        <button class="btn btn-danger" onclick="banIp()">Ban IP</button>
+                        <button class="btn btn-success" onclick="unbanIp()">Unban IP</button>
+                    </div>
+                    <div class="feedback" id="ipban-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Mute / Unmute Player</h3>
+                    <div class="form-row">
+                        <input type="number" id="mute-account-id" placeholder="Account ID">
+                        <input type="number" id="mute-minutes" placeholder="Minutes (0 = permanent)">
+                        <button class="btn btn-warning" onclick="mutePlayer()">Mute</button>
+                        <button class="btn btn-success" onclick="unmutePlayer()">Unmute</button>
+                    </div>
+                    <div class="feedback" id="mute-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Set Rank</h3>
+                    <div class="form-row">
+                        <input type="number" id="rank-account-id" placeholder="Account ID">
+                        <select id="rank-value">
+                            <option value="0">Regular (0)</option>
+                            <option value="1">Donator (1)</option>
+                            <option value="2">Supporter (2)</option>
+                            <option value="3">Sponsor (3)</option>
+                            <option value="4">Sandbox (4)</option>
+                            <option value="5">Moderator (5)</option>
+                            <option value="6">Admin (6)</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="setRank()">Set Rank</button>
+                    </div>
+                    <div class="feedback" id="rank-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Gift Credits / Fame</h3>
+                    <div class="form-row">
+                        <input type="number" id="gift-account-id" placeholder="Account ID">
+                        <input type="number" id="gift-credits" placeholder="Credits">
+                        <input type="number" id="gift-fame" placeholder="Fame">
+                        <button class="btn btn-primary" onclick="giftCurrency()">Gift</button>
+                    </div>
+                    <div class="feedback" id="gift-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Loot Boost</h3>
+                    <div class="form-row">
+                        <input type="number" id="lootboost-account-id" placeholder="Account ID">
+                        <input type="number" id="lootboost-minutes" placeholder="Duration (minutes)">
+                        <button class="btn btn-primary" onclick="setLootBoost()">Set Loot Boost</button>
+                    </div>
+                    <div class="feedback" id="lootboost-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Fame / XP Boost</h3>
+                    <div class="form-row">
+                        <input type="number" id="fameboost-account-id" placeholder="Account ID">
+                        <input type="number" id="fameboost-minutes" placeholder="Duration (minutes)">
+                        <button class="btn btn-primary" onclick="setFameBoost()">Set Fame Boost</button>
+                    </div>
+                    <div class="feedback" id="fameboost-feedback"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Maintenance Mode</h3>
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <span>Block non-admin players:</span>
+                        <div class="toggle" id="maintenance-toggle" onclick="toggleMaintenance()"></div>
+                    </div>
+                    <div class="feedback" id="maintenance-feedback"></div>
+                </div>
             </div>
 
             <!-- Logs Page -->

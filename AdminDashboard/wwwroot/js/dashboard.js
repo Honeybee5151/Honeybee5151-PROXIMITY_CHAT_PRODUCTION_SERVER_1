@@ -81,7 +81,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
             case 'voice': loadVoice(); startTimer('voice', loadVoice, 3000); break;
             case 'players': loadPlayers(); break;
             case 'redis': onRedisTabOpen(); break;
-            case 'admin': break;
+            case 'admin': loadMaintenanceState(); break;
             case 'logs': loadLogs(); break;
         }
     });
@@ -687,6 +687,182 @@ async function toggleTestMode() {
     } catch (e) {
         showFeedback('voice-admin-feedback', e.message, 'error');
     }
+}
+
+//8812938 — ban/unban
+async function banPlayer() {
+    const id = document.getElementById('ban-account-id').value;
+    const reason = document.getElementById('ban-reason').value;
+    if (!id) return;
+    showConfirm(`Ban account ${id}?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/ban', {
+                method: 'POST', body: JSON.stringify({ accountId: parseInt(id), reason })
+            });
+            showFeedback('ban-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('ban-feedback', e.message, 'error');
+        }
+    });
+}
+
+async function unbanPlayer() {
+    const id = document.getElementById('ban-account-id').value;
+    if (!id) return;
+    try {
+        const data = await apiFetch('/api/admin/unban', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id) })
+        });
+        showFeedback('ban-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('ban-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — IP ban/unban
+async function banIp() {
+    const ip = document.getElementById('ipban-ip').value;
+    const reason = document.getElementById('ipban-reason').value;
+    if (!ip) return;
+    showConfirm(`Ban IP ${ip}?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/banip', {
+                method: 'POST', body: JSON.stringify({ ip, reason })
+            });
+            showFeedback('ipban-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('ipban-feedback', e.message, 'error');
+        }
+    });
+}
+
+async function unbanIp() {
+    const ip = document.getElementById('ipban-ip').value;
+    if (!ip) return;
+    try {
+        const data = await apiFetch('/api/admin/unbanip', {
+            method: 'POST', body: JSON.stringify({ ip })
+        });
+        showFeedback('ipban-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('ipban-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — mute/unmute
+async function mutePlayer() {
+    const id = document.getElementById('mute-account-id').value;
+    const minutes = parseInt(document.getElementById('mute-minutes').value) || 0;
+    if (!id) return;
+    try {
+        const data = await apiFetch('/api/admin/mute', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), minutes })
+        });
+        showFeedback('mute-feedback', data.message, data.success ? 'success' : 'error');
+    } catch (e) {
+        showFeedback('mute-feedback', e.message, 'error');
+    }
+}
+
+async function unmutePlayer() {
+    const id = document.getElementById('mute-account-id').value;
+    if (!id) return;
+    try {
+        const data = await apiFetch('/api/admin/unmute', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id) })
+        });
+        showFeedback('mute-feedback', data.message, data.success ? 'success' : 'error');
+    } catch (e) {
+        showFeedback('mute-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — set rank
+async function setRank() {
+    const id = document.getElementById('rank-account-id').value;
+    const rank = parseInt(document.getElementById('rank-value').value);
+    if (!id) return;
+    showConfirm(`Set account ${id} rank to ${rank}?`, async () => {
+        try {
+            const data = await apiFetch('/api/admin/setrank', {
+                method: 'POST', body: JSON.stringify({ accountId: parseInt(id), rank })
+            });
+            showFeedback('rank-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('rank-feedback', e.message, 'error');
+        }
+    });
+}
+
+//8812938 — gift credits/fame
+async function giftCurrency() {
+    const id = document.getElementById('gift-account-id').value;
+    const credits = parseInt(document.getElementById('gift-credits').value) || 0;
+    const fame = parseInt(document.getElementById('gift-fame').value) || 0;
+    if (!id) return;
+    if (credits === 0 && fame === 0) { showFeedback('gift-feedback', 'Enter credits and/or fame amount', 'error'); return; }
+    try {
+        const data = await apiFetch('/api/admin/gift', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), credits, fame })
+        });
+        showFeedback('gift-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('gift-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — boosts
+async function setLootBoost() {
+    const id = document.getElementById('lootboost-account-id').value;
+    const minutes = parseInt(document.getElementById('lootboost-minutes').value) || 0;
+    if (!id || minutes <= 0) { showFeedback('lootboost-feedback', 'Enter account ID and duration', 'error'); return; }
+    try {
+        const data = await apiFetch('/api/admin/lootboost', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), minutes })
+        });
+        showFeedback('lootboost-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('lootboost-feedback', e.message, 'error');
+    }
+}
+
+async function setFameBoost() {
+    const id = document.getElementById('fameboost-account-id').value;
+    const minutes = parseInt(document.getElementById('fameboost-minutes').value) || 0;
+    if (!id || minutes <= 0) { showFeedback('fameboost-feedback', 'Enter account ID and duration', 'error'); return; }
+    try {
+        const data = await apiFetch('/api/admin/fameboost', {
+            method: 'POST', body: JSON.stringify({ accountId: parseInt(id), minutes })
+        });
+        showFeedback('fameboost-feedback', data.message, 'success');
+    } catch (e) {
+        showFeedback('fameboost-feedback', e.message, 'error');
+    }
+}
+
+//8812938 — maintenance mode
+async function toggleMaintenance() {
+    const toggle = document.getElementById('maintenance-toggle');
+    const enabled = !toggle.classList.contains('on');
+    showConfirm(enabled ? 'Enable maintenance mode? All non-admin players will be kicked.' : 'Disable maintenance mode?', async () => {
+        try {
+            const data = await apiFetch('/api/admin/maintenance', {
+                method: 'POST', body: JSON.stringify({ enabled })
+            });
+            toggle.classList.toggle('on', enabled);
+            showFeedback('maintenance-feedback', data.message, 'success');
+        } catch (e) {
+            showFeedback('maintenance-feedback', e.message, 'error');
+        }
+    });
+}
+
+// Load maintenance toggle state on admin page open
+async function loadMaintenanceState() {
+    try {
+        const data = await apiFetch('/api/admin/maintenance');
+        document.getElementById('maintenance-toggle').classList.toggle('on', data.enabled);
+    } catch (e) { /* ignore */ }
 }
 
 // ========== Logs ==========

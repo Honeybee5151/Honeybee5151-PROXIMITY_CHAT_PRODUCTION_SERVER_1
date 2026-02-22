@@ -262,6 +262,25 @@ namespace WorldServer.core.miscfile
                     networking.VoiceTestMode.ENABLED = enable;
                     Console.WriteLine($"[Admin] VoiceTestMode set to {enable}");
                     break;
+
+                case "maintenance":
+                    var maint = param == "true";
+                    networking.MaintenanceMode.Enabled = maint;
+                    Console.WriteLine($"[Admin] Maintenance mode set to {maint}");
+                    if (maint)
+                    {
+                        // Kick all non-admin players
+                        foreach (var c in GameServer.ConnectionManager.Clients.Keys.ToList())
+                        {
+                            if (c.Player != null && !c.Account.Admin && c.Rank < (int)Shared.RankingType.Admin)
+                            {
+                                c.SendFailure("Server entering maintenance mode.", networking.packets.outgoing.FailureMessage.MessageWithDisconnect);
+                                c.Disconnect();
+                            }
+                        }
+                        Console.WriteLine("[Admin] Non-admin players kicked for maintenance");
+                    }
+                    break;
             }
         }
 

@@ -1,4 +1,5 @@
 //8812938
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -188,6 +189,127 @@ namespace AdminDashboard.Services
             _db.HashSet(key, field, value);
         }
 
+        //8812938 — admin command helpers
+
+        /// <summary>Ban an account (sets banned flag, notes, lift time in Redis)</summary>
+        public void BanAccount(int accountId, string reason, int liftTime = -1)
+        {
+            var key = $"account.{accountId}";
+            _db.HashSet(key, new HashEntry[]
+            {
+                new("banned", "True"),
+                new("notes", reason ?? ""),
+                new("banLiftTime", liftTime.ToString())
+            });
+        }
+
+        /// <summary>Unban an account</summary>
+        public void UnbanAccount(int accountId)
+        {
+            var key = $"account.{accountId}";
+            _db.HashSet(key, new HashEntry[]
+            {
+                new("banned", "False"),
+                new("banLiftTime", "0")
+            });
+        }
+
+        /// <summary>Ban an IP address via the 'ips' hash</summary>
+        public void BanIp(string ip, string notes = "")
+        {
+            var json = _db.HashGet("ips", ip);
+            var ipInfo = json.IsNullOrEmpty
+                ? new { Accounts = new List<int>(), Notes = notes, Banned = true }
+                : (dynamic)Newtonsoft.Json.JsonConvert.DeserializeObject<IpInfoDto>((string)json);
+
+            if (ipInfo is IpInfoDto dto)
+            {
+                dto.Banned = true;
+                dto.Notes = notes;
+                _db.HashSet("ips", ip, Newtonsoft.Json.JsonConvert.SerializeObject(dto));
+            }
+            else
+            {
+                _db.HashSet("ips", ip, Newtonsoft.Json.JsonConvert.SerializeObject(
+                    new IpInfoDto { Accounts = new List<int>(), Notes = notes, Banned = true }));
+            }
+        }
+
+        /// <summary>Unban an IP address</summary>
+        public void UnbanIp(string ip)
+        {
+            var json = _db.HashGet("ips", ip);
+            if (json.IsNullOrEmpty) return;
+
+            var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<IpInfoDto>((string)json);
+            dto.Banned = false;
+            _db.HashSet("ips", ip, Newtonsoft.Json.JsonConvert.SerializeObject(dto));
+        }
+
+        /// <summary>Mute an IP (optional duration)</summary>
+        public void MuteIp(string ip, TimeSpan? duration = null)
+        {
+            _db.StringSet($"mutes:{ip}", "", duration);
+        }
+
+        /// <summary>Unmute an IP</summary>
+        public void UnmuteIp(string ip)
+        {
+            _db.KeyDelete($"mutes:{ip}");
+        }
+
+        /// <summary>Get the IP for an account ID</summary>
+        public string GetAccountIp(int accountId)
+        {
+            return HashGet($"account.{accountId}", "ip");
+        }
+
+        /// <summary>Set account rank</summary>
+        public void SetRank(int accountId, int rank)
+        {
+            _db.HashSet($"account.{accountId}", "rank", rank.ToString());
+        }
+
+        /// <summary>Add credits to an account</summary>
+        public void AddCredits(int accountId, int amount)
+        {
+            _db.HashIncrement($"account.{accountId}", "credits", amount);
+            if (amount > 0) _db.HashIncrement($"account.{accountId}", "totalCredits", amount);
+        }
+
+        /// <summary>Add fame to an account</summary>
+        public void AddFame(int accountId, int amount)
+        {
+            _db.HashIncrement($"account.{accountId}", "fame", amount);
+            if (amount > 0) _db.HashIncrement($"account.{accountId}", "totalFame", amount);
+        }
+
+        /// <summary>Set loot drop boost time on all alive characters for an account</summary>
+        public int SetLootBoost(int accountId, int seconds)
+        {
+            var alive = _db.SetMembers($"alive.{accountId}");
+            int count = 0;
+            foreach (var charId in alive)
+            {
+                _db.HashSet($"char.{accountId}.{charId}", "ldBoost", seconds.ToString());
+                count++;
+            }
+            return count;
+        }
+
+        /// <summary>Set XP/fame boost time on all alive characters for an account</summary>
+        public int SetXpBoost(int accountId, int seconds)
+        {
+            var alive = _db.SetMembers($"alive.{accountId}");
+            int count = 0;
+            foreach (var charId in alive)
+            {
+                _db.HashSet($"char.{accountId}.{charId}", "xpBoost", seconds.ToString());
+                count++;
+            }
+            return count;
+        }
+
         //8812938 — player lookup for Redis browser
 
         /// <summary>Resolve a player name to account ID via the 'names' hash</summary>
@@ -269,5 +391,12 @@ namespace AdminDashboard.Services
 
             return result;
         }
+    }
+
+    public class IpInfoDto
+    {
+        public List<int> Accounts { get; set; } = new();
+        public string Notes { get; set; } = "";
+        public bool Banned { get; set; }
     }
 }

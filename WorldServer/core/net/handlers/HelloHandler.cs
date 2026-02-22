@@ -52,6 +52,13 @@ namespace WorldServer.core.net.handlers
 
             var rank = acc.Rank;
 
+            //8812938 — maintenance mode check
+            if (MaintenanceMode.Enabled && !acc.Admin && rank < (int)RankingType.Admin)
+            {
+                client.SendFailure("Server is in maintenance mode. Please try again later.", FailureMessage.MessageWithDisconnect);
+                return;
+            }
+
             // first check: admin server
             if (config.serverInfo.adminOnly && !client.Account.Admin && !cManager.IsWhitelisted(acc.AccountId))
             {

@@ -142,6 +142,14 @@ namespace WorldServer.core
             {
                 var adminStats = new AdminStatsPublisher(this);
                 adminStats.Start();
+
+                // Check maintenance mode from Redis on startup
+                var maintVal = Database.Conn.StringGet("admin:maintenance");
+                if (maintVal == "true")
+                {
+                    networking.MaintenanceMode.Enabled = true;
+                    Console.WriteLine("[Admin] Maintenance mode is ON (restored from Redis)");
+                }
             }
 
             var timeout = TimeSpan.FromHours(Configuration.serverSettings.restartTime);
