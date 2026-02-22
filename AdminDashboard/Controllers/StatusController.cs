@@ -60,17 +60,25 @@ namespace AdminDashboard.Controllers
                 result["worldserver"] = new { status = "error", error = ex.Message };
             }
 
-            // AppServer status via HTTP probe (POST /app/init is the known endpoint)
+            // AppServer status — any HTTP response (even 404) means it's alive
             try
             {
                 var isDocker = Environment.GetEnvironmentVariable("IS_DOCKER") != null;
                 var appUrl = isDocker ? "http://appserver:8080" : "http://localhost:8888";
-                var response = await _httpClient.PostAsync($"{appUrl}/app/init", null);
+                var response = await _httpClient.GetAsync(appUrl);
                 result["appserver"] = new
                 {
                     status = "running",
                     statusCode = (int)response.StatusCode
                 };
+            }
+            catch (HttpRequestException)
+            {
+                result["appserver"] = new { status = "unreachable", error = "Connection refused" };
+            }
+            catch (TaskCanceledException)
+            {
+                result["appserver"] = new { status = "unreachable", error = "Timeout" };
             }
             catch (Exception ex)
             {
