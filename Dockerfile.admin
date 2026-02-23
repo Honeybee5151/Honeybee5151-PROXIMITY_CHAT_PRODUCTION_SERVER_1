@@ -7,6 +7,9 @@ RUN dotnet publish AdminDashboard -c Release -o /out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libfontconfig1 libfreetype6 && \
+    rm -rf /var/lib/apt/lists/*
 COPY --from=build /out .
 RUN mkdir -p /data
 COPY --from=build /app/AdminDashboard/admin.json /data/admin.json
