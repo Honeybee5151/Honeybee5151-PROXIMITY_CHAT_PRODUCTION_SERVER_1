@@ -461,17 +461,28 @@ namespace WorldServer.core.worlds
 
             // Build custom grounds XML for this dungeon
             var gameData = GameServer.Resources.GameData;
+            Console.WriteLine($"[CustomGrounds] LoadMapFromData jmPath={jmPath}, JmCustomGroundIds has {gameData.JmCustomGroundIds.Count} entries");
             if (gameData.JmCustomGroundIds.TryGetValue(jmPath, out var customIds))
             {
+                Console.WriteLine($"[CustomGrounds] Found {customIds.Count} custom ground IDs for {jmPath}");
                 var sb = new System.Text.StringBuilder("<Grounds>");
+                var matchCount = 0;
                 foreach (var groundId in customIds)
                 {
                     if (gameData.GroundXmlById.TryGetValue(groundId, out var elem))
+                    {
                         sb.Append(elem.ToString());
+                        matchCount++;
+                    }
+                    else
+                        Console.WriteLine($"[CustomGrounds] WARNING: Ground ID '{groundId}' not found in GroundXmlById");
                 }
                 sb.Append("</Grounds>");
                 CustomGroundsXml = sb.ToString();
+                Console.WriteLine($"[CustomGrounds] Built XML with {matchCount}/{customIds.Count} grounds, {CustomGroundsXml.Length} bytes");
             }
+            else
+                Console.WriteLine($"[CustomGrounds] No custom grounds for {jmPath}");
 
             return true;
         }
