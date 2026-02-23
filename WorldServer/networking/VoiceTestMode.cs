@@ -17,7 +17,7 @@ namespace WorldServer.networking
     public static class VoiceTestMode
     {
         // Toggleable at runtime via admin dashboard
-        public static volatile bool ENABLED = true;
+        public static volatile bool ENABLED = false;
 
         public const int MIN_BOT_ID = 60000;
         public const int MAX_SPRITE_BOT_ID = 60010; // bots 60000-60010 get visible sprites
