@@ -351,7 +351,9 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	awd
 </Objects>
+	awd
 </Objects>
 	<Objects>
 	<Texture>
@@ -462,5 +464,7 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	awd
 </Objects>
+	awd
 </Objects>
