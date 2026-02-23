@@ -55,11 +55,28 @@ namespace AdminDashboard.Services
             return (content, sha);
         }
 
+        /// <summary>Fetch a binary file's raw bytes from the repo</summary>
+        public async Task<byte[]> FetchBinaryFile(string path)
+        {
+            var res = await _http.GetAsync($"repos/{_repo}/contents/{path}?ref={_branch}");
+            if (!res.IsSuccessStatusCode)
+            {
+                var err = await res.Content.ReadAsStringAsync();
+                throw new Exception($"GitHub fetch error for {path}: {res.StatusCode} - {err}");
+            }
+            var data = JObject.Parse(await res.Content.ReadAsStringAsync());
+            var base64 = data["content"]?.ToString().Replace("\n", "") ?? "";
+            return Convert.FromBase64String(base64);
+        }
+
         /// <summary>
         /// Commit multiple files atomically using the Git Trees API.
         /// Creates blobs → tree → commit → updates branch ref.
         /// </summary>
-        public async Task CommitFiles(List<(string Path, string Content)> files, string message)
+        public async Task CommitFiles(
+            List<(string Path, string Content)> files,
+            string message,
+            List<(string Path, byte[] Content)> binaryFiles = null)
         {
             // 1. Get HEAD commit SHA
             var refRes = await _http.GetAsync($"repos/{_repo}/git/ref/heads/{_branch}");
@@ -94,6 +111,29 @@ namespace AdminDashboard.Services
                 });
             }
 
+            // 3b. Create blobs for binary files
+            if (binaryFiles != null)
+            {
+                foreach (var file in binaryFiles)
+                {
+                    var blobPayload = new JObject
+                    {
+                        ["content"] = Convert.ToBase64String(file.Content),
+                        ["encoding"] = "base64"
+                    };
+                    var blobRes = await Post($"repos/{_repo}/git/blobs", blobPayload);
+                    var blobSha = blobRes["sha"].ToString();
+
+                    treeEntries.Add(new JObject
+                    {
+                        ["path"] = file.Path,
+                        ["mode"] = "100644",
+                        ["type"] = "blob",
+                        ["sha"] = blobSha
+                    });
+                }
+            }
+
             // 4. Create new tree
             var treePayload = new JObject
             {
@@ -123,7 +163,8 @@ namespace AdminDashboard.Services
                 throw new Exception($"GitHub ref update error: {patchRes.StatusCode} - {err}");
             }
 
-            Console.WriteLine($"[GitHubService] Committed {files.Count} file(s): {message}");
+            var totalFiles = files.Count + (binaryFiles?.Count ?? 0);
+            Console.WriteLine($"[GitHubService] Committed {totalFiles} file(s): {message}");
         }
 
         private async Task<JObject> Post(string url, JObject payload)

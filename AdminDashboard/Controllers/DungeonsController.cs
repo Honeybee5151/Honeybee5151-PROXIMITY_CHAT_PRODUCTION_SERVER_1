@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using AdminDashboard.Services;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +86,7 @@ namespace AdminDashboard.Controllers
                     safeTitle = safeTitle.Substring(0, 100).Trim();
 
                 var files = new List<(string Path, string Content)>();
+                var binaryFiles = new List<(string Path, byte[] Content)>();
 
                 // 2. Write .jm map file
                 var jmContent = mapJm.ToString(Newtonsoft.Json.Formatting.None);
@@ -120,7 +123,7 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // 4. Write mob + item XMLs to CustomObjects.xml / CustomItems.xml
+                // 4. Generate sprite sheets + write mob/item XMLs
                 var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;
                 var items = dungeon["items"] as JArray;
                 var hasMobs = mobs != null && mobs.Count > 0;
@@ -128,23 +131,116 @@ namespace AdminDashboard.Controllers
 
                 if (hasMobs || hasItems)
                 {
-                    // Fetch both files to find global max type code (they share the same range)
+                    // 4a. Build sprite sheets and assign indices
+                    var spriteService = new SpriteSheetService(_github);
+
+                    // Collect sprites grouped by size: (mobIndex, "base"|"attack"|"item", dataUrl, spriteSize)
+                    var spriteEntries = new List<(int entityIdx, string frame, string dataUrl, int size, bool isMob)>();
+
+                    if (hasMobs)
+                    {
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var mob = mobs[i];
+                            var size = mob["spriteSize"]?.Value<int>() ?? 8;
+                            var baseUrl = (mob["spriteBase"] ?? mob["sprite"])?.ToString();
+                            var attackUrl = mob["spriteAttack"]?.ToString();
+                            if (!string.IsNullOrEmpty(baseUrl))
+                                spriteEntries.Add((i, "base", baseUrl, size, true));
+                            if (!string.IsNullOrEmpty(attackUrl))
+                                spriteEntries.Add((i, "attack", attackUrl, size, true));
+                        }
+                    }
+                    if (hasItems)
+                    {
+                        for (int i = 0; i < items!.Count; i++)
+                        {
+                            var spriteUrl = items[i]["sprite"]?.ToString();
+                            if (!string.IsNullOrEmpty(spriteUrl))
+                                spriteEntries.Add((i, "item", spriteUrl, 8, false));
+                        }
+                    }
+
+                    // Process each sprite size group
+                    // mobSpriteIndices[mobIdx] = (baseIndex, attackIndex), itemSpriteIndices[itemIdx] = index
+                    var mobSpriteIndices = new Dictionary<int, (int baseIdx, int attackIdx)>();
+                    var itemSpriteIndices = new Dictionary<int, int>();
+
+                    foreach (var sizeGroup in spriteEntries.GroupBy(e => e.size))
+                    {
+                        var spriteSize = sizeGroup.Key;
+                        var entries = sizeGroup.ToList();
+                        var sheetName = spriteSize == 16 ? "communitySprites16x16" : "communitySprites8x8";
+
+                        // Load existing sheet
+                        var (sheet, meta) = await spriteService.LoadSheet(spriteSize);
+
+                        // Decode all sprites in this size group
+                        var bitmaps = new List<SKBitmap>();
+                        foreach (var entry in entries)
+                            bitmaps.Add(SpriteSheetService.DecodeDataUrl(entry.dataUrl));
+
+                        // Pack into sheet
+                        var (updatedSheet, indices) = spriteService.AddSprites(sheet, meta, bitmaps, spriteSize);
+
+                        // Map indices back to entities
+                        for (int i = 0; i < entries.Count; i++)
+                        {
+                            var e = entries[i];
+                            if (e.isMob)
+                            {
+                                if (e.frame == "base")
+                                {
+                                    var attackIdx = -1;
+                                    // Check if next entry is the attack frame for same mob
+                                    if (i + 1 < entries.Count && entries[i + 1].entityIdx == e.entityIdx && entries[i + 1].frame == "attack")
+                                        attackIdx = indices[i + 1];
+                                    mobSpriteIndices[e.entityIdx] = (indices[i], attackIdx);
+                                }
+                                // attack frame index already captured above
+                            }
+                            else
+                            {
+                                itemSpriteIndices[e.entityIdx] = indices[i];
+                            }
+                        }
+
+                        // Add sheet PNG + metadata to commit
+                        var pngBytes = SpriteSheetService.EncodePng(updatedSheet);
+                        binaryFiles.Add(($"Shared/resources/sprites/{sheetName}.png", pngBytes));
+                        files.Add(($"Shared/resources/sprites/{sheetName}.meta.json",
+                            JsonConvert.SerializeObject(meta, Newtonsoft.Json.Formatting.Indented)));
+
+                        // Dispose bitmaps
+                        foreach (var bmp in bitmaps) bmp.Dispose();
+                        updatedSheet.Dispose();
+                    }
+
+                    // 4b. Write mob XMLs to CustomObjects.xml (with sprite texture refs)
                     var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
                     var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
                     var nextType = Math.Max(FindNextTypeCode(objectsXml, 0x5000), FindNextTypeCode(itemsXml, 0x5000));
 
-                    // 4a. Mobs → CustomObjects.xml
                     if (hasMobs)
                     {
                         var newMobEntries = "";
-                        foreach (var mob in mobs!)
+                        for (int i = 0; i < mobs!.Count; i++)
                         {
-                            var xml = mob["xml"]?.ToString();
+                            var xml = mobs[i]["xml"]?.ToString();
                             if (string.IsNullOrEmpty(xml)) continue;
 
                             xml = InjectTypeCode(xml, nextType);
-                            newMobEntries += "\t" + xml.Trim() + "\n";
                             nextType++;
+
+                            // Inject sprite texture reference
+                            if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
+                            {
+                                var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
+                                var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
+                                xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: true);
+                            }
+
+                            newMobEntries += "\t" + xml.Trim() + "\n";
                         }
 
                         if (!string.IsNullOrEmpty(newMobEntries))
@@ -154,18 +250,23 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // 4b. Items → CustomItems.xml
+                    // 4c. Write item XMLs to CustomItems.xml (with sprite texture refs)
                     if (hasItems)
                     {
                         var newItemEntries = "";
-                        foreach (var item in items!)
+                        for (int i = 0; i < items!.Count; i++)
                         {
-                            var xml = item["xml"]?.ToString();
+                            var xml = items[i]["xml"]?.ToString();
                             if (string.IsNullOrEmpty(xml)) continue;
 
                             xml = InjectTypeCode(xml, nextType);
-                            newItemEntries += "\t" + xml.Trim() + "\n";
                             nextType++;
+
+                            // Inject sprite texture reference
+                            if (itemSpriteIndices.TryGetValue(i, out var sprIdx))
+                                xml = InjectSpriteTexture(xml, "communitySprites8x8", sprIdx, isMob: false);
+
+                            newItemEntries += "\t" + xml.Trim() + "\n";
                         }
 
                         if (!string.IsNullOrEmpty(newItemEntries))
@@ -176,7 +277,7 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // 6. Add World entry to Dungeons.xml
+                // 5. Add World entry to Dungeons.xml
                 var (dungeonsXml, _) = await _github.FetchFile("Shared/resources/xml/Dungeons.xml");
 
                 // Check for duplicate
@@ -197,10 +298,10 @@ namespace AdminDashboard.Controllers
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");
                 files.Add(("Shared/resources/xml/Dungeons.xml", updatedDungeonsXml));
 
-                // 7. Atomic commit to GitHub
-                await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}");
+                // 6. Atomic commit to GitHub (text + binary files)
+                await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}", binaryFiles);
 
-                // 8. Update status in Supabase
+                // 7. Update status in Supabase
                 await _supabase.UpdateStatus(request.DungeonId, "approved");
 
                 return Ok(new { success = true, message = $"Dungeon '{safeTitle}' approved and pushed to server repo" });
@@ -267,6 +368,21 @@ namespace AdminDashboard.Controllers
                 return Regex.Replace(xml, @"(<Object\s[^>]*)type=""[^""]*""", $"$1type=\"{typeHex}\"");
             // Otherwise inject type after <Object
             return Regex.Replace(xml, @"<Object(\s)", $"<Object type=\"{typeHex}\"$1");
+        }
+
+        /// <summary>Inject or replace sprite texture reference in an Object XML</summary>
+        private static string InjectSpriteTexture(string xml, string sheetName, int index, bool isMob)
+        {
+            var tag = isMob ? "AnimatedTexture" : "Texture";
+            var textureXml = $"<{tag}>\n\t\t<File>{sheetName}</File>\n\t\t<Index>{index}</Index>\n\t</{tag}>";
+
+            // Remove any existing Texture or AnimatedTexture blocks
+            xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
+            xml = Regex.Replace(xml, @"<Texture>.*?</Texture>", "", RegexOptions.Singleline);
+
+            // Inject after the opening <Object ...> tag
+            xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t{textureXml}");
+            return xml;
         }
 
         private static string EscapeXml(string s) => s
