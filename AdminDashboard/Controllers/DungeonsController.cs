@@ -55,6 +55,97 @@ namespace AdminDashboard.Controllers
             }
         }
 
+        [HttpGet("preview/{id}")]
+        public async Task<IActionResult> Preview(string id)
+        {
+            try
+            {
+                if (!_supabase.IsConfigured)
+                    return StatusCode(500, new { error = "Supabase not configured" });
+
+                var dungeon = await _supabase.GetDungeon(id);
+                if (dungeon == null)
+                    return NotFound(new { error = "Dungeon not found" });
+
+                var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;
+                var items = dungeon["items"] as JArray;
+                var mapJm = dungeon["map_jm"];
+                var customTiles = dungeon["custom_tiles"] as JObject;
+
+                // Build mob preview list
+                var mobList = new List<object>();
+                if (mobs != null)
+                {
+                    foreach (var mob in mobs)
+                    {
+                        var xml = mob["xml"]?.ToString() ?? "";
+                        var name = Regex.Match(xml, @"id=""([^""]+)""").Groups[1].Value;
+                        mobList.Add(new
+                        {
+                            name = string.IsNullOrEmpty(name) ? "Unknown Mob" : name,
+                            xml,
+                            spriteBase = (mob["spriteBase"] ?? mob["sprite"])?.ToString(),
+                            spriteAttack = mob["spriteAttack"]?.ToString(),
+                            spriteSize = mob["spriteSize"]?.Value<int>() ?? 8,
+                        });
+                    }
+                }
+
+                // Build item preview list
+                var itemList = new List<object>();
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        var xml = item["xml"]?.ToString() ?? "";
+                        var name = Regex.Match(xml, @"id=""([^""]+)""").Groups[1].Value;
+                        itemList.Add(new
+                        {
+                            name = string.IsNullOrEmpty(name) ? "Unknown Item" : name,
+                            xml,
+                            sprite = item["sprite"]?.ToString(),
+                        });
+                    }
+                }
+
+                // Map info (lightweight — don't send full data array)
+                object mapInfo = null;
+                if (mapJm != null && mapJm.Type != JTokenType.Null)
+                {
+                    var dictCount = (mapJm["dict"] as JArray)?.Count ?? 0;
+                    mapInfo = new
+                    {
+                        width = mapJm["width"]?.Value<int>() ?? 0,
+                        height = mapJm["height"]?.Value<int>() ?? 0,
+                        dictEntries = dictCount,
+                    };
+                }
+
+                // Custom tiles
+                var tileList = new List<object>();
+                if (customTiles != null)
+                {
+                    foreach (var prop in customTiles.Properties())
+                        tileList.Add(new { hex = prop.Name, id = prop.Value.ToString() });
+                }
+
+                return Ok(new
+                {
+                    id,
+                    title = dungeon["title"]?.ToString(),
+                    description = dungeon["description"]?.ToString(),
+                    mobs = mobList,
+                    items = itemList,
+                    map = mapInfo,
+                    customTiles = tileList,
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
         [HttpPost("approve")]
         public async Task<IActionResult> Approve([FromBody] ApproveRequest request)
         {

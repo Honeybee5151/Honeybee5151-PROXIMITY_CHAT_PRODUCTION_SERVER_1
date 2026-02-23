@@ -1022,6 +1022,7 @@ async function loadDungeons() {
                 <td>${d.item_count}</td>
                 <td>${date}</td>
                 <td style="white-space:nowrap;">
+                    <button class="btn btn-primary btn-sm" onclick="previewDungeon('${d.id}')">Preview</button>
                     <button class="btn btn-success btn-sm" onclick="approveDungeon('${d.id}','${esc(d.title)}')">Approve</button>
                     <button class="btn btn-danger btn-sm" onclick="rejectDungeon('${d.id}','${esc(d.title)}')">Reject</button>
                 </td>
@@ -1078,4 +1079,134 @@ function showFeedback(id, msg, success) {
     el.textContent = msg;
     el.className = 'feedback ' + (success ? 'success' : 'error');
     el.style.display = 'block';
+}
+
+// ========== Dungeon Preview ==========
+
+async function previewDungeon(id) {
+    const overlay = document.getElementById('preview-overlay');
+    const content = document.getElementById('preview-content');
+    const title = document.getElementById('preview-title');
+
+    title.textContent = 'Loading preview...';
+    content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Loading...</div>';
+    overlay.classList.add('active');
+
+    try {
+        const data = await apiFetch(`/api/dungeons/preview/${id}`);
+        title.textContent = data.title || 'Untitled Dungeon';
+        content.innerHTML = renderPreview(data);
+    } catch (e) {
+        content.innerHTML = `<div style="color:#f87171;text-align:center;padding:40px;">Failed to load preview: ${esc(e.message)}</div>`;
+    }
+}
+
+function hidePreview() {
+    document.getElementById('preview-overlay').classList.remove('active');
+}
+
+function renderPreview(data) {
+    let html = '';
+
+    // Description
+    if (data.description) {
+        html += `<div class="preview-section"><p style="color:#aaa;margin:0;">${esc(data.description)}</p></div>`;
+    }
+
+    // Map info
+    if (data.map) {
+        html += `<div class="preview-section">
+            <h4>Map</h4>
+            <div class="preview-map-info">
+                <div>Size: <span>${data.map.width} x ${data.map.height}</span></div>
+                <div>Unique tiles: <span>${data.map.dictEntries}</span></div>
+            </div>
+        </div>`;
+    }
+
+    // Custom tiles
+    if (data.customTiles && data.customTiles.length > 0) {
+        html += `<div class="preview-section"><h4>Custom Tiles (${data.customTiles.length})</h4><div>`;
+        for (const t of data.customTiles) {
+            html += `<div class="preview-tile" style="background:#${esc(t.hex)};" title="${esc(t.id)}"></div>`;
+        }
+        html += '</div></div>';
+    }
+
+    // Mobs
+    if (data.mobs && data.mobs.length > 0) {
+        html += `<div class="preview-section"><h4>Mobs (${data.mobs.length})</h4>`;
+        for (let i = 0; i < data.mobs.length; i++) {
+            const mob = data.mobs[i];
+            const spriteScale = mob.spriteSize === 16 ? 64 : 64; // display at 64px
+            html += `<div class="preview-entity">`;
+
+            // Sprites
+            html += '<div style="display:flex;gap:6px;">';
+            if (mob.spriteBase) {
+                html += `<div style="text-align:center;"><img src="${mob.spriteBase}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Base/Idle"><div style="font-size:10px;color:#666;">idle</div></div>`;
+            }
+            if (mob.spriteAttack) {
+                html += `<div style="text-align:center;"><img src="${mob.spriteAttack}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Attack"><div style="font-size:10px;color:#666;">attack</div></div>`;
+            }
+            if (!mob.spriteBase && !mob.spriteAttack) {
+                html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
+            }
+            html += '</div>';
+
+            // Info
+            html += `<div class="preview-entity-info">
+                <div class="preview-entity-name">${esc(mob.name)}</div>
+                <div style="color:#666;font-size:11px;">${mob.spriteSize}x${mob.spriteSize} sprite</div>
+                <span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
+                <div class="preview-xml" style="display:none;">${esc(mob.xml)}</div>
+            </div>`;
+
+            html += '</div>';
+        }
+        html += '</div>';
+    }
+
+    // Items
+    if (data.items && data.items.length > 0) {
+        html += `<div class="preview-section"><h4>Items (${data.items.length})</h4>`;
+        for (let i = 0; i < data.items.length; i++) {
+            const item = data.items[i];
+            html += `<div class="preview-entity">`;
+
+            // Sprite
+            if (item.sprite) {
+                html += `<img src="${item.sprite}" class="preview-sprite" width="64" height="64" title="Item sprite">`;
+            } else {
+                html += `<div class="preview-sprite" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
+            }
+
+            // Info
+            html += `<div class="preview-entity-info">
+                <div class="preview-entity-name">${esc(item.name)}</div>
+                <span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
+                <div class="preview-xml" style="display:none;">${esc(item.xml)}</div>
+            </div>`;
+
+            html += '</div>';
+        }
+        html += '</div>';
+    }
+
+    if (!html) {
+        html = '<div style="color:#666;text-align:center;padding:40px;">No content to preview</div>';
+    }
+
+    return html;
+}
+
+function toggleXml(el) {
+    const xmlDiv = el.nextElementSibling;
+    if (xmlDiv.style.display === 'none') {
+        xmlDiv.style.display = 'block';
+        el.textContent = 'Hide XML';
+    } else {
+        xmlDiv.style.display = 'none';
+        el.textContent = 'Show XML';
+    }
 }
