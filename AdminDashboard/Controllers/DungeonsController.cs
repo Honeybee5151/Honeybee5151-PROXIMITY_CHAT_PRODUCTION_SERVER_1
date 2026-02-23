@@ -89,6 +89,7 @@ namespace AdminDashboard.Controllers
                             spriteBase = (mob["spriteBase"] ?? mob["sprite"])?.ToString(),
                             spriteAttack = mob["spriteAttack"]?.ToString(),
                             spriteSize = mob["spriteSize"]?.Value<int>() ?? 8,
+                            projectileSprites = mob["projectileSprites"] as JObject,
                         });
                     }
                 }
@@ -250,6 +251,18 @@ namespace AdminDashboard.Controllers
                                 spriteEntries.Add((i, "base", baseUrl, size, true));
                             if (!string.IsNullOrEmpty(attackUrl))
                                 spriteEntries.Add((i, "attack", attackUrl, size, true));
+
+                            // Collect projectile sprites (always 8x8)
+                            var projSprites = mob["projectileSprites"] as JObject;
+                            if (projSprites != null)
+                            {
+                                foreach (var prop in projSprites.Properties())
+                                {
+                                    var dataUrl = prop.Value?.ToString();
+                                    if (!string.IsNullOrEmpty(dataUrl))
+                                        spriteEntries.Add((i, $"proj_{prop.Name}", dataUrl, 8, true));
+                                }
+                            }
                         }
                     }
                     if (hasItems)
@@ -266,6 +279,7 @@ namespace AdminDashboard.Controllers
                     // mobSpriteIndices[mobIdx] = (baseIndex, attackIndex), itemSpriteIndices[itemIdx] = index
                     var mobSpriteIndices = new Dictionary<int, (int baseIdx, int attackIdx)>();
                     var itemSpriteIndices = new Dictionary<int, int>();
+                    var projSpriteIndices = new Dictionary<int, Dictionary<string, int>>(); // mobIdx → {projId → sheetIndex}
 
                     foreach (var sizeGroup in spriteEntries.GroupBy(e => e.size))
                     {
@@ -293,7 +307,14 @@ namespace AdminDashboard.Controllers
                                 var e = entries[i];
                                 if (e.isMob)
                                 {
-                                    if (e.frame == "base")
+                                    if (e.frame.StartsWith("proj_"))
+                                    {
+                                        var projId = e.frame.Substring(5); // strip "proj_" prefix
+                                        if (!projSpriteIndices.ContainsKey(e.entityIdx))
+                                            projSpriteIndices[e.entityIdx] = new Dictionary<string, int>();
+                                        projSpriteIndices[e.entityIdx][projId] = indices[i];
+                                    }
+                                    else if (e.frame == "base")
                                     {
                                         var attackIdx = -1;
                                         // Check if next entry is the attack frame for same mob
@@ -323,7 +344,56 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // 4b. Write mob XMLs to CustomObjects.xml (with sprite texture refs)
+                    // 4b. Generate custom projectile definitions + rewrite mob ObjectIds
+                    if (projSpriteIndices.Count > 0)
+                    {
+                        var (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
+                        var projNextType = FindNextTypeCode(projXml, 0x4970);
+                        var newProjEntries = "";
+
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            if (!projSpriteIndices.TryGetValue(i, out var projMap)) continue;
+
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var mobName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+
+                            foreach (var kvp in projMap)
+                            {
+                                var projId = kvp.Key;
+                                var sheetIdx = kvp.Value;
+                                var projName = $"{mobName} Proj {projId}";
+
+                                newProjEntries += $"\t<Object type=\"0x{projNextType:x4}\" id=\"{EscapeXml(projName)}\">\n";
+                                newProjEntries += $"\t\t<Class>Projectile</Class>\n";
+                                newProjEntries += $"\t\t<Texture>\n";
+                                newProjEntries += $"\t\t\t<File>communitySprites8x8</File>\n";
+                                newProjEntries += $"\t\t\t<Index>{sheetIdx}</Index>\n";
+                                newProjEntries += $"\t\t</Texture>\n";
+                                newProjEntries += $"\t\t<AngleCorrection>1</AngleCorrection>\n";
+                                newProjEntries += $"\t</Object>\n";
+                                projNextType++;
+
+                                // Rewrite the mob XML's ObjectId for this projectile slot
+                                rawXml = Regex.Replace(
+                                    rawXml,
+                                    $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
+                                    $"$1{EscapeXml(projName)}$2"
+                                );
+                            }
+
+                            // Write updated XML back so mob XML writing picks up new ObjectIds
+                            mobs[i]["xml"] = rawXml;
+                        }
+
+                        if (!string.IsNullOrEmpty(newProjEntries))
+                        {
+                            var updatedProjXml = projXml.Replace("</Objects>", newProjEntries + "</Objects>");
+                            files.Add(("Shared/resources/xml/custom/CustomProj.xml", updatedProjXml));
+                        }
+                    }
+
+                    // 4c. Write mob XMLs to CustomObjects.xml (with sprite texture refs)
                     var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
                     var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
                     var nextType = Math.Max(FindNextTypeCode(objectsXml, 0x5000), FindNextTypeCode(itemsXml, 0x5000));
