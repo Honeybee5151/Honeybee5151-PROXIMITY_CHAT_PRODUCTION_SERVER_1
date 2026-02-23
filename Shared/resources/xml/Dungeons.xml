@@ -366,4 +366,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="ty">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/ty.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>

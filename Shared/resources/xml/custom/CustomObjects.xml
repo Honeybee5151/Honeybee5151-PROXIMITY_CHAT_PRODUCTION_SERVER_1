@@ -141,4 +141,104 @@
 			<ConditionEffect duration="2">Dazed</ConditionEffect>
 		</Projectile>
 	</Object>
+	<Object type="0x5004" id="Voidlord Ketharis">
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StasisImmune/>
+        <StunImmune/>
+        <ParalyzeImmune/>
+        <AnimatedTexture><File>chars16x16dEncounters</File><Index>0x24</Index></AnimatedTexture>
+        <HitSound>monster/demons_hit</HitSound>
+        <DeathSound>monster/demons_death</DeathSound>
+        <MaxHitPoints>25000</MaxHitPoints>
+        <Size>120</Size>
+        <Defense>30</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>90</Speed>
+            <Damage>85</Damage>
+            <Size>80</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="3">Darkness</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Black Bullet</ObjectId>
+            <Speed>60</Speed>
+            <Damage>120</Damage>
+            <Size>100</Size>
+            <LifetimeMS>2000</LifetimeMS>
+            <ArmorPiercing/>
+            <ConditionEffect duration="2">Quiet</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>50</Speed>
+            <Damage>70</Damage>
+            <Size>60</Size>
+            <LifetimeMS>3000</LifetimeMS>
+            <ConditionEffect duration="4">Slow</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5005" id="Void Sentinel">
+        <Enemy/>
+        <Class>Character</Class>
+        <AnimatedTexture><File>chars8x8rHigh</File><Index>0x0A</Index></AnimatedTexture>
+        <HitSound>monster/demons_hit</HitSound>
+        <DeathSound>monster/demons_death</DeathSound>
+        <MaxHitPoints>3500</MaxHitPoints>
+        <Size>100</Size>
+        <Defense>20</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>70</Speed>
+            <Damage>55</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1000</LifetimeMS>
+            <ConditionEffect duration="2">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5006" id="Void Wraith">
+        <Enemy/>
+        <Class>Character</Class>
+        <Flying/>
+        <AnimatedTexture><File>chars8x8rMid</File><Index>0x18</Index></AnimatedTexture>
+        <HitSound>monster/ghost_hit</HitSound>
+        <DeathSound>monster/ghost_death</DeathSound>
+        <MaxHitPoints>1800</MaxHitPoints>
+        <Size>80</Size>
+        <Defense>5</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Black Bullet</ObjectId>
+            <Speed>100</Speed>
+            <Damage>65</Damage>
+            <Size>50</Size>
+            <LifetimeMS>800</LifetimeMS>
+            <ArmorPiercing/>
+        </Projectile>
+    </Object>
+	<Object type="0x5007" id="Void Obelisk">
+        <Enemy/>
+        <Class>Character</Class>
+        <StasisImmune/>
+        <AnimatedTexture><File>chars8x8rEncounters</File><Index>0x30</Index></AnimatedTexture>
+        <HitSound>monster/stone_hit</HitSound>
+        <DeathSound>monster/stone_death</DeathSound>
+        <MaxHitPoints>5000</MaxHitPoints>
+        <Size>90</Size>
+        <Defense>40</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>55</Speed>
+            <Damage>40</Damage>
+            <Size>50</Size>
+            <LifetimeMS>2500</LifetimeMS>
+            <ConditionEffect duration="3">Bleeding</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>
