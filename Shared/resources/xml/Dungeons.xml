@@ -373,4 +373,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="Pirate">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/Pirate.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>

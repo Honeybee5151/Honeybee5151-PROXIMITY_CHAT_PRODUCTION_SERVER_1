@@ -211,4 +211,36 @@
 		</Projectile>
 		<BagType>0</BagType>
 	</Object>
+	<Objects>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>0</Index>
+	</Texture>
+    <Object type="0x500c" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>It's literally just a stick you found on the ground. Somehow it hurts when you hit things with it.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>0</Index>
+	</Texture>Stick Bonk</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>10</MinDamage>
+            <MaxDamage>25</MaxDamage>
+            <LifetimeMS>350</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+</Objects>
 </Objects>

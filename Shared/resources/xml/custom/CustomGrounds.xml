@@ -1,2 +1,16 @@
 ﻿<GroundTypes>
+	<Ground type="0xf000" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_zfpo2gl5h2jo41ujwg6yvbok28rpnfvo">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0xed6868</Color>
+	</Ground>
+	<Ground type="0xf001" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_xkxkbfptr9z20dywmrjlxffqtac668n2">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x000000</Color>
+	</Ground>
 </GroundTypes>
