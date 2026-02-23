@@ -1,0 +1,58 @@
+{
+  "Awoken Warden of Dusk": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Dusk Sentinel": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Twilight Wisp": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Dusk Obelisk": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  }
+}

@@ -527,4 +527,113 @@
         </Projectile>
     </Object>
 	awd
+	awd
+	<Object type="0x5014" id="Awoken Warden of Dusk">
+    <Enemy/>
+    <Class>Character</Class>
+    <Quest/>
+    <God/>
+    <StasisImmune/>
+    <StunImmune/>
+    <ParalyzeImmune/>
+    <AnimatedTexture><File>chars16x16dEncounters2</File><Index>0x0A</Index></AnimatedTexture>
+    <HitSound>monster/gods_hit</HitSound>
+    <DeathSound>monster/gods_death</DeathSound>
+    <MaxHitPoints>45000</MaxHitPoints>
+    <Size>140</Size>
+    <Defense>35</Defense>
+    <XpMult>0.8</XpMult>
+    <Projectile id="0">
+      <ObjectId>Dark Ball</ObjectId>
+      <Speed>90</Speed>
+      <Damage>120</Damage>
+      <Size>80</Size>
+      <LifetimeMS>1200</LifetimeMS>
+      <ConditionEffect duration="3">Darkness</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+      <ObjectId>White Bullet</ObjectId>
+      <Speed>60</Speed>
+      <Damage>85</Damage>
+      <Size>70</Size>
+      <LifetimeMS>2000</LifetimeMS>
+      <ArmorPiercing/>
+      <ConditionEffect duration="2">Slow</ConditionEffect>
+    </Projectile>
+    <Projectile id="2">
+      <ObjectId>Purple Magic</ObjectId>
+      <Speed>110</Speed>
+      <Damage>150</Damage>
+      <Size>55</Size>
+      <LifetimeMS>800</LifetimeMS>
+      <ConditionEffect duration="4">Quiet</ConditionEffect>
+    </Projectile>
+  </Object>
+	<Object type="0x5015" id="Dusk Sentinel">
+    <Enemy/>
+    <Class>Character</Class>
+    <AnimatedTexture><File>chars8x8rHigh</File><Index>0x0E</Index></AnimatedTexture>
+    <HitSound>monster/gods_hit</HitSound>
+    <DeathSound>monster/gods_death</DeathSound>
+    <MaxHitPoints>3500</MaxHitPoints>
+    <Size>110</Size>
+    <Defense>20</Defense>
+    <XpMult>0.1</XpMult>
+    <Projectile id="0">
+      <ObjectId>Dark Ball</ObjectId>
+      <Speed>70</Speed>
+      <Damage>75</Damage>
+      <Size>60</Size>
+      <LifetimeMS>1400</LifetimeMS>
+      <ConditionEffect duration="2">Blind</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+      <ObjectId>Purple Magic</ObjectId>
+      <Speed>85</Speed>
+      <Damage>55</Damage>
+      <Size>50</Size>
+      <LifetimeMS>1000</LifetimeMS>
+    </Projectile>
+  </Object>
+	<Object type="0x5016" id="Twilight Wisp">
+    <Enemy/>
+    <Class>Character</Class>
+    <Flying/>
+    <AnimatedTexture><File>chars8x8rMid</File><Index>0x1A</Index></AnimatedTexture>
+    <HitSound>monster/sprites_hit</HitSound>
+    <DeathSound>monster/sprites_death</DeathSound>
+    <MaxHitPoints>1200</MaxHitPoints>
+    <Size>70</Size>
+    <Defense>5</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+      <ObjectId>White Bullet</ObjectId>
+      <Speed>100</Speed>
+      <Damage>45</Damage>
+      <Size>40</Size>
+      <LifetimeMS>900</LifetimeMS>
+      <ConditionEffect duration="3">Confused</ConditionEffect>
+    </Projectile>
+  </Object>
+	<Object type="0x5017" id="Dusk Obelisk">
+    <Enemy/>
+    <Class>Character</Class>
+    <StunImmune/>
+    <AnimatedTexture><File>chars16x16rEncounters</File><Index>0x12</Index></AnimatedTexture>
+    <HitSound>monster/stone_hit</HitSound>
+    <DeathSound>monster/stone_death</DeathSound>
+    <MaxHitPoints>6000</MaxHitPoints>
+    <Size>120</Size>
+    <Defense>40</Defense>
+    <XpMult>0.1</XpMult>
+    <Projectile id="0">
+      <ObjectId>Purple Magic</ObjectId>
+      <Speed>55</Speed>
+      <Damage>100</Damage>
+      <Size>90</Size>
+      <LifetimeMS>2500</LifetimeMS>
+      <ArmorPiercing/>
+      <ConditionEffect duration="5">Weak</ConditionEffect>
+    </Projectile>
+  </Object>
 </Objects>

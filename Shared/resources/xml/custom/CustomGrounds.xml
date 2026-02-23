@@ -111,4 +111,88 @@
 		</Texture>
 		<Color>0x200d0d</Color>
 	</Ground>
+	<Ground type="0xf010" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_uf6p8ozvnj1m8ijulmnnloa9er9ddrjs">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0xee6868</Color>
+	</Ground>
+	<Ground type="0xf011" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_q1cuazkk3znn3c2stjxdaw88lu3jyevu">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x010000</Color>
+	</Ground>
+	<Ground type="0xf012" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_rmbvnadmzbcwmc6geugpeey54krm9mmd">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0xef6868</Color>
+	</Ground>
+	<Ground type="0xf013" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_b0as46tu02u20cjbilkkclatv2sc571j">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x020000</Color>
+	</Ground>
+	<Ground type="0xf014" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_cwz3v9bf4x4psf1ub0fi2q009renbecs">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x030000</Color>
+	</Ground>
+	<Ground type="0xf015" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_k2pn138719vdrg0lshon24pwi9c2xtpv">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x040000</Color>
+	</Ground>
+	<Ground type="0xf016" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_q1s2vasul9rhwccs3mj3xax3jrx5gyfo">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x050000</Color>
+	</Ground>
+	<Ground type="0xf017" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_q70ftzx4intob586e1iy7f10bl52z8qj">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x060000</Color>
+	</Ground>
+	<Ground type="0xf018" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_0m6fo6ynna44dvwnhrlqw2dbd82mcg1t">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x070000</Color>
+	</Ground>
+	<Ground type="0xf019" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_vn86wnwl5wa9zxczu9plsipdg13g9nim">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x080000</Color>
+	</Ground>
+	<Ground type="0xf01a" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_cbe1huilat8pls0n28grd5f4jy3q96cs">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x090000</Color>
+	</Ground>
+	<Ground type="0xf01b" id="custom_9c40a53a-d333-4d19-b29c-3d02ecf2bd21_3h2h3o3tc0ogsz5h266ez6kn5fzzpkyp">
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x0b</Index>
+		</Texture>
+		<Color>0x0a0000</Color>
+	</Ground>
 </GroundTypes>
