@@ -357,6 +357,28 @@
 	awd
 	awd
 	asd
+	<Object type="0x501c" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>13</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>It's literally just a stick you found on the ground. Somehow it hurts when you hit things with it.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Swing</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>10</MinDamage>
+            <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -364,6 +386,28 @@
 	awd
 	awd
 	asd
+	<Object type="0x501c" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>13</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>It's literally just a stick you found on the ground. Somehow it hurts when you hit things with it.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Swing</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>10</MinDamage>
+            <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>
 	<Objects>
 	<Texture>
@@ -480,6 +524,28 @@
 	awd
 	awd
 	asd
+	<Object type="0x501c" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>13</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>It's literally just a stick you found on the ground. Somehow it hurts when you hit things with it.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Swing</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>10</MinDamage>
+            <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -487,4 +553,26 @@
 	awd
 	awd
 	asd
+	<Object type="0x501c" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>13</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>It's literally just a stick you found on the ground. Somehow it hurts when you hit things with it.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Swing</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>10</MinDamage>
+            <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>

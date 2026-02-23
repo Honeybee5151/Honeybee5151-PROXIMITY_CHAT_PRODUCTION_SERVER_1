@@ -640,4 +640,122 @@
 	awd
 	awd
 	asd
+	<Object type="0x5018" id="Goblin Warchief Grukk">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>8</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StunImmune/>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>12000</MaxHitPoints>
+        <Size>120</Size>
+        <Defense>25</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Goblin Warchief Grukk Proj 0</ObjectId>
+            <Speed>85</Speed>
+            <Damage>75</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="3">Slow</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Goblin Warchief Grukk Proj 1</ObjectId>
+            <Speed>60</Speed>
+            <Damage>110</Damage>
+            <Size>80</Size>
+            <LifetimeMS>1800</LifetimeMS>
+            <ArmorPiercing/>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Goblin Warchief Grukk Proj 2</ObjectId>
+            <Speed>50</Speed>
+            <Damage>90</Damage>
+            <Size>90</Size>
+            <LifetimeMS>2200</LifetimeMS>
+            <ConditionEffect duration="2">Daze</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5019" id="Goblin Shaman">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>8</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/imp_hit</HitSound>
+        <DeathSound>monster/imp_death</DeathSound>
+        <MaxHitPoints>1800</MaxHitPoints>
+        <Size>80</Size>
+        <Defense>10</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Goblin Warchief Grukk Proj 0</ObjectId>
+            <Speed>70</Speed>
+            <Damage>55</Damage>
+            <Size>50</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="3">Healing</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Goblin Warchief Grukk Proj 1</ObjectId>
+            <Speed>65</Speed>
+            <Damage>70</Damage>
+            <Size>55</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="4">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x501a" id="Goblin Berserker">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>8</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>2200</MaxHitPoints>
+        <Size>90</Size>
+        <Defense>15</Defense>
+        <XpMult>0.12</XpMult>
+        <Projectile id="0">
+            <ObjectId>Goblin Warchief Grukk Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>85</Damage>
+            <Size>60</Size>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+    </Object>
+	<Object type="0x501b" id="Goblin Scavenger">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>8</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/imp_hit</HitSound>
+        <DeathSound>monster/imp_death</DeathSound>
+        <MaxHitPoints>800</MaxHitPoints>
+        <Size>65</Size>
+        <Defense>5</Defense>
+        <XpMult>0.05</XpMult>
+        <Projectile id="0">
+            <ObjectId>Goblin Warchief Grukk Proj 0</ObjectId>
+            <Speed>90</Speed>
+            <Damage>40</Damage>
+            <Size>40</Size>
+            <LifetimeMS>800</LifetimeMS>
+            <ConditionEffect duration="2">Blind</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>
