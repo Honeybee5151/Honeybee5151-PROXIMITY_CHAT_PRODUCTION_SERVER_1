@@ -345,4 +345,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="wuw">
+		<Width>64</Width>
+		<Height>64</Height>
+		<MapJM>Dungeons/wuw.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
