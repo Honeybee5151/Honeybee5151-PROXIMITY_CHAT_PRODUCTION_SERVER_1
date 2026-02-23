@@ -416,6 +416,10 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
+                                // Skip type codes already in use
+                                while (Regex.IsMatch(objectsXml + itemsXml + newMobEntries, $@"type=""0x{nextType:x4}"""))
+                                    nextType++;
+
                                 xml = InjectTypeCode(xml, nextType);
                                 nextType++;
 
@@ -424,11 +428,12 @@ namespace AdminDashboard.Controllers
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
 
                                 // Inject sprite texture reference (use index from first block of this mob)
+                                // Community sprites are single-frame — use Texture, not AnimatedTexture
                                 if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
                                 {
                                     var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
                                     var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: true);
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false);
                                 }
 
                                 newMobEntries += "\t" + xml.Trim() + "\n";
@@ -448,17 +453,32 @@ namespace AdminDashboard.Controllers
                         var newItemEntries = "";
                         for (int i = 0; i < items!.Count; i++)
                         {
-                            var xml = items[i]["xml"]?.ToString();
-                            if (string.IsNullOrEmpty(xml)) continue;
+                            var rawXml = items[i]["xml"]?.ToString();
+                            if (string.IsNullOrEmpty(rawXml)) continue;
 
-                            xml = InjectTypeCode(xml, nextType);
-                            nextType++;
+                            // Extract individual <Object> blocks (strip <Objects> wrapper if present)
+                            var objectBlocks = Regex.Matches(rawXml, @"<Object\b[^>]*>.*?</Object>", RegexOptions.Singleline);
+                            var blocks = objectBlocks.Count > 0
+                                ? objectBlocks.Cast<Match>().Select(m => m.Value).ToList()
+                                : new List<string> { rawXml };
 
-                            // Inject sprite texture reference
-                            if (itemSpriteIndices.TryGetValue(i, out var sprIdx))
-                                xml = InjectSpriteTexture(xml, "communitySprites8x8", sprIdx, isMob: false);
+                            foreach (var block in blocks)
+                            {
+                                var xml = block;
 
-                            newItemEntries += "\t" + xml.Trim() + "\n";
+                                // Check existing type codes to find next available
+                                while (Regex.IsMatch(objectsXml + itemsXml + newItemEntries, $@"type=""0x{nextType:x4}"""))
+                                    nextType++;
+
+                                xml = InjectTypeCode(xml, nextType);
+                                nextType++;
+
+                                // Inject sprite texture reference
+                                if (itemSpriteIndices.TryGetValue(i, out var sprIdx))
+                                    xml = InjectSpriteTexture(xml, "communitySprites8x8", sprIdx, isMob: false);
+
+                                newItemEntries += "\t" + xml.Trim() + "\n";
+                            }
                         }
 
                         if (!string.IsNullOrEmpty(newItemEntries))
@@ -671,12 +691,13 @@ namespace AdminDashboard.Controllers
             var tag = isMob ? "AnimatedTexture" : "Texture";
             var textureXml = $"<{tag}>\n\t\t<File>{sheetName}</File>\n\t\t<Index>{index}</Index>\n\t</{tag}>";
 
-            // Remove any existing Texture or AnimatedTexture blocks
+            // Remove existing top-level AnimatedTexture/Texture (direct children of <Object>)
             xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
-            xml = Regex.Replace(xml, @"<Texture>.*?</Texture>", "", RegexOptions.Singleline);
+            xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
 
             // Inject after the opening <Object ...> tag
-            xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t{textureXml}");
+            // Use word boundary: <Object followed by space or > (NOT <ObjectId> or <Objects>)
+            xml = Regex.Replace(xml, @"(<Object(?:\s[^>]*)?>)(?!\w)", $"$1\n\t{textureXml}");
             return xml;
         }
 
