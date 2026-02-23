@@ -58,7 +58,7 @@
 			<ArmorPiercing/>
 		</Projectile>
 		<Projectile id="3">
-			<ObjectId>Big Red Fire</ObjectId>
+			<ObjectId>Red Fire</ObjectId>
 			<Speed>45</Speed>
 			<Damage>180</Damage>
 			<Size>140</Size>
