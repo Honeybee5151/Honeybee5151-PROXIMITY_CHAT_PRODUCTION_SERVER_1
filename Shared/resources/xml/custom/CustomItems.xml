@@ -242,5 +242,225 @@
         </Projectile>
         <BagType>0</BagType>
     </Object>
+	<Objects>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+    <Object type="0x5012" id="Barbarian's War Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A massive, primitive club hewn from petrified oak and bound with iron rivets. Its wielder needs no finesse — only brute strength.</Description>
+        <RateOfFire>0.65</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Heavy Smash</ObjectId>
+            <Speed>70</Speed>
+            <MinDamage>200</MinDamage>
+            <MaxDamage>340</MaxDamage>
+            <LifetimeMS>350</LifetimeMS>
+            <ConditionEffect duration="1.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+            <AddStat stat="21" amount="3"/>
+            <AddStat stat="22" amount="-5"/>
+            <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+
+    <Object type="0x5012" id="Troll's Spiked Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>Ripped from the grip of a bridge troll, this grotesque club is studded with jagged bone shards. Each swing sends splinters of pain in every direction.</Description>
+        <RateOfFire>0.55</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>25</ArcGap>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Bone Splinter</ObjectId>
+            <Speed>80</Speed>
+            <MinDamage>150</MinDamage>
+            <MaxDamage>280</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="8"/>
+            <AddStat stat="0" amount="30"/>
+            <AddStat stat="22" amount="-8"/>
+            <AddStat stat="28" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+
+    <Object type="0x5012" id="Worldbreaker Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>Forged in the molten core of a dying realm, this legendary club pulverizes anything it touches. The ground itself trembles with each devastating blow.</Description>
+        <RateOfFire>0.45</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Earthshatter</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>350</MinDamage>
+            <MaxDamage>550</MaxDamage>
+            <LifetimeMS>380</LifetimeMS>
+            <ConditionEffect duration="3">Stunned</ConditionEffect>
+            <ConditionEffect duration="3">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="12"/>
+            <AddStat stat="21" amount="6"/>
+            <AddStat stat="0" amount="50"/>
+            <AddStat stat="22" amount="-10"/>
+            <AddStat stat="28" amount="-7"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+</Objects>
+</Objects>
+	<Objects>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+    <Object type="0x5012" id="Barbarian's War Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A massive, primitive club hewn from petrified oak and bound with iron rivets. Its wielder needs no finesse — only brute strength.</Description>
+        <RateOfFire>0.65</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Heavy Smash</ObjectId>
+            <Speed>70</Speed>
+            <MinDamage>200</MinDamage>
+            <MaxDamage>340</MaxDamage>
+            <LifetimeMS>350</LifetimeMS>
+            <ConditionEffect duration="1.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+            <AddStat stat="21" amount="3"/>
+            <AddStat stat="22" amount="-5"/>
+            <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+
+    <Object type="0x5012" id="Troll's Spiked Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>Ripped from the grip of a bridge troll, this grotesque club is studded with jagged bone shards. Each swing sends splinters of pain in every direction.</Description>
+        <RateOfFire>0.55</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>25</ArcGap>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Bone Splinter</ObjectId>
+            <Speed>80</Speed>
+            <MinDamage>150</MinDamage>
+            <MaxDamage>280</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="8"/>
+            <AddStat stat="0" amount="30"/>
+            <AddStat stat="22" amount="-8"/>
+            <AddStat stat="28" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+
+    <Object type="0x5012" id="Worldbreaker Club">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>Forged in the molten core of a dying realm, this legendary club pulverizes anything it touches. The ground itself trembles with each devastating blow.</Description>
+        <RateOfFire>0.45</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>7</Index>
+	</Texture>Earthshatter</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>350</MinDamage>
+            <MaxDamage>550</MaxDamage>
+            <LifetimeMS>380</LifetimeMS>
+            <ConditionEffect duration="3">Stunned</ConditionEffect>
+            <ConditionEffect duration="3">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="12"/>
+            <AddStat stat="21" amount="6"/>
+            <AddStat stat="0" amount="50"/>
+            <AddStat stat="22" amount="-10"/>
+            <AddStat stat="28" amount="-7"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 </Objects>

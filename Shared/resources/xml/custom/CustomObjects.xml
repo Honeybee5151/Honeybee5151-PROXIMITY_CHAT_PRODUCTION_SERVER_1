@@ -354,4 +354,176 @@
             <ConditionEffect duration="3">Confused</ConditionEffect>
         </Projectile>
     </Object>
+	skeleton
+	<Object type="0x500e" id="Gorath the Colossal">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StasisImmune/>
+        <StunImmune/>
+        
+        <HitSound>monster/giants_hit</HitSound>
+        <DeathSound>monster/giants_death</DeathSound>
+        <MaxHitPoints>45000</MaxHitPoints>
+        <Size>200</Size>
+        <Defense>35</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 0</ObjectId>
+            <Speed>55</Speed>
+            <Damage>150</Damage>
+            <Size>120</Size>
+            <LifetimeMS>2200</LifetimeMS>
+            <ConditionEffect duration="3">Armor Broken</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 1</ObjectId>
+            <Speed>40</Speed>
+            <Damage>95</Damage>
+            <Size>100</Size>
+            <LifetimeMS>3000</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 2</ObjectId>
+            <Speed>85</Speed>
+            <Damage>120</Damage>
+            <Size>80</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ArmorPiercing/>
+        </Projectile>
+        <Projectile id="3">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 3</ObjectId>
+            <Speed>65</Speed>
+            <Damage>70</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1800</LifetimeMS>
+            <ConditionEffect duration="4">Slow</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x500f" id="Giant Stone Hurler">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/giants_hit</HitSound>
+        <DeathSound>monster/giants_death</DeathSound>
+        <MaxHitPoints>3500</MaxHitPoints>
+        <Size>150</Size>
+        <Defense>20</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 0</ObjectId>
+            <Speed>50</Speed>
+            <Damage>85</Damage>
+            <Size>90</Size>
+            <LifetimeMS>2000</LifetimeMS>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 1</ObjectId>
+            <Speed>70</Speed>
+            <Damage>60</Damage>
+            <Size>50</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="2">Dazed</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5010" id="Giant Earthshaker">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <ParalyzeImmune/>
+        
+        <HitSound>monster/giants_hit</HitSound>
+        <DeathSound>monster/giants_death</DeathSound>
+        <MaxHitPoints>5000</MaxHitPoints>
+        <Size>160</Size>
+        <Defense>30</Defense>
+        <XpMult>0.2</XpMult>
+        <Projectile id="0">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 0</ObjectId>
+            <Speed>60</Speed>
+            <Damage>110</Damage>
+            <Size>100</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <ConditionEffect duration="3">Slow</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 1</ObjectId>
+            <Speed>45</Speed>
+            <Damage>130</Damage>
+            <Size>110</Size>
+            <LifetimeMS>2400</LifetimeMS>
+            <ArmorPiercing/>
+        </Projectile>
+    </Object>
+	<Object type="0x5011" id="Tiny Stone Golem">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/stone_hit</HitSound>
+        <DeathSound>monster/stone_death</DeathSound>
+        <MaxHitPoints>1200</MaxHitPoints>
+        <Size>80</Size>
+        <Defense>15</Defense>
+        <XpMult>0.05</XpMult>
+        <Projectile id="0">
+            <ObjectId>
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>1</Index>
+	</AnimatedTexture>Gorath the Colossal Proj 0</ObjectId>
+            <Speed>90</Speed>
+            <Damage>45</Damage>
+            <Size>40</Size>
+            <LifetimeMS>800</LifetimeMS>
+        </Projectile>
+    </Object>
 </Objects>
