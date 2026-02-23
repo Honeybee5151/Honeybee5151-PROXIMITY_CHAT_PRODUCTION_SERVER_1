@@ -120,7 +120,63 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // 4. Add World entry to Dungeons.xml
+                // 4. Write mob + item XMLs to CustomObjects.xml / CustomItems.xml
+                var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;
+                var items = dungeon["items"] as JArray;
+                var hasMobs = mobs != null && mobs.Count > 0;
+                var hasItems = items != null && items.Count > 0;
+
+                if (hasMobs || hasItems)
+                {
+                    // Fetch both files to find global max type code (they share the same range)
+                    var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
+                    var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
+                    var nextType = Math.Max(FindNextTypeCode(objectsXml, 0x5000), FindNextTypeCode(itemsXml, 0x5000));
+
+                    // 4a. Mobs → CustomObjects.xml
+                    if (hasMobs)
+                    {
+                        var newMobEntries = "";
+                        foreach (var mob in mobs!)
+                        {
+                            var xml = mob["xml"]?.ToString();
+                            if (string.IsNullOrEmpty(xml)) continue;
+
+                            xml = InjectTypeCode(xml, nextType);
+                            newMobEntries += "\t" + xml.Trim() + "\n";
+                            nextType++;
+                        }
+
+                        if (!string.IsNullOrEmpty(newMobEntries))
+                        {
+                            var updatedObjectsXml = objectsXml.Replace("</Objects>", newMobEntries + "</Objects>");
+                            files.Add(("Shared/resources/xml/custom/CustomObjects.xml", updatedObjectsXml));
+                        }
+                    }
+
+                    // 4b. Items → CustomItems.xml
+                    if (hasItems)
+                    {
+                        var newItemEntries = "";
+                        foreach (var item in items!)
+                        {
+                            var xml = item["xml"]?.ToString();
+                            if (string.IsNullOrEmpty(xml)) continue;
+
+                            xml = InjectTypeCode(xml, nextType);
+                            newItemEntries += "\t" + xml.Trim() + "\n";
+                            nextType++;
+                        }
+
+                        if (!string.IsNullOrEmpty(newItemEntries))
+                        {
+                            var updatedItemsXml = itemsXml.Replace("</Objects>", newItemEntries + "</Objects>");
+                            files.Add(("Shared/resources/xml/custom/CustomItems.xml", updatedItemsXml));
+                        }
+                    }
+                }
+
+                // 6. Add World entry to Dungeons.xml
                 var (dungeonsXml, _) = await _github.FetchFile("Shared/resources/xml/Dungeons.xml");
 
                 // Check for duplicate
@@ -141,10 +197,10 @@ namespace AdminDashboard.Controllers
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");
                 files.Add(("Shared/resources/xml/Dungeons.xml", updatedDungeonsXml));
 
-                // 5. Atomic commit to GitHub
+                // 7. Atomic commit to GitHub
                 await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}");
 
-                // 6. Update status in Supabase
+                // 8. Update status in Supabase
                 await _supabase.UpdateStatus(request.DungeonId, "approved");
 
                 return Ok(new { success = true, message = $"Dungeon '{safeTitle}' approved and pushed to server repo" });
@@ -189,17 +245,28 @@ namespace AdminDashboard.Controllers
             return ids.ToList();
         }
 
-        /// <summary>Find the next available type code in CustomGrounds.xml (starts at 0xF000)</summary>
-        private static int FindNextTypeCode(string xml)
+        /// <summary>Find the next available type code. Default start: 0xF000 for grounds, 0x5000 for objects</summary>
+        private static int FindNextTypeCode(string xml, int defaultStart = 0xF000)
         {
             var matches = Regex.Matches(xml, @"type=""0x([0-9a-fA-F]+)""");
-            int max = 0xEFFF; // so first will be 0xF000
+            int max = defaultStart - 1;
             foreach (Match m in matches)
             {
                 if (int.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, null, out int val))
                     if (val > max) max = val;
             }
             return max + 1;
+        }
+
+        /// <summary>Inject or replace the type="0xNNNN" attribute in an Object XML tag</summary>
+        private static string InjectTypeCode(string xml, int typeCode)
+        {
+            var typeHex = $"0x{typeCode:x4}";
+            // If there's already a type attribute, replace it
+            if (Regex.IsMatch(xml, @"<Object\s[^>]*type=""[^""]*"""))
+                return Regex.Replace(xml, @"(<Object\s[^>]*)type=""[^""]*""", $"$1type=\"{typeHex}\"");
+            // Otherwise inject type after <Object
+            return Regex.Replace(xml, @"<Object(\s)", $"<Object type=\"{typeHex}\"$1");
         }
 
         private static string EscapeXml(string s) => s
