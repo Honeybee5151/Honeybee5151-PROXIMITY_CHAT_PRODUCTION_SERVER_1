@@ -333,25 +333,36 @@ namespace AdminDashboard.Controllers
                         var newMobEntries = "";
                         for (int i = 0; i < mobs!.Count; i++)
                         {
-                            var xml = mobs[i]["xml"]?.ToString();
-                            if (string.IsNullOrEmpty(xml)) continue;
+                            var rawXml = mobs[i]["xml"]?.ToString();
+                            if (string.IsNullOrEmpty(rawXml)) continue;
 
-                            xml = InjectTypeCode(xml, nextType);
-                            nextType++;
+                            // Extract individual <Object>...</Object> blocks (strip <Objects> wrapper if present)
+                            var objectBlocks = Regex.Matches(rawXml, @"<Object\b[^>]*>.*?</Object>", RegexOptions.Singleline);
+                            var blocks = objectBlocks.Count > 0
+                                ? objectBlocks.Cast<Match>().Select(m => m.Value).ToList()
+                                : new List<string> { rawXml };
 
-                            // Ensure <Enemy/> tag is present (required for server to spawn mob)
-                            if (!xml.Contains("<Enemy/>") && !xml.Contains("<Enemy />"))
-                                xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
-
-                            // Inject sprite texture reference
-                            if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
+                            foreach (var block in blocks)
                             {
-                                var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
-                                var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: true);
-                            }
+                                var xml = block;
 
-                            newMobEntries += "\t" + xml.Trim() + "\n";
+                                xml = InjectTypeCode(xml, nextType);
+                                nextType++;
+
+                                // Ensure <Enemy/> tag is present (required for server to spawn mob)
+                                if (!xml.Contains("<Enemy/>") && !xml.Contains("<Enemy />"))
+                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
+
+                                // Inject sprite texture reference (use index from first block of this mob)
+                                if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
+                                {
+                                    var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
+                                    var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: true);
+                                }
+
+                                newMobEntries += "\t" + xml.Trim() + "\n";
+                            }
                         }
 
                         if (!string.IsNullOrEmpty(newMobEntries))

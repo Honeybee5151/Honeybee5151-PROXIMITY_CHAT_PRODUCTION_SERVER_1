@@ -1,4 +1,4 @@
-﻿<Objects>
+<Objects>
 	<Object type="0x4969" id="Potion Storage">
 		<Class>PotionStorage</Class>
 		<Texture>
@@ -16,135 +16,129 @@
 		</Texture>
 		<Static />
 	</Object>
-	awd
-	<Objects>
-    <Object type="0x5000" id="Drakonax the Eternal">
-        <Enemy/>
-        <Class>Character</Class>
-        <Flying/>
-        <Quest/>
-        <God/>
-        <StasisImmune/>
-        <StunImmune/>
-        <ParalyzeImmune/>
-        <AnimatedTexture><File>chars16x16dEncounters</File><Index>0x24</Index></AnimatedTexture>
-        <HitSound>monster/dragons_hit</HitSound>
-        <DeathSound>monster/dragons_death</DeathSound>
-        <MaxHitPoints>45000</MaxHitPoints>
-        <Size>180</Size>
-        <Defense>35</Defense>
-        <XpMult>0.9</XpMult>
-        <Projectile id="0">
-            <ObjectId>Red Fire</ObjectId>
-            <Speed>90</Speed>
-            <Damage>130</Damage>
-            <Size>100</Size>
-            <LifetimeMS>1200</LifetimeMS>
-            <MultiHit/>
-            <ConditionEffect duration="3">Burning</ConditionEffect>
-        </Projectile>
-        <Projectile id="1">
-            <ObjectId>Orange Missile</ObjectId>
-            <Speed>60</Speed>
-            <Damage>95</Damage>
-            <Size>80</Size>
-            <LifetimeMS>2000</LifetimeMS>
-            <ConditionEffect duration="4">Armor Broken</ConditionEffect>
-        </Projectile>
-        <Projectile id="2">
-            <ObjectId>White Bullet</ObjectId>
-            <Speed>110</Speed>
-            <Damage>75</Damage>
-            <Size>50</Size>
-            <LifetimeMS>800</LifetimeMS>
-            <ArmorPiercing/>
-        </Projectile>
-        <Projectile id="3">
-            <ObjectId>Big Red Fire</ObjectId>
-            <Speed>45</Speed>
-            <Damage>180</Damage>
-            <Size>140</Size>
-            <LifetimeMS>3000</LifetimeMS>
-            <MultiHit/>
-            <ConditionEffect duration="2">Pet Stasis</ConditionEffect>
-            <ConditionEffect duration="5">Bleeding</ConditionEffect>
-        </Projectile>
-    </Object>
-
-    <Object type="0x5000" id="Dragonfire Wyrm">
-        <Enemy/>
-        <Class>Character</Class>
-        <Flying/>
-        <AnimatedTexture><File>chars16x16rEncounters</File><Index>0x18</Index></AnimatedTexture>
-        <HitSound>monster/dragons_hit</HitSound>
-        <DeathSound>monster/dragons_death</DeathSound>
-        <MaxHitPoints>3500</MaxHitPoints>
-        <Size>120</Size>
-        <Defense>15</Defense>
-        <XpMult>0.2</XpMult>
-        <Projectile id="0">
-            <ObjectId>Red Fire</ObjectId>
-            <Speed>85</Speed>
-            <Damage>70</Damage>
-            <Size>70</Size>
-            <LifetimeMS>1000</LifetimeMS>
-            <ConditionEffect duration="3">Burning</ConditionEffect>
-        </Projectile>
-        <Projectile id="1">
-            <ObjectId>Orange Missile</ObjectId>
-            <Speed>70</Speed>
-            <Damage>55</Damage>
-            <Size>60</Size>
-            <LifetimeMS>1400</LifetimeMS>
-        </Projectile>
-    </Object>
-
-    <Object type="0x5000" id="Dragon Hatchling">
-        <Enemy/>
-        <Class>Character</Class>
-        <AnimatedTexture><File>chars8x8rHigh</File><Index>0x0A</Index></AnimatedTexture>
-        <HitSound>monster/dragons_hit</HitSound>
-        <DeathSound>monster/dragons_death</DeathSound>
-        <MaxHitPoints>1200</MaxHitPoints>
-        <Size>80</Size>
-        <Defense>5</Defense>
-        <XpMult>0.1</XpMult>
-        <Projectile id="0">
-            <ObjectId>Red Fire</ObjectId>
-            <Speed>95</Speed>
-            <Damage>45</Damage>
-            <Size>50</Size>
-            <LifetimeMS>700</LifetimeMS>
-        </Projectile>
-    </Object>
-
-    <Object type="0x5000" id="Scaled Guardian">
-        <Enemy/>
-        <Class>Character</Class>
-        <StunImmune/>
-        <AnimatedTexture><File>chars16x16rEncounters</File><Index>0x30</Index></AnimatedTexture>
-        <HitSound>monster/stone_hit</HitSound>
-        <DeathSound>monster/stone_death</DeathSound>
-        <MaxHitPoints>6000</MaxHitPoints>
-        <Size>140</Size>
-        <Defense>45</Defense>
-        <XpMult>0.15</XpMult>
-        <Projectile id="0">
-            <ObjectId>Silver Shield</ObjectId>
-            <Speed>55</Speed>
-            <Damage>85</Damage>
-            <Size>80</Size>
-            <LifetimeMS>1600</LifetimeMS>
-            <ConditionEffect duration="3">Slow</ConditionEffect>
-        </Projectile>
-        <Projectile id="1">
-            <ObjectId>White Bullet</ObjectId>
-            <Speed>70</Speed>
-            <Damage>60</Damage>
-            <Size>60</Size>
-            <LifetimeMS>1000</LifetimeMS>
-            <ConditionEffect duration="2">Dazed</ConditionEffect>
-        </Projectile>
-    </Object>
-</Objects>
+	<Object type="0x5000" id="Drakonax the Eternal">
+		<Enemy/>
+		<Class>Character</Class>
+		<Flying/>
+		<Quest/>
+		<God/>
+		<StasisImmune/>
+		<StunImmune/>
+		<ParalyzeImmune/>
+		<AnimatedTexture><File>chars16x16dEncounters</File><Index>0x24</Index></AnimatedTexture>
+		<HitSound>monster/dragons_hit</HitSound>
+		<DeathSound>monster/dragons_death</DeathSound>
+		<MaxHitPoints>45000</MaxHitPoints>
+		<Size>180</Size>
+		<Defense>35</Defense>
+		<XpMult>0.9</XpMult>
+		<Projectile id="0">
+			<ObjectId>Red Fire</ObjectId>
+			<Speed>90</Speed>
+			<Damage>130</Damage>
+			<Size>100</Size>
+			<LifetimeMS>1200</LifetimeMS>
+			<MultiHit/>
+			<ConditionEffect duration="3">Burning</ConditionEffect>
+		</Projectile>
+		<Projectile id="1">
+			<ObjectId>Orange Missile</ObjectId>
+			<Speed>60</Speed>
+			<Damage>95</Damage>
+			<Size>80</Size>
+			<LifetimeMS>2000</LifetimeMS>
+			<ConditionEffect duration="4">Armor Broken</ConditionEffect>
+		</Projectile>
+		<Projectile id="2">
+			<ObjectId>White Bullet</ObjectId>
+			<Speed>110</Speed>
+			<Damage>75</Damage>
+			<Size>50</Size>
+			<LifetimeMS>800</LifetimeMS>
+			<ArmorPiercing/>
+		</Projectile>
+		<Projectile id="3">
+			<ObjectId>Big Red Fire</ObjectId>
+			<Speed>45</Speed>
+			<Damage>180</Damage>
+			<Size>140</Size>
+			<LifetimeMS>3000</LifetimeMS>
+			<MultiHit/>
+			<ConditionEffect duration="2">Pet Stasis</ConditionEffect>
+			<ConditionEffect duration="5">Bleeding</ConditionEffect>
+		</Projectile>
+	</Object>
+	<Object type="0x5001" id="Dragonfire Wyrm">
+		<Enemy/>
+		<Class>Character</Class>
+		<Flying/>
+		<AnimatedTexture><File>chars16x16rEncounters</File><Index>0x18</Index></AnimatedTexture>
+		<HitSound>monster/dragons_hit</HitSound>
+		<DeathSound>monster/dragons_death</DeathSound>
+		<MaxHitPoints>3500</MaxHitPoints>
+		<Size>120</Size>
+		<Defense>15</Defense>
+		<XpMult>0.2</XpMult>
+		<Projectile id="0">
+			<ObjectId>Red Fire</ObjectId>
+			<Speed>85</Speed>
+			<Damage>70</Damage>
+			<Size>70</Size>
+			<LifetimeMS>1000</LifetimeMS>
+			<ConditionEffect duration="3">Burning</ConditionEffect>
+		</Projectile>
+		<Projectile id="1">
+			<ObjectId>Orange Missile</ObjectId>
+			<Speed>70</Speed>
+			<Damage>55</Damage>
+			<Size>60</Size>
+			<LifetimeMS>1400</LifetimeMS>
+		</Projectile>
+	</Object>
+	<Object type="0x5002" id="Dragon Hatchling">
+		<Enemy/>
+		<Class>Character</Class>
+		<AnimatedTexture><File>chars8x8rHigh</File><Index>0x0A</Index></AnimatedTexture>
+		<HitSound>monster/dragons_hit</HitSound>
+		<DeathSound>monster/dragons_death</DeathSound>
+		<MaxHitPoints>1200</MaxHitPoints>
+		<Size>80</Size>
+		<Defense>5</Defense>
+		<XpMult>0.1</XpMult>
+		<Projectile id="0">
+			<ObjectId>Red Fire</ObjectId>
+			<Speed>95</Speed>
+			<Damage>45</Damage>
+			<Size>50</Size>
+			<LifetimeMS>700</LifetimeMS>
+		</Projectile>
+	</Object>
+	<Object type="0x5003" id="Scaled Guardian">
+		<Enemy/>
+		<Class>Character</Class>
+		<StunImmune/>
+		<AnimatedTexture><File>chars16x16rEncounters</File><Index>0x30</Index></AnimatedTexture>
+		<HitSound>monster/stone_hit</HitSound>
+		<DeathSound>monster/stone_death</DeathSound>
+		<MaxHitPoints>6000</MaxHitPoints>
+		<Size>140</Size>
+		<Defense>45</Defense>
+		<XpMult>0.15</XpMult>
+		<Projectile id="0">
+			<ObjectId>Silver Shield</ObjectId>
+			<Speed>55</Speed>
+			<Damage>85</Damage>
+			<Size>80</Size>
+			<LifetimeMS>1600</LifetimeMS>
+			<ConditionEffect duration="3">Slow</ConditionEffect>
+		</Projectile>
+		<Projectile id="1">
+			<ObjectId>White Bullet</ObjectId>
+			<Speed>70</Speed>
+			<Damage>60</Damage>
+			<Size>60</Size>
+			<LifetimeMS>1000</LifetimeMS>
+			<ConditionEffect duration="2">Dazed</ConditionEffect>
+		</Projectile>
+	</Object>
 </Objects>
