@@ -339,6 +339,10 @@ namespace AdminDashboard.Controllers
                             xml = InjectTypeCode(xml, nextType);
                             nextType++;
 
+                            // Ensure <Enemy/> tag is present (required for server to spawn mob)
+                            if (!xml.Contains("<Enemy/>") && !xml.Contains("<Enemy />"))
+                                xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
+
                             // Inject sprite texture reference
                             if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
                             {
