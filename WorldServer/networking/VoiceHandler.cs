@@ -688,8 +688,6 @@ namespace WorldServer.networking
         Console.WriteLine($"UDP voice data processing error: {ex.Message}");
     }
 }
-       // Debug: track which speakers we've already logged (avoid spamming)
-       private readonly ConcurrentDictionary<string, DateTime> _debugLoggedSpeakers = new();
 
        private async Task BroadcastVoiceToNearbyPlayers(UdpVoiceData voiceData)
 {
@@ -698,26 +696,7 @@ namespace WorldServer.networking
         // Use cached nearby players (recalculated every 200ms, not per packet)
         var (speakerPosition, nearbyPlayers) = voiceUtils.GetCachedNearbyPlayers(voiceData.PlayerId);
         if (speakerPosition == null)
-        {
-            // Debug: log once per speaker
-            if (!_debugLoggedSpeakers.ContainsKey(voiceData.PlayerId + "_nopos"))
-            {
-                Console.WriteLine($"[VOICE_DEBUG] Speaker {voiceData.PlayerId} has NO position — skipping broadcast");
-                _debugLoggedSpeakers[voiceData.PlayerId + "_nopos"] = DateTime.UtcNow;
-            }
             return;
-        }
-
-        // Debug: log nearby players once per speaker (every 10 seconds)
-        if (!_debugLoggedSpeakers.TryGetValue(voiceData.PlayerId, out var lastLog) || (DateTime.UtcNow - lastLog).TotalSeconds >= 10)
-        {
-            var playerIds = string.Join(", ", nearbyPlayers.Select(p => $"{p.PlayerId}(d={p.Distance:F1})"));
-            var gridCount = voiceUtils.GetSpatialGrid().GetTrackedPlayerCount();
-            var authPlayers = string.Join(", ", authenticatedPlayers.Keys);
-            var endpointPlayers = string.Join(", ", playerUdpEndpoints.Keys);
-            Console.WriteLine($"[VOICE_DEBUG] Speaker {voiceData.PlayerId} at ({speakerPosition.X:F1},{speakerPosition.Y:F1}) world={speakerPosition.WorldId} | Nearby: [{playerIds}] | Grid players: {gridCount} | Auth: [{authPlayers}] | Endpoints: [{endpointPlayers}]");
-            _debugLoggedSpeakers[voiceData.PlayerId] = DateTime.UtcNow;
-        }
 
         // Build list of eligible listeners with their computed volumes
         // Each listener has their OWN priority settings
