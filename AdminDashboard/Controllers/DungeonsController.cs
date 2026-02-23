@@ -435,6 +435,42 @@ namespace AdminDashboard.Controllers
                     files.Add(("Shared/resources/worlds/community-dungeons.txt", safeTitle));
                 }
 
+                // 5c. Build behavior JSON for community mobs (used by JsonBehaviorLoader on server)
+                if (hasMobs)
+                {
+                    var behaviorDict = new JObject();
+                    for (int i = 0; i < mobs!.Count; i++)
+                    {
+                        var mob = mobs[i];
+                        var behavior = mob["behavior"] as JObject;
+                        if (behavior == null || behavior.Count == 0) continue;
+
+                        // Extract mob name from XML
+                        var rawXml = mob["xml"]?.ToString() ?? "";
+                        var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                        if (!nameMatch.Success) continue;
+
+                        // Handle multiple mobs in one XML block
+                        var nameMatches = Regex.Matches(rawXml, @"<Object\b[^>]*\bid=""([^""]+)""");
+                        if (nameMatches.Count > 0)
+                        {
+                            // Assign the same behavior to all mobs in this block
+                            foreach (Match nm in nameMatches)
+                                behaviorDict[nm.Groups[1].Value] = behavior.DeepClone();
+                        }
+                        else
+                        {
+                            behaviorDict[nameMatch.Groups[1].Value] = behavior.DeepClone();
+                        }
+                    }
+
+                    if (behaviorDict.Count > 0)
+                    {
+                        files.Add(($"Shared/resources/behaviors/community/{safeTitle}.json",
+                            behaviorDict.ToString(Newtonsoft.Json.Formatting.Indented)));
+                    }
+                }
+
                 // 6. Atomic commit to GitHub (text + binary files)
                 await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}", binaryFiles);
 

@@ -51,6 +51,9 @@ namespace WorldServer.logic
 
             InitDb = null;
             _initializing = 0;
+
+            // Load community dungeon behaviors from JSON files
+            JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
         }
 
         public void ResolveBehavior(Entity entity)

@@ -1,0 +1,112 @@
+{
+  "Drakonax the Eternal": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          { "type": "Wander", "speed": 0.3 }
+        ],
+        "transitions": [
+          { "type": "PlayerWithinTransition", "dist": 12, "target": "attack" }
+        ]
+      },
+      "attack": {
+        "behaviors": [
+          { "type": "Chase", "speed": 0.6, "range": 3, "sightRange": 14 },
+          { "type": "Shoot", "radius": 10, "count": 5, "shootAngle": 20, "projectileIndex": 0, "coolDown": 1500 },
+          { "type": "Shoot", "radius": 8, "count": 1, "projectileIndex": 1, "coolDown": 2500 }
+        ],
+        "transitions": [
+          { "type": "HpLessTransition", "threshold": 0.5, "target": "rage" }
+        ]
+      },
+      "rage": {
+        "behaviors": [
+          { "type": "Chase", "speed": 0.9, "range": 2, "sightRange": 16 },
+          { "type": "Shoot", "radius": 12, "count": 8, "shootAngle": 45, "projectileIndex": 0, "coolDown": 800 },
+          { "type": "Shoot", "radius": 10, "count": 3, "shootAngle": 15, "projectileIndex": 2, "coolDown": 1200 },
+          { "type": "Shoot", "radius": 8, "count": 1, "projectileIndex": 3, "coolDown": 3000 },
+          { "type": "Taunt", "text": ["YOU DARE CHALLENGE ME?!", "BURN IN DRAGONFIRE!"] }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Dragonfire Wyrm": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          { "type": "Wander", "speed": 0.5 }
+        ],
+        "transitions": [
+          { "type": "PlayerWithinTransition", "dist": 10, "target": "attack" }
+        ]
+      },
+      "attack": {
+        "behaviors": [
+          { "type": "Follow", "speed": 0.7, "range": 4, "acquireRange": 12 },
+          { "type": "Shoot", "radius": 8, "count": 3, "shootAngle": 15, "projectileIndex": 0, "coolDown": 1200 },
+          { "type": "Shoot", "radius": 6, "count": 1, "projectileIndex": 1, "coolDown": 2000 }
+        ],
+        "transitions": [
+          { "type": "NoPlayerWithinTransition", "dist": 14, "target": "idle" }
+        ]
+      }
+    },
+    "initialState": "idle"
+  },
+  "Dragon Hatchling": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          { "type": "Wander", "speed": 0.6 }
+        ],
+        "transitions": [
+          { "type": "PlayerWithinTransition", "dist": 8, "target": "attack" }
+        ]
+      },
+      "attack": {
+        "behaviors": [
+          { "type": "Chase", "speed": 1.0, "range": 2, "sightRange": 10 },
+          { "type": "Shoot", "radius": 6, "count": 2, "shootAngle": 10, "projectileIndex": 0, "coolDown": 800 }
+        ],
+        "transitions": [
+          { "type": "NoPlayerWithinTransition", "dist": 12, "target": "idle" }
+        ]
+      }
+    },
+    "initialState": "idle"
+  },
+  "Scaled Guardian": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          { "type": "Wander", "speed": 0.2 }
+        ],
+        "transitions": [
+          { "type": "PlayerWithinTransition", "dist": 8, "target": "defend" }
+        ]
+      },
+      "defend": {
+        "behaviors": [
+          { "type": "Chase", "speed": 0.4, "range": 4, "sightRange": 10 },
+          { "type": "Shoot", "radius": 7, "count": 1, "projectileIndex": 0, "coolDown": 1800 },
+          { "type": "Shoot", "radius": 6, "count": 3, "shootAngle": 20, "projectileIndex": 1, "coolDown": 2500 }
+        ],
+        "transitions": [
+          { "type": "HpLessTransition", "threshold": 0.3, "target": "enraged" }
+        ]
+      },
+      "enraged": {
+        "behaviors": [
+          { "type": "Chase", "speed": 0.7, "range": 2, "sightRange": 12 },
+          { "type": "Shoot", "radius": 9, "count": 4, "shootAngle": 25, "projectileIndex": 0, "coolDown": 1000 },
+          { "type": "Shoot", "radius": 7, "count": 5, "shootAngle": 30, "projectileIndex": 1, "coolDown": 1500 },
+          { "type": "HealSelf", "amount": 500, "coolDown": 8000 }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  }
+}
