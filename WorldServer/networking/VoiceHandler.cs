@@ -618,7 +618,15 @@ namespace WorldServer.networking
         {
             try
             {
-                // Respond to ping with pong
+                // Only PONG authenticated players — forces re-auth after server restart
+                string epKey = clientEndpoint.ToString();
+                if (!endpointToPlayerId.TryGetValue(epKey, out var playerId) ||
+                    !authenticatedPlayers.ContainsKey(playerId))
+                {
+                    // Not authenticated — don't PONG, client will miss 3 PONGs and re-auth
+                    return;
+                }
+
                 byte[] pongResponse = Encoding.UTF8.GetBytes("PONG");
                 await udpServer.SendAsync(pongResponse, pongResponse.Length, clientEndpoint);
             }
