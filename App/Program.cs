@@ -52,6 +52,18 @@ namespace App
                 RequestPath = "/music"
             });
 
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider($"{core.Resources.ResourcePath}/sprites"),
+                RequestPath = "/sprites"
+            });
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider($"{core.Resources.ResourcePath}/xml/custom"),
+                RequestPath = "/community/xml"
+            });
+
             //app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
