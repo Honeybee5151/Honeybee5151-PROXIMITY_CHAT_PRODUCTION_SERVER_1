@@ -415,4 +415,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="lean">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/lean.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
