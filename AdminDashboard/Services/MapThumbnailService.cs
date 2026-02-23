@@ -102,19 +102,30 @@ namespace AdminDashboard.Services
                     }
                 }
 
-                // Create bitmap (1px per tile)
-                using var bitmap = new SKBitmap(width, height);
+                // Create bitmap — scale each tile to TILE_PX pixels so the thumbnail is visible
+                const int TILE_PX = 8;
+                var bmpW = width * TILE_PX;
+                var bmpH = height * TILE_PX;
+                using var bitmap = new SKBitmap(bmpW, bmpH);
                 var bgColor = new SKColor(0xFF111111); // dark background for empty
 
-                // Pass 1: Ground layer
-                for (int y = 0; y < height; y++)
+                // Helper to fill a tile-sized block
+                void FillTile(int tx, int ty, SKColor color)
                 {
-                    for (int x = 0; x < width; x++)
+                    for (int py = 0; py < TILE_PX; py++)
+                        for (int px = 0; px < TILE_PX; px++)
+                            bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, color);
+                }
+
+                // Pass 1: Ground layer
+                for (int ty = 0; ty < height; ty++)
+                {
+                    for (int tx = 0; tx < width; tx++)
                     {
-                        var idx = grid[y * width + x];
+                        var idx = grid[ty * width + tx];
                         if (idx < 0 || idx >= dict.Count)
                         {
-                            bitmap.SetPixel(x, y, bgColor);
+                            FillTile(tx, ty, bgColor);
                             continue;
                         }
 
@@ -123,26 +134,26 @@ namespace AdminDashboard.Services
 
                         if (string.IsNullOrEmpty(groundId) || groundId == "Empty")
                         {
-                            bitmap.SetPixel(x, y, bgColor);
+                            FillTile(tx, ty, bgColor);
                             continue;
                         }
 
                         // Try standard color, then custom color
                         if (_groundColors.TryGetValue(groundId, out uint gc))
-                            bitmap.SetPixel(x, y, new SKColor(gc));
+                            FillTile(tx, ty, new SKColor(gc));
                         else if (customColorMap.TryGetValue(groundId, out uint cc))
-                            bitmap.SetPixel(x, y, new SKColor(cc));
+                            FillTile(tx, ty, new SKColor(cc));
                         else
-                            bitmap.SetPixel(x, y, new SKColor(0xFF444444)); // unknown tile = grey
+                            FillTile(tx, ty, new SKColor(0xFF444444)); // unknown tile = grey
                     }
                 }
 
-                // Pass 2: Object overlay (darken/brighten existing pixel)
-                for (int y = 0; y < height; y++)
+                // Pass 2: Object overlay (blend into existing tile block)
+                for (int ty = 0; ty < height; ty++)
                 {
-                    for (int x = 0; x < width; x++)
+                    for (int tx = 0; tx < width; tx++)
                     {
-                        var idx = grid[y * width + x];
+                        var idx = grid[ty * width + tx];
                         if (idx < 0 || idx >= dict.Count) continue;
 
                         var entry = dict[idx];
@@ -152,24 +163,27 @@ namespace AdminDashboard.Services
                         var objId = objs[0]?["id"]?.ToString();
                         if (string.IsNullOrEmpty(objId)) continue;
 
+                        // Get blend color
+                        SKColor blendColor;
+                        float objWeight = 0.6f;
                         if (_objectColors.TryGetValue(objId, out uint oc))
-                        {
-                            // Blend: 60% object color + 40% existing
-                            var existing = bitmap.GetPixel(x, y);
-                            var objColor = new SKColor(oc);
-                            var r = (byte)(objColor.Red * 0.6 + existing.Red * 0.4);
-                            var g = (byte)(objColor.Green * 0.6 + existing.Green * 0.4);
-                            var b = (byte)(objColor.Blue * 0.6 + existing.Blue * 0.4);
-                            bitmap.SetPixel(x, y, new SKColor(r, g, b));
-                        }
+                            blendColor = new SKColor(oc);
                         else
                         {
-                            // Unknown object — darken the pixel slightly
-                            var existing = bitmap.GetPixel(x, y);
-                            var r = (byte)(existing.Red * 0.7);
-                            var g = (byte)(existing.Green * 0.7);
-                            var b = (byte)(existing.Blue * 0.7);
-                            bitmap.SetPixel(x, y, new SKColor(r, g, b));
+                            blendColor = new SKColor(0, 0, 0);
+                            objWeight = 0.3f; // unknown = slight darken
+                        }
+
+                        for (int py = 0; py < TILE_PX; py++)
+                        {
+                            for (int px = 0; px < TILE_PX; px++)
+                            {
+                                var ex = bitmap.GetPixel(tx * TILE_PX + px, ty * TILE_PX + py);
+                                var r = (byte)(blendColor.Red * objWeight + ex.Red * (1 - objWeight));
+                                var g = (byte)(blendColor.Green * objWeight + ex.Green * (1 - objWeight));
+                                var b = (byte)(blendColor.Blue * objWeight + ex.Blue * (1 - objWeight));
+                                bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, new SKColor(r, g, b));
+                            }
                         }
                     }
                 }
