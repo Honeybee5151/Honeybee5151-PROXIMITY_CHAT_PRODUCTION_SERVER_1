@@ -405,6 +405,21 @@ namespace AdminDashboard.Controllers
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");
                 files.Add(("Shared/resources/xml/Dungeons.xml", updatedDungeonsXml));
 
+                // 5b. Append to community-dungeons.txt (used by /dungeon command in-game)
+                try
+                {
+                    var (communityList, _) = await _github.FetchFile("Shared/resources/worlds/community-dungeons.txt");
+                    if (communityList == null) communityList = "";
+                    var trimmed = communityList.TrimEnd();
+                    var updated = string.IsNullOrEmpty(trimmed) ? safeTitle : trimmed + "\n" + safeTitle;
+                    files.Add(("Shared/resources/worlds/community-dungeons.txt", updated));
+                }
+                catch
+                {
+                    // File doesn't exist yet — create it
+                    files.Add(("Shared/resources/worlds/community-dungeons.txt", safeTitle));
+                }
+
                 // 6. Atomic commit to GitHub (text + binary files)
                 await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}", binaryFiles);
 
