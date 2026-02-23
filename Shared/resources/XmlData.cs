@@ -29,6 +29,7 @@ namespace Shared.resources
         public Dictionary<ushort, string> TileTypeToId = new Dictionary<ushort, string>();
         public Dictionary<string, XElement> GroundXmlById = new Dictionary<string, XElement>();
         public Dictionary<string, List<string>> JmCustomGroundIds = new Dictionary<string, List<string>>();
+        public Dictionary<string, string> GroundPixelsById = new Dictionary<string, string>(); // groundId -> base64 groundPixels from JM
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
         private readonly Dictionary<string, byte[]> WorldDataCache = new Dictionary<string, byte[]>();
@@ -179,7 +180,7 @@ namespace Shared.resources
                             var data = Json2Wmap.Convert(this, mapJson);
                             WorldDataCache.Add(id, data);
 
-                            // Extract custom ground IDs from JM dict
+                            // Extract custom ground IDs and pixel data from JM dict
                             var jmObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(mapJson);
                             if (jmObj.TryGetValue("dict", out var dictObj))
                             {
@@ -191,7 +192,11 @@ namespace Shared.resources
                                     {
                                         var groundId = groundObj?.ToString();
                                         if (groundId != null && groundId.StartsWith("custom_") && !customIds.Contains(groundId))
+                                        {
                                             customIds.Add(groundId);
+                                            if (entry.TryGetValue("groundPixels", out var pixelsObj))
+                                                GroundPixelsById[groundId] = pixelsObj.ToString();
+                                        }
                                     }
                                 }
                                 if (customIds.Count > 0)

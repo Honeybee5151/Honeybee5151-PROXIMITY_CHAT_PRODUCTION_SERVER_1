@@ -459,30 +459,24 @@ namespace WorldServer.core.worlds
                 return false;
             FromWorldMap(new MemoryStream(data));
 
-            // Build custom grounds XML for this dungeon
+            // Build custom grounds XML for this dungeon (includes per-pixel data)
             var gameData = GameServer.Resources.GameData;
-            Console.WriteLine($"[CustomGrounds] LoadMapFromData jmPath={jmPath}, JmCustomGroundIds has {gameData.JmCustomGroundIds.Count} entries");
             if (gameData.JmCustomGroundIds.TryGetValue(jmPath, out var customIds))
             {
-                Console.WriteLine($"[CustomGrounds] Found {customIds.Count} custom ground IDs for {jmPath}");
                 var sb = new System.Text.StringBuilder("<Grounds>");
-                var matchCount = 0;
                 foreach (var groundId in customIds)
                 {
                     if (gameData.GroundXmlById.TryGetValue(groundId, out var elem))
                     {
-                        sb.Append(elem.ToString());
-                        matchCount++;
+                        var groundElem = new System.Xml.Linq.XElement(elem);
+                        if (gameData.GroundPixelsById.TryGetValue(groundId, out var pixels))
+                            groundElem.Add(new System.Xml.Linq.XElement("GroundPixels", pixels));
+                        sb.Append(groundElem.ToString());
                     }
-                    else
-                        Console.WriteLine($"[CustomGrounds] WARNING: Ground ID '{groundId}' not found in GroundXmlById");
                 }
                 sb.Append("</Grounds>");
                 CustomGroundsXml = sb.ToString();
-                Console.WriteLine($"[CustomGrounds] Built XML with {matchCount}/{customIds.Count} grounds, {CustomGroundsXml.Length} bytes");
             }
-            else
-                Console.WriteLine($"[CustomGrounds] No custom grounds for {jmPath}");
 
             return true;
         }

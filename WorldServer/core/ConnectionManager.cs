@@ -218,10 +218,7 @@ namespace WorldServer.core
 
             // Send custom ground tiles for community dungeons
             if (world.CustomGroundsXml != null)
-            {
-                Console.WriteLine($"[CustomGrounds] Sending {world.CustomGroundsXml.Length} bytes of custom grounds XML for world {world.IdName}");
                 packets.Add(new CustomGroundsMessage { GroundsXml = world.CustomGroundsXml });
-            }
 
             packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
             packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));
