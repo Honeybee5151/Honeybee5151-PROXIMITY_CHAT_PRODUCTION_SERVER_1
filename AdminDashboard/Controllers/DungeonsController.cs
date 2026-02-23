@@ -435,7 +435,7 @@ namespace AdminDashboard.Controllers
                     files.Add(("Shared/resources/worlds/community-dungeons.txt", safeTitle));
                 }
 
-                // 5c. Build behavior JSON for community mobs (used by JsonBehaviorLoader on server)
+                // 5c. Build behavior + loot JSON for community mobs (used by JsonBehaviorLoader on server)
                 if (hasMobs)
                 {
                     var behaviorDict = new JObject();
@@ -445,22 +445,74 @@ namespace AdminDashboard.Controllers
                         var behavior = mob["behavior"] as JObject;
                         if (behavior == null || behavior.Count == 0) continue;
 
-                        // Extract mob name from XML
+                        // Extract mob name(s) from XML
                         var rawXml = mob["xml"]?.ToString() ?? "";
-                        var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                        if (!nameMatch.Success) continue;
-
-                        // Handle multiple mobs in one XML block
                         var nameMatches = Regex.Matches(rawXml, @"<Object\b[^>]*\bid=""([^""]+)""");
-                        if (nameMatches.Count > 0)
+                        if (nameMatches.Count == 0)
                         {
-                            // Assign the same behavior to all mobs in this block
-                            foreach (Match nm in nameMatches)
-                                behaviorDict[nm.Groups[1].Value] = behavior.DeepClone();
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success)
+                                behaviorDict[nameMatch.Groups[1].Value] = behavior.DeepClone();
                         }
                         else
                         {
-                            behaviorDict[nameMatch.Groups[1].Value] = behavior.DeepClone();
+                            foreach (Match nm in nameMatches)
+                                behaviorDict[nm.Groups[1].Value] = behavior.DeepClone();
+                        }
+                    }
+
+                    // Inject loot from items' dropFrom/dropRate into mob behavior entries
+                    if (hasItems)
+                    {
+                        foreach (var item in items!)
+                        {
+                            var dropFrom = item["dropFrom"]?.ToString();
+                            if (string.IsNullOrEmpty(dropFrom)) continue;
+
+                            var dropRate = item["dropRate"]?.Value<double>() ?? 0.1;
+                            // Extract item name from XML id attribute
+                            var itemXml = item["xml"]?.ToString() ?? "";
+                            var itemNameMatch = Regex.Match(itemXml, @"id=""([^""]+)""");
+                            if (!itemNameMatch.Success) continue;
+                            var itemName = itemNameMatch.Groups[1].Value;
+
+                            // Find or create the mob entry in behaviorDict and add loot
+                            var mobKey = behaviorDict.Properties()
+                                .FirstOrDefault(p => p.Name.Equals(dropFrom, StringComparison.OrdinalIgnoreCase))?.Name;
+
+                            if (mobKey == null)
+                            {
+                                // Mob has no behavior defined — create a default entry with just Wander
+                                mobKey = dropFrom;
+                                behaviorDict[mobKey] = new JObject
+                                {
+                                    ["states"] = new JObject
+                                    {
+                                        ["idle"] = new JObject
+                                        {
+                                            ["behaviors"] = new JArray { new JObject { ["type"] = "Wander", ["speed"] = 0.4 } },
+                                            ["transitions"] = new JArray()
+                                        }
+                                    },
+                                    ["initialState"] = "idle"
+                                };
+                            }
+
+                            var mobDef = behaviorDict[mobKey] as JObject;
+                            if (mobDef != null)
+                            {
+                                var lootArr = mobDef["loot"] as JArray;
+                                if (lootArr == null)
+                                {
+                                    lootArr = new JArray();
+                                    mobDef["loot"] = lootArr;
+                                }
+                                lootArr.Add(new JObject
+                                {
+                                    ["item"] = itemName,
+                                    ["probability"] = dropRate
+                                });
+                            }
                         }
                     }
 

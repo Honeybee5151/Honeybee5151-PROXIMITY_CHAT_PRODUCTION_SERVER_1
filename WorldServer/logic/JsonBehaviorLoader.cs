@@ -68,7 +68,25 @@ namespace WorldServer.logic
                 var d = new Dictionary<string, State>();
                 rootState.Resolve(d);
                 rootState.ResolveChildren(d);
-                db.Definitions[type] = new Tuple<State, Loot>(rootState, null);
+
+                // Parse loot if present
+                Loot loot = null;
+                var lootArr = def["loot"] as JArray;
+                if (lootArr != null && lootArr.Count > 0)
+                {
+                    var drops = new List<MobDrops>();
+                    foreach (var item in lootArr)
+                    {
+                        var itemName = item["item"]?.ToString();
+                        var probability = item["probability"]?.Value<double>() ?? 0.1;
+                        if (!string.IsNullOrEmpty(itemName))
+                            drops.Add(new ItemLoot(itemName, probability));
+                    }
+                    if (drops.Count > 0)
+                        loot = new Loot(drops.ToArray());
+                }
+
+                db.Definitions[type] = new Tuple<State, Loot>(rootState, loot);
                 return true;
             }
             catch (Exception e)

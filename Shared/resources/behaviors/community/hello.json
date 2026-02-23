@@ -30,7 +30,11 @@
         "transitions": []
       }
     },
-    "initialState": "idle"
+    "initialState": "idle",
+    "loot": [
+      { "item": "Legendary Stick", "probability": 0.05 },
+      { "item": "Enchanted Stick", "probability": 0.15 }
+    ]
   },
   "Dragonfire Wyrm": {
     "states": {
@@ -53,7 +57,10 @@
         ]
       }
     },
-    "initialState": "idle"
+    "initialState": "idle",
+    "loot": [
+      { "item": "Pointy Stick", "probability": 0.2 }
+    ]
   },
   "Dragon Hatchling": {
     "states": {
@@ -75,7 +82,10 @@
         ]
       }
     },
-    "initialState": "idle"
+    "initialState": "idle",
+    "loot": [
+      { "item": "Stick", "probability": 0.3 }
+    ]
   },
   "Scaled Guardian": {
     "states": {
