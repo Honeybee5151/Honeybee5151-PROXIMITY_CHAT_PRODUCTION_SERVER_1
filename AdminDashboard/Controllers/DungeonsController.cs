@@ -427,13 +427,19 @@ namespace AdminDashboard.Controllers
                                 if (!xml.Contains("<Enemy/>") && !xml.Contains("<Enemy />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
 
-                                // Inject sprite texture reference (use index from first block of this mob)
-                                // Community sprites are single-frame — use Texture, not AnimatedTexture
+                                // Auto-inject <Quest/> for boss mobs (triggers boss health bar in client)
+                                var isBoss = mobs[i]["isBoss"]?.Value<bool>() ?? false;
+                                if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
+                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
+
+                                // Inject sprite texture reference
+                                // Use AnimatedTexture for mobs with both base + attack sprites (sequential indices)
                                 if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
                                 {
                                     var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
                                     var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false);
+                                    bool hasAttack = sprIdx.attackIdx >= 0;
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: hasAttack);
                                 }
 
                                 newMobEntries += "\t" + xml.Trim() + "\n";
