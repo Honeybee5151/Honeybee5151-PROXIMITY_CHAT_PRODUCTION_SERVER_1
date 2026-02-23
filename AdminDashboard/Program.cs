@@ -15,6 +15,8 @@ namespace AdminDashboard
             var service = builder.Services;
 
             service.AddSingleton<RedisService>();
+            service.AddSingleton<SupabaseService>();
+            service.AddSingleton<GitHubService>();
             service.AddControllers();
 
             var app = builder.Build();

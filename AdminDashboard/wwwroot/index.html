@@ -28,6 +28,7 @@
                 <a class="nav-item" data-page="voice">Voice Chat</a>
                 <a class="nav-item" data-page="players">Players</a>
                 <a class="nav-item" data-page="redis">Redis Browser</a>
+                <a class="nav-item" data-page="dungeons">Dungeons</a>
                 <a class="nav-item" data-page="admin">Admin Commands</a>
                 <a class="nav-item" data-page="logs">Logs</a>
             </nav>
@@ -189,6 +190,18 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Dungeons Page -->
+            <div class="page" id="page-dungeons">
+                <h2 class="page-title">Community Dungeons</h2>
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button class="btn btn-primary" onclick="loadDungeons()">Refresh</button>
+                </div>
+                <div id="dungeons-list">
+                    <div style="color: #555; text-align: center; padding: 40px;">Click Refresh to load pending dungeons</div>
+                </div>
+                <div class="feedback" id="dungeons-feedback"></div>
             </div>
 
             <!-- Admin Commands Page -->

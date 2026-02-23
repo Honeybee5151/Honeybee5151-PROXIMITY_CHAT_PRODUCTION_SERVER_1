@@ -46,6 +46,10 @@ services:
       - appserver
     environment:
       - IS_DOCKER=true
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - GITHUB_PAT=${GITHUB_PAT}
+      - GITHUB_REPO=${GITHUB_REPO}
     ports:
       - "8889:8080"
 

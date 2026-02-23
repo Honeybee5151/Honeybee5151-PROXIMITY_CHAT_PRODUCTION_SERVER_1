@@ -81,6 +81,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
             case 'voice': loadVoice(); startTimer('voice', loadVoice, 3000); break;
             case 'players': loadPlayers(); break;
             case 'redis': onRedisTabOpen(); break;
+            case 'dungeons': loadDungeons(); break;
             case 'admin': loadMaintenanceState(); break;
             case 'logs': loadLogs(); break;
         }
@@ -991,4 +992,90 @@ function showConfirm(text, onConfirm) {
 
 function hideConfirm() {
     document.getElementById('confirm-overlay').classList.remove('active');
+}
+
+// ========== Dungeons ==========
+async function loadDungeons() {
+    const container = document.getElementById('dungeons-list');
+    const feedback = document.getElementById('dungeons-feedback');
+    feedback.style.display = 'none';
+    container.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
+
+    try {
+        const data = await apiFetch('/api/dungeons/pending');
+        if (!data.dungeons || data.dungeons.length === 0) {
+            container.innerHTML = '<div style="color:#555;text-align:center;padding:40px;">No pending dungeons</div>';
+            return;
+        }
+
+        let html = '<div class="table-container"><table><thead><tr>' +
+            '<th>Title</th><th>Map</th><th>Custom Tiles</th><th>Bosses</th><th>Items</th><th>Created</th><th>Actions</th>' +
+            '</tr></thead><tbody>';
+
+        for (const d of data.dungeons) {
+            const date = d.created_at ? new Date(d.created_at).toLocaleDateString() : '—';
+            html += `<tr>
+                <td><strong>${esc(d.title || 'Untitled')}</strong>${d.description ? '<br><small style="color:#888;">' + esc(d.description) + '</small>' : ''}</td>
+                <td>${d.has_map ? '<span style="color:#22c55e;">JM</span>' : d.has_xml ? '<span style="color:#8b5cf6;">XML</span>' : '—'}</td>
+                <td>${d.has_custom_tiles ? '<span style="color:#ef4444;">Yes</span>' : 'No'}</td>
+                <td>${d.boss_count}</td>
+                <td>${d.item_count}</td>
+                <td>${date}</td>
+                <td style="white-space:nowrap;">
+                    <button class="btn btn-success btn-sm" onclick="approveDungeon('${d.id}','${esc(d.title)}')">Approve</button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectDungeon('${d.id}','${esc(d.title)}')">Reject</button>
+                </td>
+            </tr>`;
+        }
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    } catch (e) {
+        container.innerHTML = '<div style="color:#f87171;text-align:center;padding:20px;">Failed to load dungeons</div>';
+        showFeedback('dungeons-feedback', e.message, false);
+    }
+}
+
+function approveDungeon(id, title) {
+    showConfirm(`Approve dungeon "${title}"? This will push the map to the server repo and trigger a deploy.`, async () => {
+        const feedback = document.getElementById('dungeons-feedback');
+        feedback.style.display = 'none';
+        try {
+            const data = await apiFetch('/api/dungeons/approve', {
+                method: 'POST',
+                body: JSON.stringify({ dungeonId: id })
+            });
+            showFeedback('dungeons-feedback', data.message || 'Approved!', true);
+            loadDungeons();
+        } catch (e) {
+            showFeedback('dungeons-feedback', 'Approve failed: ' + e.message, false);
+        }
+    });
+}
+
+function rejectDungeon(id, title) {
+    showConfirm(`Reject dungeon "${title}"?`, async () => {
+        try {
+            const data = await apiFetch('/api/dungeons/reject', {
+                method: 'POST',
+                body: JSON.stringify({ dungeonId: id })
+            });
+            showFeedback('dungeons-feedback', data.message || 'Rejected', true);
+            loadDungeons();
+        } catch (e) {
+            showFeedback('dungeons-feedback', 'Reject failed: ' + e.message, false);
+        }
+    });
+}
+
+function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showFeedback(id, msg, success) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'feedback ' + (success ? 'success' : 'error');
+    el.style.display = 'block';
 }
