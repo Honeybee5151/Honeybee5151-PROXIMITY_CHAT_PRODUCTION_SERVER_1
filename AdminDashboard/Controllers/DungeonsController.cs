@@ -77,6 +77,12 @@ namespace AdminDashboard.Controllers
                 var safeTitle = Regex.Replace(title, @"[^\w\s\-']", "").Trim();
                 if (string.IsNullOrEmpty(safeTitle)) safeTitle = $"dungeon_{request.DungeonId}";
 
+                // Block path traversal attempts
+                if (safeTitle.Contains("..") || safeTitle.Contains('/') || safeTitle.Contains('\\'))
+                    return BadRequest(new { error = "Invalid dungeon title" });
+                if (safeTitle.Length > 100)
+                    safeTitle = safeTitle.Substring(0, 100).Trim();
+
                 var files = new List<(string Path, string Content)>();
 
                 // 2. Write .jm map file
