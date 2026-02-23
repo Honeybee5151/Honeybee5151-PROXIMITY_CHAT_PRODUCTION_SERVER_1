@@ -338,4 +338,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="Wow">
+		<Width>64</Width>
+		<Height>64</Height>
+		<MapJM>Dungeons/Wow.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
