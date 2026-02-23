@@ -636,4 +636,5 @@
       <ConditionEffect duration="5">Weak</ConditionEffect>
     </Projectile>
   </Object>
+	awd
 </Objects>
