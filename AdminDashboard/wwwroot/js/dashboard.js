@@ -1113,15 +1113,22 @@ function renderPreview(data) {
         html += `<div class="preview-section"><p style="color:#aaa;margin:0;">${esc(data.description)}</p></div>`;
     }
 
-    // Map info
+    // Map info + thumbnail
     if (data.map) {
         html += `<div class="preview-section">
             <h4>Map</h4>
             <div class="preview-map-info">
                 <div>Size: <span>${data.map.width} x ${data.map.height}</span></div>
                 <div>Unique tiles: <span>${data.map.dictEntries}</span></div>
-            </div>
-        </div>`;
+            </div>`;
+        if (data.mapThumbnail) {
+            html += `<div style="margin-top:10px;text-align:center;">
+                <img src="data:image/png;base64,${data.mapThumbnail}"
+                     style="image-rendering:pixelated;max-width:100%;max-height:400px;border:1px solid #333;border-radius:4px;background:#111;"
+                     title="Map preview — each pixel = 1 tile">
+            </div>`;
+        }
+        html += `</div>`;
     }
 
     // Custom tiles

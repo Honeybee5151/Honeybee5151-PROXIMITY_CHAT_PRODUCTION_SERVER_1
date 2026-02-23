@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace AdminDashboard.Controllers
@@ -17,6 +18,7 @@ namespace AdminDashboard.Controllers
     {
         private readonly SupabaseService _supabase;
         private readonly GitHubService _github;
+        private static readonly MapThumbnailService _mapThumb = new();
 
         public DungeonsController(SupabaseService supabase, GitHubService github)
         {
@@ -108,8 +110,9 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // Map info (lightweight — don't send full data array)
+                // Map info + thumbnail
                 object mapInfo = null;
+                string mapThumbnail = null;
                 if (mapJm != null && mapJm.Type != JTokenType.Null)
                 {
                     var dictCount = (mapJm["dict"] as JArray)?.Count ?? 0;
@@ -119,6 +122,12 @@ namespace AdminDashboard.Controllers
                         height = mapJm["height"]?.Value<int>() ?? 0,
                         dictEntries = dictCount,
                     };
+
+                    // Generate visual thumbnail
+                    var colorsPath = Path.Combine(
+                        AppContext.BaseDirectory, "wwwroot", "data", "sprite-colors.json");
+                    _mapThumb.LoadColors(colorsPath);
+                    mapThumbnail = _mapThumb.GenerateThumbnail(mapJm, customTiles);
                 }
 
                 // Custom tiles
@@ -137,6 +146,7 @@ namespace AdminDashboard.Controllers
                     mobs = mobList,
                     items = itemList,
                     map = mapInfo,
+                    mapThumbnail,
                     customTiles = tileList,
                 });
             }
