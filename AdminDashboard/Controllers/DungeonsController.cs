@@ -177,43 +177,49 @@ namespace AdminDashboard.Controllers
 
                         // Decode all sprites in this size group
                         var bitmaps = new List<SKBitmap>();
-                        foreach (var entry in entries)
-                            bitmaps.Add(SpriteSheetService.DecodeDataUrl(entry.dataUrl));
-
-                        // Pack into sheet
-                        var (updatedSheet, indices) = spriteService.AddSprites(sheet, meta, bitmaps, spriteSize);
-
-                        // Map indices back to entities
-                        for (int i = 0; i < entries.Count; i++)
+                        try
                         {
-                            var e = entries[i];
-                            if (e.isMob)
+                            foreach (var entry in entries)
+                                bitmaps.Add(SpriteSheetService.DecodeDataUrl(entry.dataUrl));
+
+                            // Pack into sheet (may replace sheet reference if expanded)
+                            var (updatedSheet, indices) = spriteService.AddSprites(sheet, meta, bitmaps, spriteSize);
+                            sheet = updatedSheet; // AddSprites disposes old sheet internally if expanded
+
+                            // Map indices back to entities
+                            for (int i = 0; i < entries.Count; i++)
                             {
-                                if (e.frame == "base")
+                                var e = entries[i];
+                                if (e.isMob)
                                 {
-                                    var attackIdx = -1;
-                                    // Check if next entry is the attack frame for same mob
-                                    if (i + 1 < entries.Count && entries[i + 1].entityIdx == e.entityIdx && entries[i + 1].frame == "attack")
-                                        attackIdx = indices[i + 1];
-                                    mobSpriteIndices[e.entityIdx] = (indices[i], attackIdx);
+                                    if (e.frame == "base")
+                                    {
+                                        var attackIdx = -1;
+                                        // Check if next entry is the attack frame for same mob
+                                        if (i + 1 < entries.Count && entries[i + 1].entityIdx == e.entityIdx && entries[i + 1].frame == "attack")
+                                            attackIdx = indices[i + 1];
+                                        mobSpriteIndices[e.entityIdx] = (indices[i], attackIdx);
+                                    }
+                                    // attack frame index already captured above
                                 }
-                                // attack frame index already captured above
+                                else
+                                {
+                                    itemSpriteIndices[e.entityIdx] = indices[i];
+                                }
                             }
-                            else
-                            {
-                                itemSpriteIndices[e.entityIdx] = indices[i];
-                            }
+
+                            // Add sheet PNG + metadata to commit
+                            var pngBytes = SpriteSheetService.EncodePng(sheet);
+                            binaryFiles.Add(($"Shared/resources/sprites/{sheetName}.png", pngBytes));
+                            files.Add(($"Shared/resources/sprites/{sheetName}.meta.json",
+                                JsonConvert.SerializeObject(meta, Newtonsoft.Json.Formatting.Indented)));
                         }
-
-                        // Add sheet PNG + metadata to commit
-                        var pngBytes = SpriteSheetService.EncodePng(updatedSheet);
-                        binaryFiles.Add(($"Shared/resources/sprites/{sheetName}.png", pngBytes));
-                        files.Add(($"Shared/resources/sprites/{sheetName}.meta.json",
-                            JsonConvert.SerializeObject(meta, Newtonsoft.Json.Formatting.Indented)));
-
-                        // Dispose bitmaps
-                        foreach (var bmp in bitmaps) bmp.Dispose();
-                        updatedSheet.Dispose();
+                        finally
+                        {
+                            // Always dispose all bitmaps, even on error
+                            foreach (var bmp in bitmaps) bmp.Dispose();
+                            sheet.Dispose();
+                        }
                     }
 
                     // 4b. Write mob XMLs to CustomObjects.xml (with sprite texture refs)

@@ -47,8 +47,17 @@ namespace AdminDashboard.Services
                 if (sheet == null)
                     throw new Exception("Failed to decode existing sheet");
 
-                var (metaJson, _) = await _github.FetchFile(metaPath);
-                meta = JsonConvert.DeserializeObject<SheetMetadata>(metaJson) ?? new SheetMetadata();
+                try
+                {
+                    var (metaJson, _) = await _github.FetchFile(metaPath);
+                    meta = JsonConvert.DeserializeObject<SheetMetadata>(metaJson) ?? new SheetMetadata();
+                }
+                catch
+                {
+                    // Meta missing but PNG exists — infer next index from sheet dimensions
+                    var totalSlots = (sheet.Width / spriteSize) * (sheet.Height / spriteSize);
+                    meta = new SheetMetadata { NextIndex = totalSlots };
+                }
             }
             catch
             {
