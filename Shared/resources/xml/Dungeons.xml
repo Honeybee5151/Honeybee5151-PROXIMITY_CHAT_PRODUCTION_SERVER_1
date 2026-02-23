@@ -422,4 +422,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="mrsus">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/mrsus.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
