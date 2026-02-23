@@ -352,4 +352,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="laggy">
+		<Width>512</Width>
+		<Height>512</Height>
+		<MapJM>Dungeons/laggy.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
