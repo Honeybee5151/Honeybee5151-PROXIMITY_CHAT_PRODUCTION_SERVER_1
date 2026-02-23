@@ -92,5 +92,6 @@ public enum MessageId : byte
     BREAKDOWN_SLOT = 86,
     IMMINENT_ARENA_WAVE = 87,
     //777592
-    PROXIMITY_VOICE = 88 
+    PROXIMITY_VOICE = 88,
+    CUSTOM_GROUNDS = 89
 }

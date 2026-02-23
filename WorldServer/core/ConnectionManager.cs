@@ -197,7 +197,7 @@ namespace WorldServer.core
             // send out map info
             var mapSize = (short)Math.Max(world.Map.Width, world.Map.Height);
 
-            client.SendPackets(new OutgoingMessage[]
+            var packets = new System.Collections.Generic.List<OutgoingMessage>
             {
                 new MapInfoMessage()
                 {
@@ -213,10 +213,16 @@ namespace WorldServer.core
                     ShowDisplays = world.ShowDisplays,
                     DisableShooting = world.DisableShooting,
                     DisableAbilities = world.DisableAbilities
-                },
-                new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()),
-                new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray())
-            });
+                }
+            };
+
+            // Send custom ground tiles for community dungeons
+            if (world.CustomGroundsXml != null)
+                packets.Add(new CustomGroundsMessage { GroundsXml = world.CustomGroundsXml });
+
+            packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
+            packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));
+            client.SendPackets(packets.ToArray());
             client.State = ProtocolState.Handshaked;
 
             _ = Connecting.TryAdd(client, DateTime.Now.AddSeconds(CONNECTING_TTL));

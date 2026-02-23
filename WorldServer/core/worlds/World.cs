@@ -47,6 +47,7 @@ namespace WorldServer.core.worlds
         private long Lifetime { get; set; }
 
         public bool isWeekend { get; set; } = false;
+        public string CustomGroundsXml { get; set; }
 
         public readonly Wmap Map;
         public readonly GameServer GameServer;
@@ -452,10 +453,26 @@ namespace WorldServer.core.worlds
 
         public bool LoadMapFromData(WorldResource worldResource)
         {
-            var data = GameServer.Resources.GameData.GetWorldData(worldResource.MapJM[Random.Shared.Next(0, worldResource.MapJM.Count)]);
+            var jmPath = worldResource.MapJM[Random.Shared.Next(0, worldResource.MapJM.Count)];
+            var data = GameServer.Resources.GameData.GetWorldData(jmPath);
             if (data == null)
                 return false;
             FromWorldMap(new MemoryStream(data));
+
+            // Build custom grounds XML for this dungeon
+            var gameData = GameServer.Resources.GameData;
+            if (gameData.JmCustomGroundIds.TryGetValue(jmPath, out var customIds))
+            {
+                var sb = new System.Text.StringBuilder("<Grounds>");
+                foreach (var groundId in customIds)
+                {
+                    if (gameData.GroundXmlById.TryGetValue(groundId, out var elem))
+                        sb.Append(elem.ToString());
+                }
+                sb.Append("</Grounds>");
+                CustomGroundsXml = sb.ToString();
+            }
+
             return true;
         }
 

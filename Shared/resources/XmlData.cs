@@ -27,6 +27,8 @@ namespace Shared.resources
         public Dictionary<int, ItemType> SlotTypeToItemType = new Dictionary<int, ItemType>();
         public Dictionary<ushort, TileDesc> Tiles = new Dictionary<ushort, TileDesc>();
         public Dictionary<ushort, string> TileTypeToId = new Dictionary<ushort, string>();
+        public Dictionary<string, XElement> GroundXmlById = new Dictionary<string, XElement>();
+        public Dictionary<string, List<string>> JmCustomGroundIds = new Dictionary<string, List<string>>();
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
         private readonly Dictionary<string, byte[]> WorldDataCache = new Dictionary<string, byte[]>();
@@ -66,6 +68,7 @@ namespace Shared.resources
             IdToTileType[id] = type;
 
             Tiles[type] = new TileDesc(type, e);
+            GroundXmlById[id] = e;
 
             return e;
         }).ToArray();
@@ -175,6 +178,25 @@ namespace Shared.resources
                         {
                             var data = Json2Wmap.Convert(this, mapJson);
                             WorldDataCache.Add(id, data);
+
+                            // Extract custom ground IDs from JM dict
+                            var jmObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(mapJson);
+                            if (jmObj.TryGetValue("dict", out var dictObj))
+                            {
+                                var dictArray = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(dictObj.ToString());
+                                var customIds = new List<string>();
+                                foreach (var entry in dictArray)
+                                {
+                                    if (entry.TryGetValue("ground", out var groundObj))
+                                    {
+                                        var groundId = groundObj?.ToString();
+                                        if (groundId != null && groundId.StartsWith("custom_") && !customIds.Contains(groundId))
+                                            customIds.Add(groundId);
+                                    }
+                                }
+                                if (customIds.Count > 0)
+                                    JmCustomGroundIds[id] = customIds;
+                            }
                         }
                         catch (Exception e)
                         {
