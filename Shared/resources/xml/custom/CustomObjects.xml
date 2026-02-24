@@ -355,10 +355,10 @@
         </Projectile>
     </Object>
 	<Object type="0x500e" id="Gorath the Colossal">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>1</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -406,10 +406,10 @@
         </Projectile>
     </Object>
 	<Object type="0x500f" id="Giant Stone Hurler">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>1</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -436,10 +436,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5010" id="Giant Earthshaker">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>1</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <ParalyzeImmune/>
@@ -468,10 +468,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5011" id="Tiny Stone Golem">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>1</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -598,10 +598,10 @@
     </Projectile>
   </Object>
 	<Object type="0x5018" id="Goblin Warchief Grukk">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>8</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -640,10 +640,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5019" id="Goblin Shaman">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>8</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -671,10 +671,10 @@
         </Projectile>
     </Object>
 	<Object type="0x501a" id="Goblin Berserker">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>8</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -693,10 +693,10 @@
         </Projectile>
     </Object>
 	<Object type="0x501b" id="Goblin Scavenger">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>8</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -716,10 +716,10 @@
         </Projectile>
     </Object>
 	<Object type="0x501d" id="Volcanus the Eternal Dragon">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>14</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     <Quest/>
@@ -769,10 +769,10 @@
     </Projectile>
 </Object>
 	<Object type="0x501e" id="Dragonfire Whelpling">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>14</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     <Flying/>
@@ -793,10 +793,10 @@
     </Projectile>
 </Object>
 	<Object type="0x501f" id="Dragon's Chosen Pyromancer">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>14</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -823,10 +823,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5020" id="Molten Dragon Egg">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>14</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -847,10 +847,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5022" id="Pirate King Bartholomew">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>20</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -899,10 +899,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5023" id="Corsair Cannoneer">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>20</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -929,10 +929,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5024" id="Cutthroat Deckhand">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>20</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -952,10 +952,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5025" id="Scallywag Bomber">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>20</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -983,10 +983,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5026" id="Voodoo Sea Witch">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>20</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1014,10 +1014,10 @@
         </Projectile>
     </Object>
 	<Object type="0x502a" id="Glaciarch, the Frozen Tyrant">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>27</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -1067,10 +1067,10 @@
         </Projectile>
     </Object>
 	<Object type="0x502b" id="Frostbound Sentinel">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>27</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1090,10 +1090,10 @@
         </Projectile>
     </Object>
 	<Object type="0x502c" id="Shivering Wraith">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>27</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Flying/>
@@ -1122,10 +1122,10 @@
         </Projectile>
     </Object>
 	<Object type="0x502d" id="Rime Crawler">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>27</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1144,10 +1144,10 @@
         </Projectile>
     </Object>
 	<Object type="0x502e" id="Avalanche Shaman">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>27</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1177,10 +1177,10 @@
     </Object>
 	awd
 	<Object type="0x5030" id="Warchief Grommash the Ironbound">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>34</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -1230,10 +1230,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5031" id="Orc Skull Crusher">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>34</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1253,10 +1253,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5032" id="Orc Bloodhowler Shaman">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>34</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1284,10 +1284,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5033" id="Orc Worg Rider">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>34</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1307,10 +1307,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5034" id="Orc Pit Grunt">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>34</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1337,10 +1337,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5038" id="Dreadcaptain Blacktide">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>41</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -1381,10 +1381,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5039" id="Saltblood Cannoneer">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>41</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1404,10 +1404,10 @@
         </Projectile>
     </Object>
 	<Object type="0x503a" id="Cutthroat Deckhand">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>41</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1427,10 +1427,10 @@
         </Projectile>
     </Object>
 	<Object type="0x503b" id="Bilgerat Swashbuckler">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>41</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1457,10 +1457,10 @@
         </Projectile>
     </Object>
 	<Object type="0x503c" id="Voodoo Sea Witch">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>41</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1488,10 +1488,10 @@
         </Projectile>
     </Object>
 	<Object type="0x503e" id="Grakthor the Orcgod">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>47</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     <Quest/>
@@ -1541,10 +1541,10 @@
     </Projectile>
 </Object>
 	<Object type="0x503f" id="Orcgod Warchief">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>47</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -1571,10 +1571,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5040" id="Orcgod Blood Shaman">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>47</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -1602,10 +1602,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5041" id="Orcgod Ragesmasher">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>47</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -1625,10 +1625,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5042" id="Orcgod Gruntling">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>47</Index>
-	</AnimatedTexture>
+	</Texture>
     <Enemy/>
     <Class>Character</Class>
     
@@ -1647,10 +1647,10 @@
     </Projectile>
 </Object>
 	<Object type="0x5047" id="Warchief Groznak the Undying">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>54</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         <Quest/>
@@ -1700,10 +1700,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5048" id="Orc Ironhide Brute">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>54</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1723,10 +1723,10 @@
         </Projectile>
     </Object>
 	<Object type="0x5049" id="Orc Bone Hurler">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>54</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1754,10 +1754,10 @@
         </Projectile>
     </Object>
 	<Object type="0x504a" id="Orc War Drummer">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>54</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         
@@ -1778,10 +1778,10 @@
         </Projectile>
     </Object>
 	<Object type="0x504b" id="Orc Bloodfang Worg">
-	<AnimatedTexture>
+	<Texture>
 		<File>communitySprites8x8</File>
 		<Index>54</Index>
-	</AnimatedTexture>
+	</Texture>
         <Enemy/>
         <Class>Character</Class>
         

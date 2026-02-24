@@ -436,13 +436,13 @@ namespace AdminDashboard.Controllers
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
                                 // Inject sprite texture reference
-                                // Use AnimatedTexture for mobs with both base + attack sprites (sequential indices)
+                                // Always use <Texture> (not AnimatedTexture) — community sprites are simple tile grids,
+                                // not 7-frame directional animation strips that AnimatedChars expects
                                 if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
                                 {
                                     var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
                                     var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    bool hasAttack = sprIdx.attackIdx >= 0;
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: hasAttack);
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false);
                                 }
 
                                 newMobEntries += "\t" + xml.Trim() + "\n";
