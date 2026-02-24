@@ -234,6 +234,9 @@ namespace AdminDashboard.Controllers
                 var hasMobs = mobs != null && mobs.Count > 0;
                 var hasItems = items != null && items.Count > 0;
 
+                // Track item renames so loot injection in behavior JSON uses the correct name
+                var itemRenames = new Dictionary<string, string>(); // oldName -> newName
+
                 if (hasMobs || hasItems)
                 {
                     // 4a. Build sprite sheets and assign indices
@@ -486,8 +489,6 @@ namespace AdminDashboard.Controllers
                     }
 
                     // 4c. Write item XMLs to CustomItems.xml (with sprite texture refs)
-                    // Track renames so loot injection in behavior JSON uses the correct name
-                    var itemRenames = new Dictionary<string, string>(); // oldName -> newName
                     if (hasItems)
                     {
                         // Collect existing item names to avoid duplicates
