@@ -197,7 +197,17 @@ namespace WorldServer.core.objects
                 DamageCounter.Death();
                 CurrentState?.OnDeath(this, ref time);
                 if (GameServer.BehaviorDb.Definitions.TryGetValue(ObjectType, out var loot))
-                    loot.Item2?.Handle(this, time);
+                {
+                    if (loot.Item2 != null)
+                    {
+                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - loot table found with {loot.Item2.Count} entries");
+                        loot.Item2.Handle(this, time);
+                    }
+                    else
+                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - behavior found but NO loot table");
+                }
+                else
+                    Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - NO behavior definition found");
             }
             Dead = true;
             World.LeaveWorld(this);

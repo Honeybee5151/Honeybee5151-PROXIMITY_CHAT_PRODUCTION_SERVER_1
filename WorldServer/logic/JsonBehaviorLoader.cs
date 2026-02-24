@@ -87,6 +87,10 @@ namespace WorldServer.logic
                 }
 
                 db.Definitions[type] = new Tuple<State, Loot>(rootState, loot);
+                if (loot != null)
+                    Log.Info($"[JsonBehavior] Registered '{mobName}' (0x{type:X}) with {loot.Count} loot entries");
+                else
+                    Log.Info($"[JsonBehavior] Registered '{mobName}' (0x{type:X}) with no loot");
                 return true;
             }
             catch (Exception e)

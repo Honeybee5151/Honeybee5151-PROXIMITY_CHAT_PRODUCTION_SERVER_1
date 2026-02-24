@@ -151,12 +151,19 @@ namespace WorldServer.logic.loot
         public void Handle(Enemy enemy, TickTime time)
         {
             if (enemy.SpawnedByBehavior)
+            {
+                Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} skipped - SpawnedByBehavior");
                 return;
+            }
 
             var possDrops = new List<LootDef>();
             ExtraLootTables(possDrops, enemy);
             foreach (var i in this)
                 i.Populate(possDrops);
+
+            Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} died - {possDrops.Count} possible drops, {this.Count} MobDrops entries");
+            foreach (var d in possDrops)
+                Log.Info($"[Loot]   drop: item='{d.Item}' prob={d.Probabilty} threshold={d.Threshold} type={d.ItemType} tier={d.Tier}");
 
             var pubDrops = new List<Item>();
 
@@ -170,7 +177,7 @@ namespace WorldServer.logic.loot
 
                 if (DropsInSoulboundBag(i.ItemType, i.Tier))
                     continue;
-                
+
                 var chance = Random.Shared.NextDouble();
                 if (i.Threshold <= 0 && chance < i.Probabilty)
                 {
@@ -185,7 +192,12 @@ namespace WorldServer.logic.loot
 
             var playersAvaliable = enemy.DamageCounter.GetPlayerData();
             if (playersAvaliable == null)
+            {
+                Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} - no player data available");
                 return;
+            }
+
+            Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} - {playersAvaliable.Length} players, TotalDamage={enemy.DamageCounter.TotalDamage}");
 
             var privDrops = new Dictionary<Player, IList<Item>>();
             foreach (var tupPlayer in playersAvaliable)
@@ -207,14 +219,17 @@ namespace WorldServer.logic.loot
 
                 var gameData = enemy.GameServer.Resources.GameData;
 
+                Log.Info($"[Loot] Player {player.Name}: dmgBoost={dmgBoost} totalBoost={totalBoost} playerDmg={tupPlayer.Item2}");
+
                 var drops = new List<Item>();
                 foreach (var i in possDrops)
                 {
                     var c = Random.Shared.NextDouble();
 
                     var probability = i.Probabilty * totalBoost;
+                    var dmgRatio = Math.Round(tupPlayer.Item2 / (double)enemy.DamageCounter.TotalDamage, 4);
 
-                    if (i.Threshold >= 0 && i.Threshold < Math.Round(tupPlayer.Item2 / (double)enemy.DamageCounter.TotalDamage, 4))
+                    if (i.Threshold >= 0 && i.Threshold < dmgRatio)
                     {
                         Item item = null;
                         if (i.ItemType != ItemType.None)
@@ -226,9 +241,15 @@ namespace WorldServer.logic.loot
                         else
                         {
                             if (!gameData.IdToObjectType.TryGetValue(i.Item, out var type))
+                            {
+                                Log.Warn($"[Loot] Item '{i.Item}' not found in IdToObjectType!");
                                 continue;
+                            }
                             if (!gameData.Items.TryGetValue(type, out item))
+                            {
+                                Log.Warn($"[Loot] Item type 0x{type:X} for '{i.Item}' not found in Items dict!");
                                 continue;
+                            }
                         }
 
                         if (item == null)
@@ -238,15 +259,17 @@ namespace WorldServer.logic.loot
                         }
 
                         if (c >= probability)
-                            continue;
-
-                        if (item == null)
                         {
-                            player.SendError($"There was a error giving u the item: {i.Item}, please report this [#2]");
+                            Log.Info($"[Loot] Roll failed for '{i.Item}': c={c:F4} >= prob={probability:F4}");
                             continue;
                         }
 
+                        Log.Info($"[Loot] DROP! '{item.ObjectId}' for player {player.Name} (c={c:F4} < prob={probability:F4})");
                         drops.Add(item);
+                    }
+                    else
+                    {
+                        Log.Info($"[Loot] Threshold check failed for '{i.Item}': threshold={i.Threshold} >= dmgRatio={Math.Round(tupPlayer.Item2 / (double)enemy.DamageCounter.TotalDamage, 4)}");
                     }
                 }
 
