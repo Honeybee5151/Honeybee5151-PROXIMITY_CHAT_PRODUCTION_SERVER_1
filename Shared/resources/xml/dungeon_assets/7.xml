@@ -1,0 +1,96 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_32x32" tileW="32" tileH="32">iVBORw0KGgoAAAANSUhEUgAAAgAAAAAgCAYAAABkS8DlAAAABHNCSVQICAgIfAhkiAAAAfdJREFUeJzt3TF6gjAUAGDr2K3nceVcHTyXa8/j5kon2oABEhMI7ff/i6IY3N7Le4GcTgUu10cfe137DgBo6+10+g3OX5/vo+M1w/mpYuPmjgEAVDKdudeerc+NqSoAAA2FZfqaQXltLAkAALRxDg9ql+OV9wHgmM6xD0tm5keY1d+7rvl/AIDDaxW0a153CPrTVwBgRuz2ven71N+3EAv6EgAASNDifv3SawnyAPCapzUAOQv3Ws/8P2632f8qOQCADHver18yrgAPABXkBONaCUGtcSQDAFDo6GsABHsAaGDPJwWWkCgAwLyfRYD/bde+pQWCAMDEUgKwxSZBqeea0QPABlps3LPVcwAkCwCQaS4ot9zOV0AHgLqimwGlKt3tLzWBqNHPl0QAwIylhYB7rg0I1Qjcgj8AJNir3J8yZk6fX6AHgDRFLYASl+ujL2khxNoC088kBACQ4NUWQM45AMBBXa6PPgzm0+Na10g5b60FYJYPAPlGLYAhKIel+dhna2onC7EgP5T7Y60ASQEALJsN6mEQL73dr9S96/qU/r7H/wJAgaHkXzqTr3nr4L3remV/ANjAFr3/nCcLAgD7eNoNMCz3D++3rAQAAPsbLQKM9frDJOCVQF76ewCgvtFq/5TFfrlBfDpm6QOAAIA/SjUAANr6BhZMgpkAeAjcAAAAAElFTkSuQmCC</Sheet>
+<Sheet name="dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAGpJREFUWIVjZKAQvNrM8R+ZL+b7g5FSM0fBEAXoiWEUDH7AhMx54zHz/xuPmXgj8b2Ly2gkDyPAhC4gsiMdZxFOTOSPlgJDC2AkAEJAcM+e0Tp+GAGSEwA+MNoAHAWjVcAQA1QtAUbB0AMABn8alk7W+toAAAAASUVORK5CYII=</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x5055" id="Corsair Deckhand">
+	<AnimatedTexture>
+		<File>dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_32x32</File>
+		<Index>0</Index>
+	</AnimatedTexture>
+	<AltTexture id="1">
+		<AnimatedTexture>
+			<File>dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_32x32</File>
+			<Index>1</Index>
+		</AnimatedTexture>
+	</AltTexture>
+	
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/humans_hit</HitSound>
+    <DeathSound>monster/humans_death</DeathSound>
+    <MaxHitPoints>1200</MaxHitPoints>
+    <Size>85</Size>
+    <Defense>8</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+        <ObjectId>Corsair Deckhand Proj 0</ObjectId>
+        <Speed>90</Speed>
+        <Damage>45</Damage>
+        <Size>40</Size>
+        <LifetimeMS>700</LifetimeMS>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Corsair Deckhand Proj 1</ObjectId>
+        <Speed>60</Speed>
+        <Damage>60</Damage>
+        <Size>60</Size>
+        <LifetimeMS>500</LifetimeMS>
+        <ConditionEffect duration="2">Slowed</ConditionEffect>
+    </Projectile>
+</Object>
+<Object type="0x499a" id="Corsair Deckhand Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x499b" id="Corsair Deckhand Proj 1">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_8x8</File>
+		<Index>1</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x5056" id="Golden Stick">
+	<Texture>
+		<File>dungeon_3a7d4527-33ce-4c5c-8e02-5b07eaee085a_8x8</File>
+		<Index>2</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>An unassuming stick plated in pure gold. Deceptively heavy, it channels arcane energy with surprising potency — though its wielder must endure the burden of its weight.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>145</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="2"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+</Objects>
+</DungeonAssets>

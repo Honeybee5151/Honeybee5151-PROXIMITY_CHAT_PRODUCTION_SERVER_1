@@ -1,0 +1,169 @@
+{
+  "Corsair Deckhand": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "Ye'll walk the plank!",
+              "No quarter given!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Chase",
+            "range": 4,
+            "speed": 4.5,
+            "sightRange": 10
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 7,
+            "coolDown": 800,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3000,
+            "type": "TimedTransition",
+            "target": "aggressive"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "I won't go down easy!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 16711680,
+            "period": 0.3,
+            "repeats": 3
+          },
+          {
+            "type": "Chase",
+            "range": 2,
+            "speed": 5.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 500,
+            "shootAngle": 10,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 5,
+            "coolDown": 1500,
+            "predictive": 0.7,
+            "shootAngle": 20,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "aggressive": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Chase",
+            "range": 3,
+            "speed": 5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 7,
+            "coolDown": 600,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 5,
+            "coolDown": 2000,
+            "predictive": 0.6,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 4000,
+            "type": "TimedTransition",
+            "target": "engage"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle"
+  }
+}

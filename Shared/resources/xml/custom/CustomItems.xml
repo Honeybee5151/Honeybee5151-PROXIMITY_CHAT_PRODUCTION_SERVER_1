@@ -753,4 +753,38 @@
         </ActivateOnEquip>
         <BagType>0</BagType>
     </Object>
+	<Object type="0x5056" id="Golden Stick">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>An unassuming stick plated in pure gold. Deceptively heavy, it channels arcane energy with surprising potency — though its wielder must endure the burden of its weight.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>145</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="2"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
 </Objects>
