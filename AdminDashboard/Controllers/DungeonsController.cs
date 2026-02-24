@@ -731,6 +731,20 @@ namespace AdminDashboard.Controllers
             var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;
             if (mobs == null || mobs.Count == 0) return;
 
+            // Build set of valid mob names from submitted XML
+            var validMobNames = new HashSet<string>();
+            var mobNamesList = new List<(string name, bool isBoss)>();
+            foreach (var mob in mobs)
+            {
+                var xml = mob["xml"]?.ToString() ?? "";
+                var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                if (!nameMatch.Success) continue;
+                var name = nameMatch.Groups[1].Value;
+                validMobNames.Add(name);
+                var isBoss = mob["isBoss"]?.Value<bool>() ?? xml.Contains("<Quest/>");
+                mobNamesList.Add((name, isBoss));
+            }
+
             // Check if JM already has mob placements
             bool hasExistingMobs = false;
             foreach (var entry in dict)
@@ -741,7 +755,24 @@ namespace AdminDashboard.Controllers
                     break;
                 }
             }
-            if (hasExistingMobs) return; // Editor already placed mobs — don't override
+
+            if (hasExistingMobs)
+            {
+                // Fix invalid mob names (e.g. "Unknown") in existing placements
+                foreach (var entry in dict)
+                {
+                    if (entry["objs"] is JArray objs && objs.Count > 0)
+                    {
+                        var id = objs[0]?["id"]?.ToString();
+                        if (!string.IsNullOrEmpty(id) && !validMobNames.Contains(id) && mobNamesList.Count > 0)
+                        {
+                            // Replace with first valid mob name
+                            objs[0]["id"] = mobNamesList[0].name;
+                        }
+                    }
+                }
+                return;
+            }
 
             // Decode grid to find non-empty ground tiles
             byte[] inflated;
@@ -769,17 +800,8 @@ namespace AdminDashboard.Controllers
 
             if (groundTiles.Count == 0) return;
 
-            // Extract mob names from XML
-            var mobNames = new List<(string name, bool isBoss)>();
-            foreach (var mob in mobs)
-            {
-                var xml = mob["xml"]?.ToString() ?? "";
-                var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                if (!nameMatch.Success) continue;
-                var isBoss = mob["isBoss"]?.Value<bool>() ?? xml.Contains("<Quest/>");
-                mobNames.Add((nameMatch.Groups[1].Value, isBoss));
-            }
-            if (mobNames.Count == 0) return;
+            // Reuse mob names already extracted above
+            if (mobNamesList.Count == 0) return;
 
             var rng = new Random(42); // deterministic for reproducibility
 
@@ -794,9 +816,9 @@ namespace AdminDashboard.Controllers
             int placeIdx = 0;
 
             // Place each mob: boss once, minions 2-4 times
-            foreach (var (mobName, isBoss) in mobNames)
+            foreach (var (mobName, isBoss) in mobNamesList)
             {
-                int count = isBoss ? 1 : Math.Min(2 + rng.Next(3), shuffled.Count / Math.Max(mobNames.Count, 1));
+                int count = isBoss ? 1 : Math.Min(2 + rng.Next(3), shuffled.Count / Math.Max(mobNamesList.Count, 1));
                 count = Math.Max(1, count);
 
                 for (int c = 0; c < count && placeIdx < shuffled.Count; c++)
