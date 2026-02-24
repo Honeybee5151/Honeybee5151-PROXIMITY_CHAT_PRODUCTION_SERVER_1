@@ -401,6 +401,16 @@ namespace AdminDashboard.Controllers
                     var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
                     var nextType = Math.Max(FindNextTypeCode(objectsXml, 0x5000), FindNextTypeCode(itemsXml, 0x5000));
 
+                    // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
+                    var reservedNames = new HashSet<string>();
+                    try
+                    {
+                        var (reservedContent, _) = await _github.FetchFile("Shared/resources/reserved_names.txt");
+                        foreach (var line in reservedContent.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                            reservedNames.Add(line.Trim());
+                    }
+                    catch { /* reserved_names.txt missing — skip check */ }
+
                     if (hasMobs)
                     {
                         // Collect existing mob names to avoid duplicates
@@ -428,6 +438,13 @@ namespace AdminDashboard.Controllers
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 if (nameMatch.Success && existingMobNames.Contains(nameMatch.Groups[1].Value))
                                     continue;
+                                // Auto-rename mobs that collide with prod names
+                                if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
+                                {
+                                    var newName = $"{safeTitle} {nameMatch.Groups[1].Value}";
+                                    xml = xml.Replace($"id=\"{nameMatch.Groups[1].Value}\"", $"id=\"{newName}\"");
+                                    nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                                }
                                 if (nameMatch.Success)
                                     existingMobNames.Add(nameMatch.Groups[1].Value);
 
@@ -469,6 +486,8 @@ namespace AdminDashboard.Controllers
                     }
 
                     // 4c. Write item XMLs to CustomItems.xml (with sprite texture refs)
+                    // Track renames so loot injection in behavior JSON uses the correct name
+                    var itemRenames = new Dictionary<string, string>(); // oldName -> newName
                     if (hasItems)
                     {
                         // Collect existing item names to avoid duplicates
@@ -496,6 +515,15 @@ namespace AdminDashboard.Controllers
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 if (nameMatch.Success && existingItemNames.Contains(nameMatch.Groups[1].Value))
                                     continue;
+                                // Auto-rename items that collide with prod names
+                                if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
+                                {
+                                    var oldName = nameMatch.Groups[1].Value;
+                                    var newName = $"{safeTitle} {oldName}";
+                                    xml = xml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                    itemRenames[oldName] = newName;
+                                    nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                                }
                                 if (nameMatch.Success)
                                     existingItemNames.Add(nameMatch.Groups[1].Value);
 
@@ -598,6 +626,9 @@ namespace AdminDashboard.Controllers
                             var itemNameMatch = Regex.Match(itemXml, @"id=""([^""]+)""");
                             if (!itemNameMatch.Success) continue;
                             var itemName = itemNameMatch.Groups[1].Value;
+                            // Use renamed name if item was auto-renamed due to prod collision
+                            if (itemRenames.TryGetValue(itemName, out var renamedName))
+                                itemName = renamedName;
 
                             // Find or create the mob entry in behaviorDict and add loot
                             var mobKey = behaviorDict.Properties()
