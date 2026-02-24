@@ -779,14 +779,20 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Inject loot from items' dropFrom/dropRate into mob behavior entries
+                    // Inject loot from items' dropFromMobs/dropRate into mob behavior entries
                     if (hasItems)
                     {
+                        // Collect all mob names for "__all__" expansion
+                        var allMobNames = new List<string>();
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success) allMobNames.Add(nameMatch.Groups[1].Value);
+                        }
+
                         foreach (var item in items!)
                         {
-                            var dropFrom = item["dropFrom"]?.ToString();
-                            if (string.IsNullOrEmpty(dropFrom)) continue;
-
                             var dropRate = item["dropRate"]?.Value<double>() ?? 0.1;
                             // Extract item name from XML id attribute
                             var itemXml = item["xml"]?.ToString() ?? "";
@@ -797,42 +803,67 @@ namespace AdminDashboard.Controllers
                             if (itemRenames.TryGetValue(itemName, out var renamedName))
                                 itemName = renamedName;
 
-                            // Find or create the mob entry in behaviorDict and add loot
-                            var mobKey = behaviorDict.Properties()
-                                .FirstOrDefault(p => p.Name.Equals(dropFrom, StringComparison.OrdinalIgnoreCase))?.Name;
-
-                            if (mobKey == null)
+                            // Resolve target mob names: dropFromMobs (new) or dropFrom (legacy)
+                            var targetMobs = new List<string>();
+                            var dropFromMobs = item["dropFromMobs"] as JArray;
+                            if (dropFromMobs != null && dropFromMobs.Count > 0)
                             {
-                                // Mob has no behavior defined — create a default entry with just Wander
-                                mobKey = dropFrom;
-                                behaviorDict[mobKey] = new JObject
-                                {
-                                    ["states"] = new JObject
-                                    {
-                                        ["idle"] = new JObject
-                                        {
-                                            ["behaviors"] = new JArray { new JObject { ["type"] = "Wander", ["speed"] = 0.4 } },
-                                            ["transitions"] = new JArray()
-                                        }
-                                    },
-                                    ["initialState"] = "idle"
-                                };
+                                if (dropFromMobs.Any(t => t.ToString() == "__all__"))
+                                    targetMobs.AddRange(allMobNames);
+                                else
+                                    targetMobs.AddRange(dropFromMobs.Select(t => t.ToString()));
+                            }
+                            else
+                            {
+                                // Legacy: single dropFrom field
+                                var dropFrom = item["dropFrom"]?.ToString();
+                                if (!string.IsNullOrEmpty(dropFrom))
+                                    targetMobs.Add(dropFrom);
                             }
 
-                            var mobDef = behaviorDict[mobKey] as JObject;
-                            if (mobDef != null)
+                            if (targetMobs.Count == 0) continue;
+
+                            var lootEntry = new JObject
                             {
-                                var lootArr = mobDef["loot"] as JArray;
-                                if (lootArr == null)
+                                ["item"] = itemName,
+                                ["probability"] = dropRate
+                            };
+
+                            foreach (var mobName in targetMobs)
+                            {
+                                // Find or create the mob entry in behaviorDict and add loot
+                                var mobKey = behaviorDict.Properties()
+                                    .FirstOrDefault(p => p.Name.Equals(mobName, StringComparison.OrdinalIgnoreCase))?.Name;
+
+                                if (mobKey == null)
                                 {
-                                    lootArr = new JArray();
-                                    mobDef["loot"] = lootArr;
+                                    // Mob has no behavior defined — create a default entry with just Wander
+                                    mobKey = mobName;
+                                    behaviorDict[mobKey] = new JObject
+                                    {
+                                        ["states"] = new JObject
+                                        {
+                                            ["idle"] = new JObject
+                                            {
+                                                ["behaviors"] = new JArray { new JObject { ["type"] = "Wander", ["speed"] = 0.4 } },
+                                                ["transitions"] = new JArray()
+                                            }
+                                        },
+                                        ["initialState"] = "idle"
+                                    };
                                 }
-                                lootArr.Add(new JObject
+
+                                var mobDef = behaviorDict[mobKey] as JObject;
+                                if (mobDef != null)
                                 {
-                                    ["item"] = itemName,
-                                    ["probability"] = dropRate
-                                });
+                                    var lootArr = mobDef["loot"] as JArray;
+                                    if (lootArr == null)
+                                    {
+                                        lootArr = new JArray();
+                                        mobDef["loot"] = lootArr;
+                                    }
+                                    lootArr.Add(lootEntry.DeepClone());
+                                }
                             }
                         }
                     }
