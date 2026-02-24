@@ -1487,4 +1487,163 @@
             <ConditionEffect duration="2">Quiet</ConditionEffect>
         </Projectile>
     </Object>
+	<Object type="0x503e" id="Grakthor the Orcgod">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>47</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    <Quest/>
+    <God/>
+    <StunImmune/>
+    <ParalyzeImmune/>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>42000</MaxHitPoints>
+    <Size>180</Size>
+    <Defense>35</Defense>
+    <XpMult>0.85</XpMult>
+    <Projectile id="0">
+        <ObjectId>Grakthor the Orcgod Proj 0</ObjectId>
+        <Speed>55</Speed>
+        <Damage>175</Damage>
+        <Size>110</Size>
+        <LifetimeMS>1600</LifetimeMS>
+        <MultiHit/>
+        <ConditionEffect duration="3">ArmorBroken</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Grakthor the Orcgod Proj 1</ObjectId>
+        <Speed>70</Speed>
+        <Damage>130</Damage>
+        <Size>80</Size>
+        <LifetimeMS>1400</LifetimeMS>
+        <ConditionEffect duration="2">Curse</ConditionEffect>
+    </Projectile>
+    <Projectile id="2">
+        <ObjectId>Grakthor the Orcgod Proj 2</ObjectId>
+        <Speed>90</Speed>
+        <Damage>95</Damage>
+        <Size>60</Size>
+        <LifetimeMS>1000</LifetimeMS>
+        <ConditionEffect duration="3">Sick</ConditionEffect>
+    </Projectile>
+    <Projectile id="3">
+        <ObjectId>Grakthor the Orcgod Proj 3</ObjectId>
+        <Speed>45</Speed>
+        <Damage>200</Damage>
+        <Size>120</Size>
+        <LifetimeMS>2000</LifetimeMS>
+        <ArmorPiercing/>
+        <ConditionEffect duration="2">Bleeding</ConditionEffect>
+    </Projectile>
+</Object>
+	<Object type="0x503f" id="Orcgod Warchief">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>47</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>8500</MaxHitPoints>
+    <Size>130</Size>
+    <Defense>30</Defense>
+    <XpMult>0.15</XpMult>
+    <Projectile id="0">
+        <ObjectId>Grakthor the Orcgod Proj 0</ObjectId>
+        <Speed>60</Speed>
+        <Damage>110</Damage>
+        <Size>90</Size>
+        <LifetimeMS>1200</LifetimeMS>
+        <ConditionEffect duration="2">Slowed</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Grakthor the Orcgod Proj 1</ObjectId>
+        <Speed>80</Speed>
+        <Damage>75</Damage>
+        <Size>50</Size>
+        <LifetimeMS>900</LifetimeMS>
+    </Projectile>
+</Object>
+	<Object type="0x5040" id="Orcgod Blood Shaman">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>47</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/giants_hit</HitSound>
+    <DeathSound>monster/giants_death</DeathSound>
+    <MaxHitPoints>5000</MaxHitPoints>
+    <Size>100</Size>
+    <Defense>20</Defense>
+    <XpMult>0.12</XpMult>
+    <Projectile id="0">
+        <ObjectId>Grakthor the Orcgod Proj 0</ObjectId>
+        <Speed>65</Speed>
+        <Damage>90</Damage>
+        <Size>70</Size>
+        <LifetimeMS>1500</LifetimeMS>
+        <ConditionEffect duration="3">Bleeding</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Grakthor the Orcgod Proj 1</ObjectId>
+        <Speed>55</Speed>
+        <Damage>70</Damage>
+        <Size>60</Size>
+        <LifetimeMS>1800</LifetimeMS>
+        <ConditionEffect duration="2">Weak</ConditionEffect>
+    </Projectile>
+</Object>
+	<Object type="0x5041" id="Orcgod Ragesmasher">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>47</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>4200</MaxHitPoints>
+    <Size>110</Size>
+    <Defense>15</Defense>
+    <XpMult>0.1</XpMult>
+    <Projectile id="0">
+        <ObjectId>Grakthor the Orcgod Proj 0</ObjectId>
+        <Speed>100</Speed>
+        <Damage>100</Damage>
+        <Size>55</Size>
+        <LifetimeMS>600</LifetimeMS>
+        <ConditionEffect duration="1">Stunned</ConditionEffect>
+    </Projectile>
+</Object>
+	<Object type="0x5042" id="Orcgod Gruntling">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>47</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>2800</MaxHitPoints>
+    <Size>75</Size>
+    <Defense>10</Defense>
+    <XpMult>0.06</XpMult>
+    <Projectile id="0">
+        <ObjectId>Grakthor the Orcgod Proj 0</ObjectId>
+        <Speed>85</Speed>
+        <Damage>60</Damage>
+        <Size>40</Size>
+        <LifetimeMS>800</LifetimeMS>
+    </Projectile>
+</Object>
 </Objects>

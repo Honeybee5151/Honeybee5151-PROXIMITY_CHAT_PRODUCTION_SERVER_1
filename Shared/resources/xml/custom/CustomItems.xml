@@ -641,6 +641,133 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5043" id="Whisper of the Jade Serpent">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A cursed blade said to hiss when drawn, its edge dripping with spectral venom that eats through even the thickest armor.</Description>
+        <RateOfFire>1.2</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>90</MinDamage>
+            <MaxDamage>155</MaxDamage>
+            <LifetimeMS>370</LifetimeMS>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="2"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5044" id="Bloodmoon Tachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>Forged under a crimson moon by a blind swordsmith. Each strike draws life from the wound it inflicts.</Description>
+        <RateOfFire>0.95</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>165</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="4">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="-25"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5045" id="Frostbitten Nodachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>An ancient blade encased in permafrost, its wielder feels nothing — not cold, not pain, not mercy.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Blue Missile</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>120</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>410</LifetimeMS>
+            <ConditionEffect duration="2.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x5046" id="Shinigami's Last Breath">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>The death god's own blade, abandoned when even it grew weary of reaping. Fires a wide arc of spectral energy that weakens all it touches.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>15</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>450</LifetimeMS>
+            <ConditionEffect duration="3">Weak</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-40"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -929,6 +1056,133 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5043" id="Whisper of the Jade Serpent">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A cursed blade said to hiss when drawn, its edge dripping with spectral venom that eats through even the thickest armor.</Description>
+        <RateOfFire>1.2</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>90</MinDamage>
+            <MaxDamage>155</MaxDamage>
+            <LifetimeMS>370</LifetimeMS>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="2"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5044" id="Bloodmoon Tachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>Forged under a crimson moon by a blind swordsmith. Each strike draws life from the wound it inflicts.</Description>
+        <RateOfFire>0.95</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>165</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="4">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="-25"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5045" id="Frostbitten Nodachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>An ancient blade encased in permafrost, its wielder feels nothing — not cold, not pain, not mercy.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Blue Missile</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>120</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>410</LifetimeMS>
+            <ConditionEffect duration="2.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x5046" id="Shinigami's Last Breath">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>The death god's own blade, abandoned when even it grew weary of reaping. Fires a wide arc of spectral energy that weakens all it touches.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>15</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>450</LifetimeMS>
+            <ConditionEffect duration="3">Weak</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-40"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
@@ -1332,6 +1586,133 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5043" id="Whisper of the Jade Serpent">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A cursed blade said to hiss when drawn, its edge dripping with spectral venom that eats through even the thickest armor.</Description>
+        <RateOfFire>1.2</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>90</MinDamage>
+            <MaxDamage>155</MaxDamage>
+            <LifetimeMS>370</LifetimeMS>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="2"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5044" id="Bloodmoon Tachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>Forged under a crimson moon by a blind swordsmith. Each strike draws life from the wound it inflicts.</Description>
+        <RateOfFire>0.95</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>165</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="4">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="-25"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5045" id="Frostbitten Nodachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>An ancient blade encased in permafrost, its wielder feels nothing — not cold, not pain, not mercy.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Blue Missile</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>120</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>410</LifetimeMS>
+            <ConditionEffect duration="2.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x5046" id="Shinigami's Last Breath">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>The death god's own blade, abandoned when even it grew weary of reaping. Fires a wide arc of spectral energy that weakens all it touches.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>15</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>450</LifetimeMS>
+            <ConditionEffect duration="3">Weak</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-40"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -1620,6 +2001,133 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5043" id="Whisper of the Jade Serpent">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A cursed blade said to hiss when drawn, its edge dripping with spectral venom that eats through even the thickest armor.</Description>
+        <RateOfFire>1.2</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>90</MinDamage>
+            <MaxDamage>155</MaxDamage>
+            <LifetimeMS>370</LifetimeMS>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="2"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5044" id="Bloodmoon Tachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>Forged under a crimson moon by a blind swordsmith. Each strike draws life from the wound it inflicts.</Description>
+        <RateOfFire>0.95</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>165</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="4">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="-25"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5045" id="Frostbitten Nodachi">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>An ancient blade encased in permafrost, its wielder feels nothing — not cold, not pain, not mercy.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Blue Missile</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>120</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>410</LifetimeMS>
+            <ConditionEffect duration="2.5">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x5046" id="Shinigami's Last Breath">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>53</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>The death god's own blade, abandoned when even it grew weary of reaping. Fires a wide arc of spectral energy that weakens all it touches.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/blade</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>15</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>450</LifetimeMS>
+            <ConditionEffect duration="3">Weak</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-40"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>

@@ -215,4 +215,36 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x498f" id="Grakthor the Orcgod Proj 0">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>49</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4990" id="Grakthor the Orcgod Proj 1">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>50</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4991" id="Grakthor the Orcgod Proj 2">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>51</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4992" id="Grakthor the Orcgod Proj 3">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>52</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>
