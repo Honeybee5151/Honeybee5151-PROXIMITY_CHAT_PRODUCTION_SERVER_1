@@ -1009,7 +1009,7 @@ async function loadDungeons() {
         }
 
         let html = '<div class="table-container"><table><thead><tr>' +
-            '<th>Title</th><th>Map</th><th>Custom Tiles</th><th>Bosses</th><th>Items</th><th>Created</th><th>Actions</th>' +
+            '<th>Title</th><th>Map</th><th>Custom Tiles</th><th>Mobs</th><th>Items</th><th>Created</th><th>Actions</th>' +
             '</tr></thead><tbody>';
 
         for (const d of data.dungeons) {
@@ -1018,7 +1018,7 @@ async function loadDungeons() {
                 <td><strong>${esc(d.title || 'Untitled')}</strong>${d.description ? '<br><small style="color:#888;">' + esc(d.description) + '</small>' : ''}</td>
                 <td>${d.has_map ? '<span style="color:#22c55e;">JM</span>' : d.has_xml ? '<span style="color:#8b5cf6;">XML</span>' : '—'}</td>
                 <td>${d.has_custom_tiles ? '<span style="color:#ef4444;">Yes</span>' : 'No'}</td>
-                <td>${d.boss_count}</td>
+                <td>${d.mob_count}</td>
                 <td>${d.item_count}</td>
                 <td>${date}</td>
                 <td style="white-space:nowrap;">

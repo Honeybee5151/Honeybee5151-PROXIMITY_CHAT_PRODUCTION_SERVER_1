@@ -45,7 +45,7 @@ namespace AdminDashboard.Controllers
                     has_map = d["map_jm"] != null && d["map_jm"].Type != JTokenType.Null,
                     has_xml = d["dungeon_xml"] != null && d["dungeon_xml"].Type != JTokenType.Null,
                     has_custom_tiles = d["custom_tiles"] != null && d["custom_tiles"].Type != JTokenType.Null,
-                    boss_count = d["bosses"] is JArray bosses ? bosses.Count : 0,
+                    mob_count = (d["mobs"] ?? d["bosses"]) is JArray mobs ? mobs.Count : 0,
                     item_count = d["items"] is JArray items ? items.Count : 0,
                 }).ToList();
 
