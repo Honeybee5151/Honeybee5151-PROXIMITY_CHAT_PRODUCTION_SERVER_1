@@ -19,8 +19,8 @@
 	<Object type="0x4960" id="Dungeon Browser">
 		<Class>GameObject</Class>
 		<Texture>
-			<File>lofiChar</File>
-			<Index>0x01</Index>
+			<File>lofiChar8x8</File>
+			<Index>0x08</Index>
 		</Texture>
 		<Size>120</Size>
 		<ShadowSize>75</ShadowSize>
