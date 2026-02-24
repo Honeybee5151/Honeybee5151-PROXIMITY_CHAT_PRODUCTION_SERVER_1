@@ -73,20 +73,6 @@
         ]
       }
     },
-    "initialState": "idle"
-  },
-  "mob_1": {
-    "states": {
-      "idle": {
-        "behaviors": [
-          {
-            "type": "Wander",
-            "speed": 0.4
-          }
-        ],
-        "transitions": []
-      }
-    },
     "initialState": "idle",
     "loot": [
       {
