@@ -16,7 +16,7 @@
 		</Texture>
 		<Static />
 	</Object>
-	<Object type="0x4971" id="Dungeon Browser">
+	<Object type="0x4960" id="Dungeon Browser">
 		<Class>GameObject</Class>
 		<Texture>
 			<File>lofiChar</File>
