@@ -50,7 +50,7 @@ namespace AdminDashboard.Services
             }
             var data = JObject.Parse(await res.Content.ReadAsStringAsync());
             var base64 = data["content"]?.ToString().Replace("\n", "") ?? "";
-            var content = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+            var content = Encoding.UTF8.GetString(Convert.FromBase64String(base64)).TrimStart('\uFEFF');
             var sha = data["sha"]?.ToString() ?? "";
             return (content, sha);
         }

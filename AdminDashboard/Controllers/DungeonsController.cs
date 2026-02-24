@@ -848,7 +848,9 @@ namespace AdminDashboard.Controllers
                     if (!path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) continue;
                     try
                     {
-                        XDocument.Parse(content);
+                        // Strip BOM and leading whitespace that GitHub API may return
+                        var cleanContent = content.TrimStart('\uFEFF', '\u200B', '\0').TrimStart();
+                        XDocument.Parse(cleanContent);
                     }
                     catch (System.Xml.XmlException xmlEx)
                     {
