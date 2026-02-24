@@ -242,7 +242,8 @@ namespace AdminDashboard.Controllers
                     // 4a. Build sprite sheets and assign indices
                     var spriteService = new SpriteSheetService(_github);
 
-                    // Collect sprites grouped by size: (mobIndex, "base"|"attack"|"item", dataUrl, spriteSize)
+                    // Collect sprites grouped by size: (mobIndex, frame, dataUrl, spriteSize)
+                    // frame = "mob_0", "mob_1", ... for mob sprites; "proj_*" for projectiles; "item" for items
                     var spriteEntries = new List<(int entityIdx, string frame, string dataUrl, int size, bool isMob)>();
 
                     if (hasMobs)
@@ -251,12 +252,29 @@ namespace AdminDashboard.Controllers
                         {
                             var mob = mobs[i];
                             var size = mob["spriteSize"]?.Value<int>() ?? 8;
-                            var baseUrl = (mob["spriteBase"] ?? mob["sprite"])?.ToString();
-                            var attackUrl = mob["spriteAttack"]?.ToString();
-                            if (!string.IsNullOrEmpty(baseUrl))
-                                spriteEntries.Add((i, "base", baseUrl, size, true));
-                            if (!string.IsNullOrEmpty(attackUrl))
-                                spriteEntries.Add((i, "attack", attackUrl, size, true));
+
+                            // New: read sprites array (N named sprites)
+                            var spritesArr = mob["sprites"] as JArray;
+                            if (spritesArr != null && spritesArr.Count > 0)
+                            {
+                                for (int j = 0; j < spritesArr.Count; j++)
+                                {
+                                    var spr = spritesArr[j] as JObject;
+                                    var dataUrl = spr?["data"]?.ToString();
+                                    if (!string.IsNullOrEmpty(dataUrl))
+                                        spriteEntries.Add((i, $"mob_{j}", dataUrl, size, true));
+                                }
+                            }
+                            else
+                            {
+                                // Legacy: read spriteBase/spriteAttack
+                                var baseUrl = (mob["spriteBase"] ?? mob["sprite"])?.ToString();
+                                var attackUrl = mob["spriteAttack"]?.ToString();
+                                if (!string.IsNullOrEmpty(baseUrl))
+                                    spriteEntries.Add((i, "mob_0", baseUrl, size, true));
+                                if (!string.IsNullOrEmpty(attackUrl))
+                                    spriteEntries.Add((i, "mob_1", attackUrl, size, true));
+                            }
 
                             // Collect projectile sprites (always 8x8)
                             var projSprites = mob["projectileSprites"] as JObject;
@@ -282,13 +300,13 @@ namespace AdminDashboard.Controllers
                     }
 
                     // Process each sprite size group
-                    // mobSpriteIndices[mobIdx] = (baseIndex, attackIndex), itemSpriteIndices[itemIdx] = index
-                    var mobSpriteIndices = new Dictionary<int, (int baseIdx, int attackIdx)>();
+                    // mobSpriteIndices[mobIdx] = [spriteIdx0, spriteIdx1, ...] (index 0=base, 1+=AltTextures)
+                    var mobSpriteIndices = new Dictionary<int, List<int>>();
                     var itemSpriteIndices = new Dictionary<int, int>();
                     var projSpriteIndices = new Dictionary<int, Dictionary<string, int>>(); // mobIdx → {projId → sheetIndex}
 
                     // Per-dungeon indices (start at 0, used for DungeonAssets XML)
-                    var pdMobSpriteIndices = new Dictionary<int, (int baseIdx, int attackIdx)>();
+                    var pdMobSpriteIndices = new Dictionary<int, List<int>>();
                     var pdItemSpriteIndices = new Dictionary<int, int>();
                     var pdProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
                     // Per-dungeon sheet PNGs: sheetName → base64 PNG
@@ -342,17 +360,22 @@ namespace AdminDashboard.Controllers
                                             pdProjSpriteIndices[e.entityIdx] = new Dictionary<string, int>();
                                         pdProjSpriteIndices[e.entityIdx][projId] = pdIndices[i];
                                     }
-                                    else if (e.frame == "base")
+                                    else if (e.frame.StartsWith("mob_"))
                                     {
-                                        var attackIdx = -1;
-                                        var pdAttackIdx = -1;
-                                        if (i + 1 < entries.Count && entries[i + 1].entityIdx == e.entityIdx && entries[i + 1].frame == "attack")
-                                        {
-                                            attackIdx = indices[i + 1];
-                                            pdAttackIdx = pdIndices[i + 1];
-                                        }
-                                        mobSpriteIndices[e.entityIdx] = (indices[i], attackIdx);
-                                        pdMobSpriteIndices[e.entityIdx] = (pdIndices[i], pdAttackIdx);
+                                        // Parse sprite slot index from "mob_0", "mob_1", etc.
+                                        var slotIdx = int.Parse(e.frame.Substring(4));
+
+                                        if (!mobSpriteIndices.ContainsKey(e.entityIdx))
+                                            mobSpriteIndices[e.entityIdx] = new List<int>();
+                                        while (mobSpriteIndices[e.entityIdx].Count <= slotIdx)
+                                            mobSpriteIndices[e.entityIdx].Add(-1);
+                                        mobSpriteIndices[e.entityIdx][slotIdx] = indices[i];
+
+                                        if (!pdMobSpriteIndices.ContainsKey(e.entityIdx))
+                                            pdMobSpriteIndices[e.entityIdx] = new List<int>();
+                                        while (pdMobSpriteIndices[e.entityIdx].Count <= slotIdx)
+                                            pdMobSpriteIndices[e.entityIdx].Add(-1);
+                                        pdMobSpriteIndices[e.entityIdx][slotIdx] = pdIndices[i];
                                     }
                                 }
                                 else
@@ -501,12 +524,12 @@ namespace AdminDashboard.Controllers
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
-                                // Inject sprite texture reference (with attack AltTexture if available)
-                                if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
+                                // Inject sprite texture references (base + N AltTextures)
+                                if (mobSpriteIndices.TryGetValue(i, out var sprIndices))
                                 {
                                     var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
                                     var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false, sprIdx.attackIdx);
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIndices, isMob: false);
                                 }
 
                                 // Save processed block (with type code + texture) for DungeonAssets
@@ -601,13 +624,13 @@ namespace AdminDashboard.Controllers
                         foreach (var (mobIdx, processedXml) in processedMobBlocks)
                         {
                             var xml = processedXml;
-                            if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIdx))
+                            if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIndices))
                             {
                                 var size = mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8;
                                 var pdSheetName = size == 16
                                     ? $"dungeon_{request.DungeonId}_16x16"
                                     : $"dungeon_{request.DungeonId}_8x8";
-                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIdx.baseIdx, isMob: false, pdSprIdx.attackIdx);
+                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
                             }
                             assetsXml += xml + "\n";
                         }
@@ -723,10 +746,12 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Auto-inject SetAltTexture into states with Shoot for mobs that have attack sprites
+                    // Auto-inject SetAltTexture for mobs with multiple sprites
+                    // Only auto-inject for simple 2-sprite mobs (base+attack) with no manual SetAltTexture.
+                    // Mobs with 3+ sprites must define their own SetAltTexture in behavior states.
                     for (int i = 0; i < mobs!.Count; i++)
                     {
-                        if (!mobSpriteIndices.TryGetValue(i, out var spr) || spr.attackIdx < 0) continue;
+                        if (!mobSpriteIndices.TryGetValue(i, out var sprIndices) || sprIndices.Count < 2) continue;
 
                         var rawXml = mobs[i]["xml"]?.ToString() ?? "";
                         var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
@@ -739,20 +764,26 @@ namespace AdminDashboard.Controllers
                         var states = mobDef["states"] as JObject;
                         if (states == null) continue;
 
+                        // Check if ANY state already has a manual SetAltTexture
+                        bool hasManualAlt = states.Properties().Any(p =>
+                        {
+                            var behaviorsArr = (p.Value as JObject)?["behaviors"] as JArray;
+                            return behaviorsArr?.Any(b => b["type"]?.ToString() == "SetAltTexture") ?? false;
+                        });
+
+                        // Skip auto-injection if user has manual SetAltTexture or 3+ sprites
+                        if (hasManualAlt || sprIndices.Count > 2) continue;
+
+                        // Simple 2-sprite mob: auto-inject shoot state cycling + idle reset
                         foreach (var prop in states.Properties())
                         {
                             var stateData = prop.Value as JObject;
                             var behaviorsArr = stateData?["behaviors"] as JArray;
                             if (behaviorsArr == null) continue;
 
-                            // Check if SetAltTexture is already present
-                            bool hasAlt = behaviorsArr.Any(b => b["type"]?.ToString() == "SetAltTexture");
-                            if (hasAlt) continue;
-
                             bool hasShoot = behaviorsArr.Any(b => b["type"]?.ToString() == "Shoot");
                             if (hasShoot)
                             {
-                                // Shooting state: cycle between base (0) and attack (1) textures
                                 behaviorsArr.Add(new JObject
                                 {
                                     ["type"] = "SetAltTexture",
@@ -764,7 +795,6 @@ namespace AdminDashboard.Controllers
                             }
                             else
                             {
-                                // Non-shooting state: reset to base texture
                                 behaviorsArr.Add(new JObject
                                 {
                                     ["type"] = "SetAltTexture",
@@ -911,32 +941,42 @@ namespace AdminDashboard.Controllers
             return Regex.Replace(xml, @"<Object(\s)", $"<Object type=\"{typeHex}\"$1");
         }
 
-        /// <summary>Inject or replace sprite texture reference in an Object XML, with optional AltTexture for attack sprite</summary>
-        private static string InjectSpriteTexture(string xml, string sheetName, int index, bool isMob, int attackIndex = -1)
+        /// <summary>Inject sprite texture with N AltTexture blocks (index 0 = base, 1+ = AltTexture IDs)</summary>
+        private static string InjectSpriteTexture(string xml, string sheetName, List<int> spriteIndices, bool isMob)
         {
+            if (spriteIndices == null || spriteIndices.Count == 0) return xml;
+
             var tag = isMob ? "AnimatedTexture" : "Texture";
-            var textureXml = $"<{tag}>\n\t\t<File>{sheetName}</File>\n\t\t<Index>{index}</Index>\n\t</{tag}>";
 
-            // Build AltTexture block for attack sprite if provided
-            var altTextureXml = "";
-            if (attackIndex >= 0)
-            {
-                altTextureXml = $"\n\t<AltTexture id=\"1\">\n\t\t<{tag}>\n\t\t\t<File>{sheetName}</File>\n\t\t\t<Index>{attackIndex}</Index>\n\t\t</{tag}>\n\t</AltTexture>";
-            }
-
-            // Remove existing top-level AnimatedTexture/Texture (direct children of <Object>)
+            // Remove existing texture and AltTexture blocks
             xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
             xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
-            // Remove existing AltTexture blocks
             xml = Regex.Replace(xml, @"<AltTexture[^>]*>.*?</AltTexture>", "", RegexOptions.Singleline);
-
-            // Safety: clean up any Texture blocks that ended up inside <ObjectId> tags
+            // Safety: clean up any Texture blocks inside <ObjectId> tags
             xml = Regex.Replace(xml, @"(<ObjectId>)\s*<(?:Animated)?Texture>.*?</(?:Animated)?Texture>\s*", "$1", RegexOptions.Singleline);
 
+            // Base texture (index 0)
+            var textureXml = $"<{tag}>\n\t\t<File>{sheetName}</File>\n\t\t<Index>{spriteIndices[0]}</Index>\n\t</{tag}>";
+
+            // AltTexture blocks for indices 1..N
+            var altBlocks = "";
+            for (int i = 1; i < spriteIndices.Count; i++)
+            {
+                if (spriteIndices[i] < 0) continue;
+                altBlocks += $"\n\t<AltTexture id=\"{i}\">\n\t\t<{tag}>\n\t\t\t<File>{sheetName}</File>\n\t\t\t<Index>{spriteIndices[i]}</Index>\n\t\t</{tag}>\n\t</AltTexture>";
+            }
+
             // Inject after the opening <Object ...> tag
-            // Negative lookahead (?![a-zA-Z]) prevents matching <ObjectId>, <Objects>, etc.
-            xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}{altTextureXml}");
+            xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}{altBlocks}");
             return xml;
+        }
+
+        /// <summary>Backward compat overload for single base + optional attack index</summary>
+        private static string InjectSpriteTexture(string xml, string sheetName, int index, bool isMob, int attackIndex = -1)
+        {
+            var indices = new List<int> { index };
+            if (attackIndex >= 0) indices.Add(attackIndex);
+            return InjectSpriteTexture(xml, sheetName, indices, isMob);
         }
 
         private static string EscapeXml(string s) => s
