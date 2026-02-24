@@ -1122,10 +1122,10 @@ function renderPreview(data) {
                 <div>Unique tiles: <span>${data.map.dictEntries}</span></div>
             </div>`;
         if (data.mapThumbnail) {
-            html += `<div style="margin-top:10px;text-align:center;">
+            html += `<div style="margin-top:10px;text-align:center;overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
                 <img src="data:image/png;base64,${data.mapThumbnail}"
-                     style="image-rendering:pixelated;max-width:100%;max-height:400px;border:1px solid #333;border-radius:4px;background:#111;"
-                     title="Map preview — each pixel = 1 tile">
+                     style="image-rendering:pixelated;display:block;margin:0 auto;"
+                     title="Map preview — pixel-accurate">
             </div>`;
         }
         html += `</div>`;
