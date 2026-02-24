@@ -715,4 +715,135 @@
             <ConditionEffect duration="2">Blind</ConditionEffect>
         </Projectile>
     </Object>
+	<Object type="0x501d" id="Volcanus the Eternal Dragon">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>14</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    <Quest/>
+    <God/>
+    <StasisImmune/>
+    <StunImmune/>
+    <ParalyzeImmune/>
+    <Flying/>
+    
+    <HitSound>monster/dragons_hit</HitSound>
+    <DeathSound>monster/dragons_death</DeathSound>
+    <MaxHitPoints>45000</MaxHitPoints>
+    <Size>180</Size>
+    <Defense>35</Defense>
+    <XpMult>0.9</XpMult>
+    <Projectile id="0">
+        <ObjectId>Volcanus the Eternal Dragon Proj 0</ObjectId>
+        <Speed>90</Speed>
+        <Damage>120</Damage>
+        <Size>100</Size>
+        <LifetimeMS>1200</LifetimeMS>
+        <ConditionEffect duration="3">Burning</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Volcanus the Eternal Dragon Proj 1</ObjectId>
+        <Speed>55</Speed>
+        <Damage>85</Damage>
+        <Size>80</Size>
+        <LifetimeMS>2400</LifetimeMS>
+        <ConditionEffect duration="4">Armor Broken</ConditionEffect>
+    </Projectile>
+    <Projectile id="2">
+        <ObjectId>Volcanus the Eternal Dragon Proj 2</ObjectId>
+        <Speed>110</Speed>
+        <Damage>150</Damage>
+        <Size>70</Size>
+        <LifetimeMS>800</LifetimeMS>
+        <ArmorPiercing/>
+    </Projectile>
+    <Projectile id="3">
+        <ObjectId>Volcanus the Eternal Dragon Proj 3</ObjectId>
+        <Speed>40</Speed>
+        <Damage>95</Damage>
+        <Size>120</Size>
+        <LifetimeMS>3000</LifetimeMS>
+        <ConditionEffect duration="3">Slow</ConditionEffect>
+    </Projectile>
+</Object>
+	<Object type="0x501e" id="Dragonfire Whelpling">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>14</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    <Flying/>
+    
+    <HitSound>monster/dragons_hit</HitSound>
+    <DeathSound>monster/dragons_death</DeathSound>
+    <MaxHitPoints>2500</MaxHitPoints>
+    <Size>80</Size>
+    <Defense>10</Defense>
+    <XpMult>0.1</XpMult>
+    <Projectile id="0">
+        <ObjectId>Volcanus the Eternal Dragon Proj 0</ObjectId>
+        <Speed>85</Speed>
+        <Damage>55</Damage>
+        <Size>60</Size>
+        <LifetimeMS>900</LifetimeMS>
+        <ConditionEffect duration="2">Burning</ConditionEffect>
+    </Projectile>
+</Object>
+	<Object type="0x501f" id="Dragon's Chosen Pyromancer">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>14</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/humans_hit</HitSound>
+    <DeathSound>monster/humans_death</DeathSound>
+    <MaxHitPoints>4000</MaxHitPoints>
+    <Size>100</Size>
+    <Defense>18</Defense>
+    <XpMult>0.15</XpMult>
+    <Projectile id="0">
+        <ObjectId>Volcanus the Eternal Dragon Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <Damage>75</Damage>
+        <Size>70</Size>
+        <LifetimeMS>1400</LifetimeMS>
+        <ConditionEffect duration="3">Quiet</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Volcanus the Eternal Dragon Proj 1</ObjectId>
+        <Speed>95</Speed>
+        <Damage>60</Damage>
+        <Size>50</Size>
+        <LifetimeMS>1000</LifetimeMS>
+    </Projectile>
+</Object>
+	<Object type="0x5020" id="Molten Dragon Egg">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>14</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/stone_hit</HitSound>
+    <DeathSound>monster/stone_death</DeathSound>
+    <StunImmune/>
+    <MaxHitPoints>6000</MaxHitPoints>
+    <Size>90</Size>
+    <Defense>40</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+        <ObjectId>Volcanus the Eternal Dragon Proj 0</ObjectId>
+        <Speed>30</Speed>
+        <Damage>70</Damage>
+        <Size>90</Size>
+        <LifetimeMS>2000</LifetimeMS>
+        <ConditionEffect duration="5">Slowed</ConditionEffect>
+    </Projectile>
+</Object>
 </Objects>

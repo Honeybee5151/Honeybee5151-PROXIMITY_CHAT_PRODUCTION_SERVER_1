@@ -379,6 +379,24 @@
         </Projectile>
         <BagType>0</BagType>
     </Object>
+	<Object type="0x5021" id="Stick">
+        <Class>Equipment</Class>
+        <Item/>
+        <Texture><File>lofiObj</File><Index>0x02</Index></Texture>
+        <SlotType>1</SlotType>
+        <Description>It's just a stick you found on the ground. Looks like it could hurt... a little.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Whack</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -404,6 +422,24 @@
             <Speed>60</Speed>
             <MinDamage>10</MinDamage>
             <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5021" id="Stick">
+        <Class>Equipment</Class>
+        <Item/>
+        <Texture><File>lofiObj</File><Index>0x02</Index></Texture>
+        <SlotType>1</SlotType>
+        <Description>It's just a stick you found on the ground. Looks like it could hurt... a little.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Whack</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
             <LifetimeMS>300</LifetimeMS>
         </Projectile>
         <BagType>0</BagType>
@@ -546,6 +582,24 @@
         </Projectile>
         <BagType>0</BagType>
     </Object>
+	<Object type="0x5021" id="Stick">
+        <Class>Equipment</Class>
+        <Item/>
+        <Texture><File>lofiObj</File><Index>0x02</Index></Texture>
+        <SlotType>1</SlotType>
+        <Description>It's just a stick you found on the ground. Looks like it could hurt... a little.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Whack</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -571,6 +625,24 @@
             <Speed>60</Speed>
             <MinDamage>10</MinDamage>
             <MaxDamage>25</MaxDamage>
+            <LifetimeMS>300</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5021" id="Stick">
+        <Class>Equipment</Class>
+        <Item/>
+        <Texture><File>lofiObj</File><Index>0x02</Index></Texture>
+        <SlotType>1</SlotType>
+        <Description>It's just a stick you found on the ground. Looks like it could hurt... a little.</Description>
+        <RateOfFire>0.8</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Stick Whack</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
             <LifetimeMS>300</LifetimeMS>
         </Projectile>
         <BagType>0</BagType>
