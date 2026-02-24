@@ -443,4 +443,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="plz2323">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/plz2323.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>

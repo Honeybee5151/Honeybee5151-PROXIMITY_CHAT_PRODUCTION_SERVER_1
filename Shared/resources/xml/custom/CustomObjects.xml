@@ -846,4 +846,171 @@
         <ConditionEffect duration="5">Slowed</ConditionEffect>
     </Projectile>
 </Object>
+	<Object type="0x5022" id="Pirate King Bartholomew">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>20</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StunImmune/>
+        <ParalyzeImmune/>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>18000</MaxHitPoints>
+        <Size>140</Size>
+        <Defense>25</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Pirate King Bartholomew Proj 0</ObjectId>
+            <Speed>55</Speed>
+            <Damage>125</Damage>
+            <Size>100</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="3">Armor Broken</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Pirate King Bartholomew Proj 1</ObjectId>
+            <Speed>90</Speed>
+            <Damage>90</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1000</LifetimeMS>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Pirate King Bartholomew Proj 2</ObjectId>
+            <Speed>70</Speed>
+            <Damage>75</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+        <Projectile id="3">
+            <ObjectId>Pirate King Bartholomew Proj 3</ObjectId>
+            <Speed>60</Speed>
+            <Damage>110</Damage>
+            <Size>80</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="3">Burning</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5023" id="Corsair Cannoneer">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>20</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>2200</MaxHitPoints>
+        <Size>100</Size>
+        <Defense>18</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Pirate King Bartholomew Proj 0</ObjectId>
+            <Speed>50</Speed>
+            <Damage>95</Damage>
+            <Size>90</Size>
+            <LifetimeMS>1800</LifetimeMS>
+            <MultiHit/>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Pirate King Bartholomew Proj 1</ObjectId>
+            <Speed>70</Speed>
+            <Damage>60</Damage>
+            <Size>50</Size>
+            <LifetimeMS>1000</LifetimeMS>
+        </Projectile>
+    </Object>
+	<Object type="0x5024" id="Cutthroat Deckhand">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>20</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>1400</MaxHitPoints>
+        <Size>85</Size>
+        <Defense>8</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Pirate King Bartholomew Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>70</Damage>
+            <Size>40</Size>
+            <LifetimeMS>600</LifetimeMS>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5025" id="Scallywag Bomber">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>20</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>1800</MaxHitPoints>
+        <Size>80</Size>
+        <Defense>10</Defense>
+        <XpMult>0.12</XpMult>
+        <Projectile id="0">
+            <ObjectId>Pirate King Bartholomew Proj 0</ObjectId>
+            <Speed>65</Speed>
+            <Damage>80</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="3">Burning</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Pirate King Bartholomew Proj 1</ObjectId>
+            <Speed>55</Speed>
+            <Damage>100</Damage>
+            <Size>80</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5026" id="Voodoo Sea Witch">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>20</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ghost_hit</HitSound>
+        <DeathSound>monster/ghost_death</DeathSound>
+        <MaxHitPoints>2800</MaxHitPoints>
+        <Size>95</Size>
+        <Defense>15</Defense>
+        <XpMult>0.18</XpMult>
+        <Projectile id="0">
+            <ObjectId>Pirate King Bartholomew Proj 0</ObjectId>
+            <Speed>70</Speed>
+            <Damage>85</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="3">Quiet</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Pirate King Bartholomew Proj 1</ObjectId>
+            <Speed>60</Speed>
+            <Damage>70</Damage>
+            <Size>55</Size>
+            <LifetimeMS>1500</LifetimeMS>
+            <ConditionEffect duration="2">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>

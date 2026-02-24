@@ -397,6 +397,93 @@
         </Projectile>
         <BagType>0</BagType>
     </Object>
+	<Object type="0x5027" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hurt so much?</Description>
+        <RateOfFire>1.4</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>40</MinDamage>
+            <MaxDamage>65</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5028" id="Stick of Smiting">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A humble branch blessed by a wandering hermit. Deceptively powerful for something so unassuming.</Description>
+        <RateOfFire>1.3</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>140</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="1.5">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5029" id="The World Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A gnarled branch torn from Yggdrasil itself. The splinters still hum with the echoes of creation. It looks like a stick.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/katana</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -443,6 +530,93 @@
             <LifetimeMS>300</LifetimeMS>
         </Projectile>
         <BagType>0</BagType>
+    </Object>
+	<Object type="0x5027" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hurt so much?</Description>
+        <RateOfFire>1.4</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>40</MinDamage>
+            <MaxDamage>65</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5028" id="Stick of Smiting">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A humble branch blessed by a wandering hermit. Deceptively powerful for something so unassuming.</Description>
+        <RateOfFire>1.3</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>140</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="1.5">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5029" id="The World Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A gnarled branch torn from Yggdrasil itself. The splinters still hum with the echoes of creation. It looks like a stick.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/katana</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
     </Object>
 </Objects>
 	<Objects>
@@ -600,6 +774,93 @@
         </Projectile>
         <BagType>0</BagType>
     </Object>
+	<Object type="0x5027" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hurt so much?</Description>
+        <RateOfFire>1.4</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>40</MinDamage>
+            <MaxDamage>65</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5028" id="Stick of Smiting">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A humble branch blessed by a wandering hermit. Deceptively powerful for something so unassuming.</Description>
+        <RateOfFire>1.3</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>140</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="1.5">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5029" id="The World Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A gnarled branch torn from Yggdrasil itself. The splinters still hum with the echoes of creation. It looks like a stick.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/katana</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -646,5 +907,92 @@
             <LifetimeMS>300</LifetimeMS>
         </Projectile>
         <BagType>0</BagType>
+    </Object>
+	<Object type="0x5027" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hurt so much?</Description>
+        <RateOfFire>1.4</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>140</Speed>
+            <MinDamage>40</MinDamage>
+            <MaxDamage>65</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x5028" id="Stick of Smiting">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A humble branch blessed by a wandering hermit. Deceptively powerful for something so unassuming.</Description>
+        <RateOfFire>1.3</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Gold Bullet</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>140</MinDamage>
+            <MaxDamage>210</MaxDamage>
+            <LifetimeMS>400</LifetimeMS>
+            <ConditionEffect duration="1.5">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
+	<Object type="0x5029" id="The World Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>26</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>17</SlotType>
+        <Description>A gnarled branch torn from Yggdrasil itself. The splinters still hum with the echoes of creation. It looks like a stick.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/katana</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>130</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
     </Object>
 </Objects>
