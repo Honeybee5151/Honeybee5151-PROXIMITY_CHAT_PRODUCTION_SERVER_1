@@ -702,8 +702,8 @@ namespace AdminDashboard.Controllers
             xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
 
             // Inject after the opening <Object ...> tag
-            // Use word boundary: <Object followed by space or > (NOT <ObjectId> or <Objects>)
-            xml = Regex.Replace(xml, @"(<Object(?:\s[^>]*)?>)(?!\w)", $"$1\n\t{textureXml}");
+            // Negative lookahead (?![a-zA-Z]) prevents matching <ObjectId>, <Objects>, etc.
+            xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}");
             return xml;
         }
 
