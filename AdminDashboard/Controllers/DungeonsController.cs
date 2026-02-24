@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace AdminDashboard.Controllers
 {
@@ -841,10 +842,25 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // 6. Atomic commit to GitHub (text + binary files)
+                // 6. Validate all XML files before committing (prevents malformed XML like dungeon-6 glitch)
+                foreach (var (path, content) in files)
+                {
+                    if (!path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) continue;
+                    try
+                    {
+                        XDocument.Parse(content);
+                    }
+                    catch (System.Xml.XmlException xmlEx)
+                    {
+                        Console.WriteLine($"[DungeonsController] MALFORMED XML in {path}: {xmlEx.Message}");
+                        return StatusCode(500, new { error = $"Malformed XML in {Path.GetFileName(path)}: {xmlEx.Message}" });
+                    }
+                }
+
+                // 7. Atomic commit to GitHub (text + binary files)
                 await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}", binaryFiles);
 
-                // 7. Update status in Supabase (renumbered from duplicate 7)
+                // 8. Update status in Supabase
                 await _supabase.UpdateStatus(request.DungeonId, "approved");
 
                 return Ok(new { success = true, message = $"Dungeon '{safeTitle}' approved and pushed to server repo" });
