@@ -93,5 +93,6 @@ public enum MessageId : byte
     IMMINENT_ARENA_WAVE = 87,
     //777592
     PROXIMITY_VOICE = 88,
-    CUSTOM_GROUNDS = 89
+    CUSTOM_GROUNDS = 89,
+    CUSTOM_DUNGEON_ASSETS = 90
 }

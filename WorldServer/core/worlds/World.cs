@@ -48,6 +48,7 @@ namespace WorldServer.core.worlds
 
         public bool isWeekend { get; set; } = false;
         public string CustomGroundsXml { get; set; }
+        public string CustomDungeonAssetsXml { get; set; }
 
         public readonly Wmap Map;
         public readonly GameServer GameServer;
@@ -477,6 +478,10 @@ namespace WorldServer.core.worlds
                 sb.Append("</Grounds>");
                 CustomGroundsXml = sb.ToString();
             }
+
+            // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
+            if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))
+                CustomDungeonAssetsXml = assetsXml;
 
             return true;
         }

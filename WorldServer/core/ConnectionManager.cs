@@ -220,6 +220,10 @@ namespace WorldServer.core
             if (world.CustomGroundsXml != null)
                 packets.Add(new CustomGroundsMessage { GroundsXml = world.CustomGroundsXml });
 
+            // Send per-dungeon sprites + object definitions
+            if (world.CustomDungeonAssetsXml != null)
+                packets.Add(new CustomDungeonAssetsMessage { AssetsXml = world.CustomDungeonAssetsXml });
+
             packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
             packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));
             client.SendPackets(packets.ToArray());

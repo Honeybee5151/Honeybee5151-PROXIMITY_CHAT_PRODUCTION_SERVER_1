@@ -30,6 +30,7 @@ namespace Shared.resources
         public Dictionary<string, XElement> GroundXmlById = new Dictionary<string, XElement>();
         public Dictionary<string, List<string>> JmCustomGroundIds = new Dictionary<string, List<string>>();
         public Dictionary<string, string> GroundPixelsById = new Dictionary<string, string>(); // groundId -> base64 groundPixels from JM
+        public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
         private readonly Dictionary<string, byte[]> WorldDataCache = new Dictionary<string, byte[]>();
@@ -218,6 +219,21 @@ namespace Shared.resources
                         }
                     }
                 }
+            }
+        }
+
+        public void LoadDungeonAssets(string basePath)
+        {
+            var dir = Path.Combine(basePath, "xml", "dungeon_assets");
+            if (!Directory.Exists(dir))
+                return;
+
+            foreach (var file in Directory.GetFiles(dir, "*.xml"))
+            {
+                var name = Path.GetFileNameWithoutExtension(file);
+                var jmPath = $"Dungeons/{name}.jm";
+                DungeonAssetsXml[jmPath] = File.ReadAllText(file);
+                Log.Info($"Loaded dungeon assets for '{name}' (key: {jmPath})");
             }
         }
 
