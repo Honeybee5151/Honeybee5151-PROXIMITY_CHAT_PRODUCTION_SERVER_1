@@ -55,10 +55,10 @@ namespace WorldServer.core.worlds.impl
                 if (found)
                 {
                     var npc = Entity.Resolve(GameServer, browserType);
-                    Console.WriteLine($"[NexusWorld] Entity.Resolve returned: {npc?.GetType().Name ?? "null"} id={npc?.Id}");
+                    npc.Size = 120;
                     npc.Move(100.5f, 131.5f);
                     EnterWorld(npc);
-                    Console.WriteLine($"[NexusWorld] Dungeon Browser NPC spawned at (100.5, 131.5)");
+                    Console.WriteLine($"[NexusWorld] Dungeon Browser NPC spawned at (100.5, 131.5) size={npc.Size}");
                 }
             }
             catch (Exception ex)
