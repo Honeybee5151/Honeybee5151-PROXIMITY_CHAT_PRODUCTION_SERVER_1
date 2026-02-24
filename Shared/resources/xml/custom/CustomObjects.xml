@@ -23,7 +23,6 @@
 			<Index>0x01</Index>
 		</Texture>
 		<Size>120</Size>
-		<Static />
 		<ShadowSize>75</ShadowSize>
 	</Object>
 	<Object type="0x5000" id="Drakonax the Eternal">
