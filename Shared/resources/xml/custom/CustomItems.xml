@@ -109,7 +109,7 @@
 		<Potion/>
 		<BagType>5</BagType>
 	</Object>
-	<Object type="0x5000" id="Stick">
+	<Object type="0x5000" id="Crude Stick">
 		<Class>Equipment</Class>
 		<Item/>
 		<Texture><File>lofiObj</File><Index>0x02</Index></Texture>

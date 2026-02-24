@@ -76,7 +76,7 @@
     "initialState": "idle",
     "loot": [
       {
-        "item": "Stick",
+        "item": "Crude Stick",
         "probability": 1.0
       }
     ]
