@@ -151,19 +151,12 @@ namespace WorldServer.logic.loot
         public void Handle(Enemy enemy, TickTime time)
         {
             if (enemy.SpawnedByBehavior)
-            {
-                Log.Info($"[Loot] {enemy.ObjectDesc.IdName} skipped - SpawnedByBehavior");
                 return;
-            }
 
             var possDrops = new List<LootDef>();
             ExtraLootTables(possDrops, enemy);
             foreach (var i in this)
                 i.Populate(possDrops);
-
-            Log.Info($"[Loot] {enemy.ObjectDesc.IdName} died - {possDrops.Count} possible drops, {this.Count} MobDrops entries");
-            foreach (var d in possDrops)
-                Log.Info($"[Loot]   drop: item='{d.Item}' prob={d.Probabilty} threshold={d.Threshold} type={d.ItemType} tier={d.Tier}");
 
             var pubDrops = new List<Item>();
 
@@ -192,12 +185,7 @@ namespace WorldServer.logic.loot
 
             var playersAvaliable = enemy.DamageCounter.GetPlayerData();
             if (playersAvaliable == null)
-            {
-                Log.Info($"[Loot] {enemy.ObjectDesc.IdName} - no player data available");
                 return;
-            }
-
-            Log.Info($"[Loot] {enemy.ObjectDesc.IdName} - {playersAvaliable.Length} players, TotalDamage={enemy.DamageCounter.TotalDamage}");
 
             var privDrops = new Dictionary<Player, IList<Item>>();
             foreach (var tupPlayer in playersAvaliable)
@@ -218,8 +206,6 @@ namespace WorldServer.logic.loot
                 var totalBoost = 1 + (ldBoost + wkndBoost + dmgBoost + enemyBoost + eventBoost);
 
                 var gameData = enemy.GameServer.Resources.GameData;
-
-                Log.Info($"[Loot] Player {player.Name}: dmgBoost={dmgBoost} totalBoost={totalBoost} playerDmg={tupPlayer.Item2}");
 
                 var drops = new List<Item>();
                 foreach (var i in possDrops)
@@ -259,12 +245,8 @@ namespace WorldServer.logic.loot
                         }
 
                         if (c >= probability)
-                        {
-                            Log.Info($"[Loot] Roll failed for '{i.Item}': c={c:F4} >= prob={probability:F4}");
                             continue;
-                        }
 
-                        Log.Info($"[Loot] DROP! '{item.ObjectId}' for player {player.Name} (c={c:F4} < prob={probability:F4})");
                         drops.Add(item);
                     }
                     else
