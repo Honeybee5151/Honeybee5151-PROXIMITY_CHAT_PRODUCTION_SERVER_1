@@ -457,4 +457,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="placeholder">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/placeholder.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
