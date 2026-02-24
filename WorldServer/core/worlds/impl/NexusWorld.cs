@@ -46,6 +46,14 @@ namespace WorldServer.core.worlds.impl
                     });
 
             base.Init();
+
+            // Spawn Dungeon Browser NPC near spawn center
+            if (GameServer.Resources.GameData.IdToObjectType.TryGetValue("Dungeon Browser", out var browserType))
+            {
+                var npc = Entity.Resolve(GameServer, browserType);
+                npc.Move(100.5f, 131.5f);
+                EnterWorld(npc);
+            }
         }
 
         protected override void UpdateLogic(ref TickTime time)
