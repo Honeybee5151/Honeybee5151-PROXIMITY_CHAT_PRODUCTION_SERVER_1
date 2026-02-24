@@ -1176,4 +1176,164 @@
         </Projectile>
     </Object>
 	awd
+	<Object type="0x5030" id="Warchief Grommash the Ironbound">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>34</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StunImmune/>
+        <ParalyzeImmune/>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>32000</MaxHitPoints>
+        <Size>170</Size>
+        <Defense>30</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Grommash the Ironbound Proj 0</ObjectId>
+            <Speed>65</Speed>
+            <Damage>140</Damage>
+            <Size>110</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="3">Armor Broken</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Warchief Grommash the Ironbound Proj 1</ObjectId>
+            <Speed>85</Speed>
+            <Damage>100</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1000</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Warchief Grommash the Ironbound Proj 2</ObjectId>
+            <Speed>55</Speed>
+            <Damage>170</Damage>
+            <Size>90</Size>
+            <LifetimeMS>1800</LifetimeMS>
+            <ArmorPiercing/>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+        <Projectile id="3">
+            <ObjectId>Warchief Grommash the Ironbound Proj 3</ObjectId>
+            <Speed>70</Speed>
+            <Damage>95</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="3">Burning</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5031" id="Orc Skull Crusher">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>34</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>4500</MaxHitPoints>
+        <Size>120</Size>
+        <Defense>25</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Grommash the Ironbound Proj 0</ObjectId>
+            <Speed>55</Speed>
+            <Damage>110</Damage>
+            <Size>90</Size>
+            <LifetimeMS>600</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5032" id="Orc Bloodhowler Shaman">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>34</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/demons_hit</HitSound>
+        <DeathSound>monster/demons_death</DeathSound>
+        <MaxHitPoints>3200</MaxHitPoints>
+        <Size>100</Size>
+        <Defense>15</Defense>
+        <XpMult>0.12</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Grommash the Ironbound Proj 0</ObjectId>
+            <Speed>75</Speed>
+            <Damage>85</Damage>
+            <Size>65</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="3">Sick</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Warchief Grommash the Ironbound Proj 1</ObjectId>
+            <Speed>60</Speed>
+            <Damage>70</Damage>
+            <Size>55</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <ConditionEffect duration="2">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5033" id="Orc Worg Rider">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>34</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/giants_hit</HitSound>
+        <DeathSound>monster/giants_death</DeathSound>
+        <MaxHitPoints>2200</MaxHitPoints>
+        <Size>85</Size>
+        <Defense>10</Defense>
+        <XpMult>0.08</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Grommash the Ironbound Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>65</Damage>
+            <Size>45</Size>
+            <LifetimeMS>900</LifetimeMS>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5034" id="Orc Pit Grunt">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>34</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>3800</MaxHitPoints>
+        <Size>105</Size>
+        <Defense>20</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Grommash the Ironbound Proj 0</ObjectId>
+            <Speed>60</Speed>
+            <Damage>90</Damage>
+            <Size>70</Size>
+            <LifetimeMS>800</LifetimeMS>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Warchief Grommash the Ironbound Proj 1</ObjectId>
+            <Speed>50</Speed>
+            <Damage>75</Damage>
+            <Size>55</Size>
+            <LifetimeMS>1100</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>

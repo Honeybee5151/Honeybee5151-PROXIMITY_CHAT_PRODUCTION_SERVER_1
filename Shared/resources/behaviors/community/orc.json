@@ -1,0 +1,92 @@
+{
+  "Warchief Grommash the Ironbound": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Skull Crusher": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Bloodhowler Shaman": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Worg Rider": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Pit Grunt": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "mob_0": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Whisper of the Falling Petal",
+        "probability": 1.0
+      }
+    ]
+  }
+}
