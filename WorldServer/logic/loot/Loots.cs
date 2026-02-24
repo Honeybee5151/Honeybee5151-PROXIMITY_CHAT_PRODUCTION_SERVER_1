@@ -152,7 +152,7 @@ namespace WorldServer.logic.loot
         {
             if (enemy.SpawnedByBehavior)
             {
-                Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} skipped - SpawnedByBehavior");
+                Log.Info($"[Loot] {enemy.ObjectDesc.IdName} skipped - SpawnedByBehavior");
                 return;
             }
 
@@ -161,7 +161,7 @@ namespace WorldServer.logic.loot
             foreach (var i in this)
                 i.Populate(possDrops);
 
-            Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} died - {possDrops.Count} possible drops, {this.Count} MobDrops entries");
+            Log.Info($"[Loot] {enemy.ObjectDesc.IdName} died - {possDrops.Count} possible drops, {this.Count} MobDrops entries");
             foreach (var d in possDrops)
                 Log.Info($"[Loot]   drop: item='{d.Item}' prob={d.Probabilty} threshold={d.Threshold} type={d.ItemType} tier={d.Tier}");
 
@@ -193,11 +193,11 @@ namespace WorldServer.logic.loot
             var playersAvaliable = enemy.DamageCounter.GetPlayerData();
             if (playersAvaliable == null)
             {
-                Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} - no player data available");
+                Log.Info($"[Loot] {enemy.ObjectDesc.IdName} - no player data available");
                 return;
             }
 
-            Log.Info($"[Loot] {enemy.ObjectDesc.ObjectId} - {playersAvaliable.Length} players, TotalDamage={enemy.DamageCounter.TotalDamage}");
+            Log.Info($"[Loot] {enemy.ObjectDesc.IdName} - {playersAvaliable.Length} players, TotalDamage={enemy.DamageCounter.TotalDamage}");
 
             var privDrops = new Dictionary<Player, IList<Item>>();
             foreach (var tupPlayer in playersAvaliable)

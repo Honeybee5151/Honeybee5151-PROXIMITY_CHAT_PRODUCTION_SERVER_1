@@ -200,14 +200,14 @@ namespace WorldServer.core.objects
                 {
                     if (loot.Item2 != null)
                     {
-                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - loot table found with {loot.Item2.Count} entries");
+                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.IdName} (0x{ObjectType:X}) - loot table found with {loot.Item2.Count} entries");
                         loot.Item2.Handle(this, time);
                     }
                     else
-                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - behavior found but NO loot table");
+                        Shared.logger.Log.Info($"[Loot] {ObjectDesc.IdName} (0x{ObjectType:X}) - behavior found but NO loot table");
                 }
                 else
-                    Shared.logger.Log.Info($"[Loot] {ObjectDesc.ObjectId} (0x{ObjectType:X}) - NO behavior definition found");
+                    Shared.logger.Log.Info($"[Loot] {ObjectDesc.IdName} (0x{ObjectType:X}) - NO behavior definition found");
             }
             Dead = true;
             World.LeaveWorld(this);
