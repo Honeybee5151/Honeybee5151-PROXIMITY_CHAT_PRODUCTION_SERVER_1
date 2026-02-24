@@ -127,4 +127,36 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x4984" id="Glaciarch, the Frozen Tyrant Proj 0">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>29</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4985" id="Glaciarch, the Frozen Tyrant Proj 1">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>30</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4986" id="Glaciarch, the Frozen Tyrant Proj 2">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>31</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x4987" id="Glaciarch, the Frozen Tyrant Proj 3">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>32</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>

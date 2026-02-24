@@ -1013,4 +1013,166 @@
             <ConditionEffect duration="2">Weak</ConditionEffect>
         </Projectile>
     </Object>
+	<Object type="0x502a" id="Glaciarch, the Frozen Tyrant">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>27</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StasisImmune/>
+        <ParalyzeImmune/>
+        
+        <HitSound>monster/stone_hit</HitSound>
+        <DeathSound>monster/stone_death</DeathSound>
+        <MaxHitPoints>38000</MaxHitPoints>
+        <Size>170</Size>
+        <Defense>35</Defense>
+        <XpMult>0.85</XpMult>
+        <Projectile id="0">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 0</ObjectId>
+            <Speed>70</Speed>
+            <Damage>130</Damage>
+            <Size>90</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="3">Slow</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 1</ObjectId>
+            <Speed>55</Speed>
+            <Damage>170</Damage>
+            <Size>110</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="2">Paralyzed</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 2</ObjectId>
+            <Speed>85</Speed>
+            <Damage>95</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1000</LifetimeMS>
+            <ArmorPiercing/>
+            <ConditionEffect duration="3">Armor Broken</ConditionEffect>
+        </Projectile>
+        <Projectile id="3">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 3</ObjectId>
+            <Speed>40</Speed>
+            <Damage>110</Damage>
+            <Size>80</Size>
+            <LifetimeMS>2200</LifetimeMS>
+            <ConditionEffect duration="4">Quiet</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x502b" id="Frostbound Sentinel">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>27</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/stone_hit</HitSound>
+        <DeathSound>monster/stone_death</DeathSound>
+        <MaxHitPoints>4800</MaxHitPoints>
+        <Size>120</Size>
+        <Defense>30</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 0</ObjectId>
+            <Speed>50</Speed>
+            <Damage>90</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="2">Slow</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x502c" id="Shivering Wraith">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>27</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Flying/>
+        
+        <HitSound>monster/ghost_hit</HitSound>
+        <DeathSound>monster/ghost_death</DeathSound>
+        <MaxHitPoints>2200</MaxHitPoints>
+        <Size>85</Size>
+        <Defense>10</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 0</ObjectId>
+            <Speed>95</Speed>
+            <Damage>70</Damage>
+            <Size>45</Size>
+            <LifetimeMS>700</LifetimeMS>
+            <ConditionEffect duration="2">Blind</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 1</ObjectId>
+            <Speed>80</Speed>
+            <Damage>55</Damage>
+            <Size>40</Size>
+            <LifetimeMS>900</LifetimeMS>
+            <ArmorPiercing/>
+        </Projectile>
+    </Object>
+	<Object type="0x502d" id="Rime Crawler">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>27</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/sprites_hit</HitSound>
+        <DeathSound>monster/sprites_death</DeathSound>
+        <MaxHitPoints>1500</MaxHitPoints>
+        <Size>70</Size>
+        <Defense>5</Defense>
+        <XpMult>0.05</XpMult>
+        <Projectile id="0">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>55</Damage>
+            <Size>35</Size>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+    </Object>
+	<Object type="0x502e" id="Avalanche Shaman">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>27</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>3500</MaxHitPoints>
+        <Size>100</Size>
+        <Defense>20</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 0</ObjectId>
+            <Speed>60</Speed>
+            <Damage>85</Damage>
+            <Size>65</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="3">Weak</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Glaciarch, the Frozen Tyrant Proj 1</ObjectId>
+            <Speed>70</Speed>
+            <Damage>100</Damage>
+            <Size>75</Size>
+            <LifetimeMS>1100</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="2">Sick</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>
