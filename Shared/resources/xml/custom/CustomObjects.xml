@@ -1175,7 +1175,6 @@
             <ConditionEffect duration="2">Sick</ConditionEffect>
         </Projectile>
     </Object>
-	awd
 	<Object type="0x5030" id="Warchief Grommash the Ironbound">
 	<Texture>
 		<File>communitySprites8x8</File>
@@ -1403,29 +1402,6 @@
             <MultiHit/>
         </Projectile>
     </Object>
-	<Object type="0x503a" id="Cutthroat Deckhand">
-	<Texture>
-		<File>communitySprites8x8</File>
-		<Index>41</Index>
-	</Texture>
-        <Enemy/>
-        <Class>Character</Class>
-        
-        <HitSound>monster/humans_hit</HitSound>
-        <DeathSound>monster/humans_death</DeathSound>
-        <MaxHitPoints>700</MaxHitPoints>
-        <Size>70</Size>
-        <Defense>4</Defense>
-        <XpMult>0.05</XpMult>
-        <Projectile id="0">
-            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
-            <Speed>100</Speed>
-            <Damage>45</Damage>
-            <Size>40</Size>
-            <LifetimeMS>500</LifetimeMS>
-            <ConditionEffect duration="2">Bleeding</ConditionEffect>
-        </Projectile>
-    </Object>
 	<Object type="0x503b" id="Bilgerat Swashbuckler">
 	<Texture>
 		<File>communitySprites8x8</File>
@@ -1454,37 +1430,6 @@
             <Size>35</Size>
             <LifetimeMS>600</LifetimeMS>
             <ConditionEffect duration="1">Confused</ConditionEffect>
-        </Projectile>
-    </Object>
-	<Object type="0x503c" id="Voodoo Sea Witch">
-	<Texture>
-		<File>communitySprites8x8</File>
-		<Index>41</Index>
-	</Texture>
-        <Enemy/>
-        <Class>Character</Class>
-        
-        <HitSound>monster/ghost_hit</HitSound>
-        <DeathSound>monster/ghost_death</DeathSound>
-        <MaxHitPoints>1400</MaxHitPoints>
-        <Size>90</Size>
-        <Defense>12</Defense>
-        <XpMult>0.15</XpMult>
-        <Projectile id="0">
-            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
-            <Speed>65</Speed>
-            <Damage>50</Damage>
-            <Size>60</Size>
-            <LifetimeMS>1100</LifetimeMS>
-            <ConditionEffect duration="3">Sick</ConditionEffect>
-        </Projectile>
-        <Projectile id="1">
-            <ObjectId>Dreadcaptain Blacktide Proj 1</ObjectId>
-            <Speed>55</Speed>
-            <Damage>60</Damage>
-            <Size>70</Size>
-            <LifetimeMS>1300</LifetimeMS>
-            <ConditionEffect duration="2">Quiet</ConditionEffect>
         </Projectile>
     </Object>
 	<Object type="0x503e" id="Grakthor the Orcgod">

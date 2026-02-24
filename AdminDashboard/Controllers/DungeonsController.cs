@@ -403,6 +403,11 @@ namespace AdminDashboard.Controllers
 
                     if (hasMobs)
                     {
+                        // Collect existing mob names to avoid duplicates
+                        var existingMobNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(objectsXml, @"id=""([^""]+)"""))
+                            existingMobNames.Add(m.Groups[1].Value);
+
                         var newMobEntries = "";
                         for (int i = 0; i < mobs!.Count; i++)
                         {
@@ -418,6 +423,13 @@ namespace AdminDashboard.Controllers
                             foreach (var block in blocks)
                             {
                                 var xml = block;
+
+                                // Skip mobs with duplicate names (already exist in CustomObjects.xml)
+                                var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                                if (nameMatch.Success && existingMobNames.Contains(nameMatch.Groups[1].Value))
+                                    continue;
+                                if (nameMatch.Success)
+                                    existingMobNames.Add(nameMatch.Groups[1].Value);
 
                                 // Skip type codes already in use
                                 while (Regex.IsMatch(objectsXml + itemsXml + newMobEntries, $@"type=""0x{nextType:x4}"""))
@@ -459,6 +471,11 @@ namespace AdminDashboard.Controllers
                     // 4c. Write item XMLs to CustomItems.xml (with sprite texture refs)
                     if (hasItems)
                     {
+                        // Collect existing item names to avoid duplicates
+                        var existingItemNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(itemsXml, @"id=""([^""]+)"""))
+                            existingItemNames.Add(m.Groups[1].Value);
+
                         var newItemEntries = "";
                         for (int i = 0; i < items!.Count; i++)
                         {
@@ -474,6 +491,13 @@ namespace AdminDashboard.Controllers
                             foreach (var block in blocks)
                             {
                                 var xml = block;
+
+                                // Skip items with duplicate names (already exist in CustomItems.xml)
+                                var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                                if (nameMatch.Success && existingItemNames.Contains(nameMatch.Groups[1].Value))
+                                    continue;
+                                if (nameMatch.Success)
+                                    existingItemNames.Add(nameMatch.Groups[1].Value);
 
                                 // Check existing type codes to find next available
                                 while (Regex.IsMatch(objectsXml + itemsXml + newItemEntries, $@"type=""0x{nextType:x4}"""))
