@@ -117,6 +117,18 @@ namespace AdminDashboard.Services
                             bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, color);
                 }
 
+                // Pre-decode groundPixels for each dict entry (base64 → 8×8 RGB bytes)
+                var dictPixels = new byte[dict.Count][];
+                for (int d = 0; d < dict.Count; d++)
+                {
+                    var gpB64 = dict[d]?["groundPixels"]?.ToString();
+                    if (!string.IsNullOrEmpty(gpB64))
+                    {
+                        try { dictPixels[d] = Convert.FromBase64String(gpB64); }
+                        catch { dictPixels[d] = null; }
+                    }
+                }
+
                 // Pass 1: Ground layer
                 for (int ty = 0; ty < height; ty++)
                 {
@@ -138,8 +150,20 @@ namespace AdminDashboard.Services
                             continue;
                         }
 
+                        // Use per-pixel groundPixels data if available (8×8 RGB = 192 bytes)
+                        var pixels = dictPixels[idx];
+                        if (pixels != null && pixels.Length >= TILE_PX * TILE_PX * 3)
+                        {
+                            for (int py = 0; py < TILE_PX; py++)
+                                for (int px = 0; px < TILE_PX; px++)
+                                {
+                                    int off = (py * TILE_PX + px) * 3;
+                                    bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py,
+                                        new SKColor(pixels[off], pixels[off + 1], pixels[off + 2]));
+                                }
+                        }
                         // Try standard color, then custom color
-                        if (_groundColors.TryGetValue(groundId, out uint gc))
+                        else if (_groundColors.TryGetValue(groundId, out uint gc))
                             FillTile(tx, ty, new SKColor(gc));
                         else if (customColorMap.TryGetValue(groundId, out uint cc))
                             FillTile(tx, ty, new SKColor(cc));
