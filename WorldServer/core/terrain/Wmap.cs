@@ -118,6 +118,9 @@ namespace WorldServer.core.terrain
                         Tiles[x, y].InitConnection(this, x, y);
 
                 Entities = entities.ToArray();
+                Log.Info($"[Wmap.Load] Map {Width}x{Height}, {Entities.Length} entities, {Regions.Count} regions");
+                foreach (var ent in entities)
+                    Log.Info($"  Entity: type=0x{ent.Item2:x4} at ({ent.Item1.X},{ent.Item1.Y})");
 
                 return enCount;
             }
