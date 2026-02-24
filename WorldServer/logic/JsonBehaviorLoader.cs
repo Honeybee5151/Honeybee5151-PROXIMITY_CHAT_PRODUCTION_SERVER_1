@@ -251,6 +251,14 @@ namespace WorldServer.logic
                         );
                     }
 
+                    case "SetAltTexture":
+                        return new SetAltTexture(
+                            minValue: b["minValue"]?.Value<int>() ?? 0,
+                            maxValue: b["maxValue"]?.Value<int>() ?? -1,
+                            cooldown: new Cooldown(b["coolDown"]?.Value<int>() ?? 500, 0),
+                            loop: b["loop"]?.Value<bool>() ?? false
+                        );
+
                     default:
                         Log.Warn($"[JsonBehavior] Unknown behavior type: {type}");
                         return null;

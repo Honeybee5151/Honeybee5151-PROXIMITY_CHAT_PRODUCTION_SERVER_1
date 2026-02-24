@@ -501,14 +501,12 @@ namespace AdminDashboard.Controllers
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
-                                // Inject sprite texture reference
-                                // Always use <Texture> (not AnimatedTexture) — community sprites are simple tile grids,
-                                // not 7-frame directional animation strips that AnimatedChars expects
+                                // Inject sprite texture reference (with attack AltTexture if available)
                                 if (mobSpriteIndices.TryGetValue(i, out var sprIdx))
                                 {
                                     var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
                                     var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false);
+                                    xml = InjectSpriteTexture(xml, sheetName, sprIdx.baseIdx, isMob: false, sprIdx.attackIdx);
                                 }
 
                                 // Save processed block (with type code + texture) for DungeonAssets
@@ -609,7 +607,7 @@ namespace AdminDashboard.Controllers
                                 var pdSheetName = size == 16
                                     ? $"dungeon_{request.DungeonId}_16x16"
                                     : $"dungeon_{request.DungeonId}_8x8";
-                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIdx.baseIdx, isMob: false);
+                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIdx.baseIdx, isMob: false, pdSprIdx.attackIdx);
                             }
                             assetsXml += xml + "\n";
                         }
@@ -722,6 +720,57 @@ namespace AdminDashboard.Controllers
                         {
                             foreach (Match nm in nameMatches)
                                 behaviorDict[nm.Groups[1].Value] = behavior.DeepClone();
+                        }
+                    }
+
+                    // Auto-inject SetAltTexture into states with Shoot for mobs that have attack sprites
+                    for (int i = 0; i < mobs!.Count; i++)
+                    {
+                        if (!mobSpriteIndices.TryGetValue(i, out var spr) || spr.attackIdx < 0) continue;
+
+                        var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                        var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                        if (!nameMatch.Success) continue;
+                        var mobName = nameMatch.Groups[1].Value;
+
+                        var mobDef = behaviorDict[mobName] as JObject;
+                        if (mobDef == null) continue;
+
+                        var states = mobDef["states"] as JObject;
+                        if (states == null) continue;
+
+                        foreach (var prop in states.Properties())
+                        {
+                            var stateData = prop.Value as JObject;
+                            var behaviorsArr = stateData?["behaviors"] as JArray;
+                            if (behaviorsArr == null) continue;
+
+                            // Check if SetAltTexture is already present
+                            bool hasAlt = behaviorsArr.Any(b => b["type"]?.ToString() == "SetAltTexture");
+                            if (hasAlt) continue;
+
+                            bool hasShoot = behaviorsArr.Any(b => b["type"]?.ToString() == "Shoot");
+                            if (hasShoot)
+                            {
+                                // Shooting state: cycle between base (0) and attack (1) textures
+                                behaviorsArr.Add(new JObject
+                                {
+                                    ["type"] = "SetAltTexture",
+                                    ["minValue"] = 0,
+                                    ["maxValue"] = 1,
+                                    ["coolDown"] = 500,
+                                    ["loop"] = true
+                                });
+                            }
+                            else
+                            {
+                                // Non-shooting state: reset to base texture
+                                behaviorsArr.Add(new JObject
+                                {
+                                    ["type"] = "SetAltTexture",
+                                    ["minValue"] = 0
+                                });
+                            }
                         }
                     }
 
@@ -862,19 +911,31 @@ namespace AdminDashboard.Controllers
             return Regex.Replace(xml, @"<Object(\s)", $"<Object type=\"{typeHex}\"$1");
         }
 
-        /// <summary>Inject or replace sprite texture reference in an Object XML</summary>
-        private static string InjectSpriteTexture(string xml, string sheetName, int index, bool isMob)
+        /// <summary>Inject or replace sprite texture reference in an Object XML, with optional AltTexture for attack sprite</summary>
+        private static string InjectSpriteTexture(string xml, string sheetName, int index, bool isMob, int attackIndex = -1)
         {
             var tag = isMob ? "AnimatedTexture" : "Texture";
             var textureXml = $"<{tag}>\n\t\t<File>{sheetName}</File>\n\t\t<Index>{index}</Index>\n\t</{tag}>";
 
+            // Build AltTexture block for attack sprite if provided
+            var altTextureXml = "";
+            if (attackIndex >= 0)
+            {
+                altTextureXml = $"\n\t<AltTexture id=\"1\">\n\t\t<{tag}>\n\t\t\t<File>{sheetName}</File>\n\t\t\t<Index>{attackIndex}</Index>\n\t\t</{tag}>\n\t</AltTexture>";
+            }
+
             // Remove existing top-level AnimatedTexture/Texture (direct children of <Object>)
             xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
             xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
+            // Remove existing AltTexture blocks
+            xml = Regex.Replace(xml, @"<AltTexture[^>]*>.*?</AltTexture>", "", RegexOptions.Singleline);
+
+            // Safety: clean up any Texture blocks that ended up inside <ObjectId> tags
+            xml = Regex.Replace(xml, @"(<ObjectId>)\s*<(?:Animated)?Texture>.*?</(?:Animated)?Texture>\s*", "$1", RegexOptions.Singleline);
 
             // Inject after the opening <Object ...> tag
             // Negative lookahead (?![a-zA-Z]) prevents matching <ObjectId>, <Objects>, etc.
-            xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}");
+            xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}{altTextureXml}");
             return xml;
         }
 

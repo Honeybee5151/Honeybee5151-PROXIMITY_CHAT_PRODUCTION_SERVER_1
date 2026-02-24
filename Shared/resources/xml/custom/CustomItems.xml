@@ -225,11 +225,7 @@
         <Sound>weapon/long_sword</Sound>
         <NumProjectiles>1</NumProjectiles>
         <Projectile>
-            <ObjectId>
-	<Texture>
-		<File>communitySprites8x8</File>
-		<Index>7</Index>
-	</Texture>Heavy Smash</ObjectId>
+            <ObjectId>Heavy Smash</ObjectId>
             <Speed>70</Speed>
             <MinDamage>200</MinDamage>
             <MaxDamage>340</MaxDamage>
@@ -259,11 +255,7 @@
         <NumProjectiles>3</NumProjectiles>
         <ArcGap>25</ArcGap>
         <Projectile>
-            <ObjectId>
-	<Texture>
-		<File>communitySprites8x8</File>
-		<Index>7</Index>
-	</Texture>Bone Splinter</ObjectId>
+            <ObjectId>Bone Splinter</ObjectId>
             <Speed>80</Speed>
             <MinDamage>150</MinDamage>
             <MaxDamage>280</MaxDamage>
@@ -292,11 +284,7 @@
         <Sound>weapon/long_sword</Sound>
         <NumProjectiles>1</NumProjectiles>
         <Projectile>
-            <ObjectId>
-	<Texture>
-		<File>communitySprites8x8</File>
-		<Index>7</Index>
-	</Texture>Earthshatter</ObjectId>
+            <ObjectId>Earthshatter</ObjectId>
             <Speed>60</Speed>
             <MinDamage>350</MinDamage>
             <MaxDamage>550</MaxDamage>
