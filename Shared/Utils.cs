@@ -148,8 +148,26 @@ namespace Shared
             return null;
         }
 
+        private static readonly Dictionary<string, ConditionEffectIndex> EffectAliases = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Slow", ConditionEffectIndex.Slowed },
+            { "Burning", ConditionEffectIndex.Bleeding },
+            { "Armor Broken", ConditionEffectIndex.ArmorBroken },
+            { "Pet Stasis", ConditionEffectIndex.Stasis },
+            { "Petrified", ConditionEffectIndex.Petrify },
+            { "Silence", ConditionEffectIndex.Silenced },
+        };
+
         public static ConditionEffectIndex GetEffect(string val)
-            => (ConditionEffectIndex)Enum.Parse(typeof(ConditionEffectIndex), val.Replace(" ", ""));
+        {
+            var clean = val.Replace(" ", "");
+            if (Enum.TryParse(typeof(ConditionEffectIndex), clean, true, out var result))
+                return (ConditionEffectIndex)result;
+            if (EffectAliases.TryGetValue(val.Trim(), out var alias))
+                return alias;
+            Log.Warn($"Unknown ConditionEffect '{val}', defaulting to Nothing");
+            return ConditionEffectIndex.Nothing;
+        }
 
         public static int GetInt(string x) => x.Contains("x") ? Convert.ToInt32(x, 16) : int.Parse(x);
 

@@ -78,76 +78,84 @@ namespace Shared.resources
         {
             foreach (var e in root.Elements("Object"))
             {
-                if (exportXmls)
-                {
-                    if (e.Element("Player") != null)
-                        CombinedXMLPlayers.Add(e);
-                    else if (e.Element("Skin") != null)
-                        SkinsCombinedXML.Add(e);
-                    else
-                        ObjectCombinedXML.Add(e);
-                }
-
-                var cls = e.GetValue<string>("Class");
-                if (string.IsNullOrWhiteSpace(cls))
-                    continue;
-
-                ushort type = 0;
                 try
                 {
-                    type = e.GetAttribute<ushort>("type");
+                    if (exportXmls)
+                    {
+                        if (e.Element("Player") != null)
+                            CombinedXMLPlayers.Add(e);
+                        else if (e.Element("Skin") != null)
+                            SkinsCombinedXML.Add(e);
+                        else
+                            ObjectCombinedXML.Add(e);
+                    }
+
+                    var cls = e.GetValue<string>("Class");
+                    if (string.IsNullOrWhiteSpace(cls))
+                        continue;
+
+                    ushort type = 0;
+                    try
+                    {
+                        type = e.GetAttribute<ushort>("type");
+                    }
+                    catch
+                    {
+                        Log.Error("XML Error: " + e);
+                    }
+
+                    var id = e.GetAttribute<string>("id");
+                    var displayId = e.GetValue<string>("DisplayId");
+                    var displayName = string.IsNullOrWhiteSpace(displayId) ? id : displayId;
+
+                    if (cls == "PetAbility" || cls == "PetBehavior") // dont add this
+                        return;
+
+                    if (ObjectTypeToId.ContainsKey(type))
+                        Log.Warn("'{0}' and '{1}' have the same type of '0x{2:x4}'", id, ObjectTypeToId[type], type);
+
+                    if (IdToObjectType.ContainsKey(id))
+                    {
+                        // to prevent the situation where 'Something' and 'something' or 'SOMETHING' is flagging as same even if they have different capitalization
+                        if (ObjectTypeToId[IdToObjectType[id]].Equals(id))
+                            Log.Warn("'0x{0:x4}' and '0x{1:x4}' have the same id of '{2}'", type, IdToObjectType[id], id);
+                    }
+
+                    ObjectTypeToId[type] = id;
+                    IdToObjectType[id] = type;
+                    DisplayIdToObjectType[displayName] = type;
+
+                    switch (cls)
+                    {
+                        case "Equipment":
+                        case "Dye":
+                            Items[type] = new Item(type, e);
+                            break;
+                        case "Player":
+                            var pDesc = Classes[type] = new PlayerDesc(type, e);
+                            ObjectDescs[type] = Classes[type];
+                            SlotTypeToItemType[pDesc.SlotTypes[0]] = ItemType.Weapon;
+                            SlotTypeToItemType[pDesc.SlotTypes[1]] = ItemType.Ability;
+                            SlotTypeToItemType[pDesc.SlotTypes[2]] = ItemType.Armor;
+                            SlotTypeToItemType[pDesc.SlotTypes[3]] = ItemType.Ring;
+                            break;
+                        case "GuildHallPortal":
+                        case "Portal":
+                            Portals[type] = new PortalDesc(type, e);
+                            ObjectDescs[type] = Portals[type];
+                            break;
+                        case "Skin":
+                            Skins[type] = new SkinDesc(type, e);
+                            break;
+                        default:
+                            ObjectDescs[type] = new ObjectDesc(type, e);
+                            break;
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log.Error("XML Error: " + e);
-                }
-
-                var id = e.GetAttribute<string>("id");
-                var displayId = e.GetValue<string>("DisplayId");
-                var displayName = string.IsNullOrWhiteSpace(displayId) ? id : displayId;
-
-                if (cls == "PetAbility" || cls == "PetBehavior") // dont add this
-                    return;
-
-                if (ObjectTypeToId.ContainsKey(type))
-                    Log.Warn("'{0}' and '{1}' have the same type of '0x{2:x4}'", id, ObjectTypeToId[type], type);
-
-                if (IdToObjectType.ContainsKey(id))
-                {
-                    // to prevent the situation where 'Something' and 'something' or 'SOMETHING' is flagging as same even if they have different capitalization
-                    if (ObjectTypeToId[IdToObjectType[id]].Equals(id))
-                        Log.Warn("'0x{0:x4}' and '0x{1:x4}' have the same id of '{2}'", type, IdToObjectType[id], id);
-                }
-
-                ObjectTypeToId[type] = id;
-                IdToObjectType[id] = type;
-                DisplayIdToObjectType[displayName] = type;
-
-                switch (cls)
-                {
-                    case "Equipment":
-                    case "Dye":
-                        Items[type] = new Item(type, e);
-                        break;
-                    case "Player":
-                        var pDesc = Classes[type] = new PlayerDesc(type, e);
-                        ObjectDescs[type] = Classes[type];
-                        SlotTypeToItemType[pDesc.SlotTypes[0]] = ItemType.Weapon;
-                        SlotTypeToItemType[pDesc.SlotTypes[1]] = ItemType.Ability;
-                        SlotTypeToItemType[pDesc.SlotTypes[2]] = ItemType.Armor;
-                        SlotTypeToItemType[pDesc.SlotTypes[3]] = ItemType.Ring;
-                        break;
-                    case "GuildHallPortal":
-                    case "Portal":
-                        Portals[type] = new PortalDesc(type, e);
-                        ObjectDescs[type] = Portals[type];
-                        break;
-                    case "Skin":
-                        Skins[type] = new SkinDesc(type, e);
-                        break;
-                    default:
-                        ObjectDescs[type] = new ObjectDesc(type, e);
-                        break;
+                    var id = e.Attribute("id")?.Value ?? "unknown";
+                    Log.Error($"Failed to load Object '{id}': {ex.Message}");
                 }
             }
         }
