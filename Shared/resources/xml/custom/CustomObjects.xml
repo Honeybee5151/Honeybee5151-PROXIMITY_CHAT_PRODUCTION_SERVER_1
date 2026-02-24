@@ -1828,4 +1828,34 @@
         <ConditionEffect duration="2">Slowed</ConditionEffect>
     </Projectile>
 </Object>
+	<Object type="0x5057" id="Scallywag Cutthroat">
+	<AnimatedTexture>
+		<File>chars8x8rEncounters</File>
+		<Index>0</Index>
+	</AnimatedTexture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/humans_hit</HitSound>
+    <DeathSound>monster/humans_death</DeathSound>
+    <MaxHitPoints>1400</MaxHitPoints>
+    <Size>85</Size>
+    <Defense>8</Defense>
+    <XpMult>0.08</XpMult>
+    <Projectile id="0">
+        <ObjectId>Scallywag Cutthroat Proj 0</ObjectId>
+        <Speed>90</Speed>
+        <Damage>50</Damage>
+        <Size>45</Size>
+        <LifetimeMS>700</LifetimeMS>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Scallywag Cutthroat Proj 1</ObjectId>
+        <Speed>60</Speed>
+        <Damage>65</Damage>
+        <Size>60</Size>
+        <LifetimeMS>500</LifetimeMS>
+        <ConditionEffect duration="2">Bleeding</ConditionEffect>
+    </Projectile>
+</Object>
 </Objects>

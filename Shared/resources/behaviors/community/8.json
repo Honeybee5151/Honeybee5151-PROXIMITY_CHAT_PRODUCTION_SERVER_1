@@ -1,0 +1,222 @@
+{
+  "Scallywag Cutthroat": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "Yer treasure's mine, landlubber!",
+              "I'll gut ye like a fish!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Chase",
+            "range": 4,
+            "speed": 5,
+            "sightRange": 11
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 7,
+            "coolDown": 800,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3000,
+            "type": "TimedTransition",
+            "target": "aggressive"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Flash",
+            "color": 16711680,
+            "period": 0.3,
+            "repeats": 5
+          },
+          {
+            "text": [
+              "Ye'll never take me alive!",
+              "I ain't done yet!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Charge",
+            "range": 8,
+            "speed": 7,
+            "coolDown": 2500
+          },
+          {
+            "type": "Chase",
+            "range": 1.5,
+            "speed": 6,
+            "sightRange": 14
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 8,
+            "coolDown": 400,
+            "shootAngle": 10,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 6,
+            "coolDown": 1200,
+            "predictive": 0.8,
+            "shootAngle": 15,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "aggressive": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Chase",
+            "range": 2.5,
+            "speed": 5.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 600,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 5,
+            "coolDown": 1500,
+            "predictive": 0.7,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 4000,
+            "type": "TimedTransition",
+            "target": "reposition"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "reposition": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Orbit",
+            "speed": 3.5,
+            "radius": 4
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 7,
+            "coolDown": 700,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 5,
+            "coolDown": 2000,
+            "predictive": 0.6,
+            "shootAngle": 20,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3000,
+            "type": "TimedTransition",
+            "target": "engage"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle"
+  }
+}

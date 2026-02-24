@@ -319,4 +319,20 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x499c" id="Scallywag Cutthroat Proj 0">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>lofiObj5</File>
+			<Index>0</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x499d" id="Scallywag Cutthroat Proj 1">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>lofiObj5</File>
+			<Index>0</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>

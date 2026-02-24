@@ -1,0 +1,61 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_32x32" tileW="32" tileH="32">iVBORw0KGgoAAAANSUhEUgAAAgAAAAAgCAYAAABkS8DlAAAABHNCSVQICAgIfAhkiAAAATxJREFUeJzt3TGOwjAQBVCQqOg4D63PRcG50nKedLShQspazgokj52Q96S0dro/HtvJ4QAAAAAAALAN1/tz6v0OALBmx4hBx5T+BPBlGELmyZWC/3E7N5kbAMjkBUGE6/05lQoA3QAACNYi6HPzgF8Ke0UAAHQwpjS9n6g5/gt5BQAABFgK9uiOwCerfwAgSCnoe2wHAAArVLMo+Gb1rzsAAJXlod77ICAA0MA88LX9AWAnvgn9qALBDQAA6OAd7K06AHmoC3kA6KjnFoCvAAJAQ5+GfstvAgAAOzL/H4CCAAACre3a39JPgQCASlz7AwCKFAkA8GPWduofAOjMyh8AfpQOAADslJU+AGzPqfaAY0rTZRiOtcctybsAj9u5ybwAsHVVAnPeBWgV/gDACtgKAAAAAAAAAAAAgLZe2e+sQZEXD08AAAAASUVORK5CYII=</Sheet>
+<Sheet name="dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAHFJREFUWIVjYBgFowAfeO/i8v+9i8t/fGpebeb4/2ozB141o2AIge6YbyiRSSgBMDBAEgHtXDQKaAWYiFEkuGcP42giGCEAPfcjA2KqAuq7aBTQEmAtAXAlAsE9exhp65xRMKjBaAkwCvAmgtEEMPQAAP36L2N+L9ruAAAAAElFTkSuQmCC</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x5057" id="Scallywag Cutthroat">
+	<Texture>
+		<File>dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_32x32</File>
+		<Index>0</Index>
+	</Texture>
+	<AltTexture id="1">
+		<Texture>
+			<File>dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_32x32</File>
+			<Index>1</Index>
+		</Texture>
+	</AltTexture>
+	
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/humans_hit</HitSound>
+    <DeathSound>monster/humans_death</DeathSound>
+    <MaxHitPoints>1400</MaxHitPoints>
+    <Size>85</Size>
+    <Defense>8</Defense>
+    <XpMult>0.08</XpMult>
+    <Projectile id="0">
+        <ObjectId>Scallywag Cutthroat Proj 0</ObjectId>
+        <Speed>90</Speed>
+        <Damage>50</Damage>
+        <Size>45</Size>
+        <LifetimeMS>700</LifetimeMS>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Scallywag Cutthroat Proj 1</ObjectId>
+        <Speed>60</Speed>
+        <Damage>65</Damage>
+        <Size>60</Size>
+        <LifetimeMS>500</LifetimeMS>
+        <ConditionEffect duration="2">Bleeding</ConditionEffect>
+    </Projectile>
+</Object>
+<Object type="0x499c" id="Scallywag Cutthroat Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x499d" id="Scallywag Cutthroat Proj 1">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_8c2fb3e8-5193-4193-b30f-7c57cc316b2c_8x8</File>
+		<Index>1</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+</Objects>
+</DungeonAssets>
