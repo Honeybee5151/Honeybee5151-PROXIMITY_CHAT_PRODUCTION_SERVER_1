@@ -48,11 +48,22 @@ namespace WorldServer.core.worlds.impl
             base.Init();
 
             // Spawn Dungeon Browser NPC near spawn center
-            if (GameServer.Resources.GameData.IdToObjectType.TryGetValue("Dungeon Browser", out var browserType))
+            try
             {
-                var npc = Entity.Resolve(GameServer, browserType);
-                npc.Move(100.5f, 131.5f);
-                EnterWorld(npc);
+                var found = GameServer.Resources.GameData.IdToObjectType.TryGetValue("Dungeon Browser", out var browserType);
+                Console.WriteLine($"[NexusWorld] Dungeon Browser lookup: found={found} type=0x{browserType:x4}");
+                if (found)
+                {
+                    var npc = Entity.Resolve(GameServer, browserType);
+                    Console.WriteLine($"[NexusWorld] Entity.Resolve returned: {npc?.GetType().Name ?? "null"} id={npc?.Id}");
+                    npc.Move(100.5f, 131.5f);
+                    EnterWorld(npc);
+                    Console.WriteLine($"[NexusWorld] Dungeon Browser NPC spawned at (100.5, 131.5)");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NexusWorld] ERROR spawning Dungeon Browser: {ex}");
             }
         }
 
