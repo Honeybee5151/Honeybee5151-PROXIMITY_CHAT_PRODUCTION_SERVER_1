@@ -492,4 +492,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="4">
+		<Width>32</Width>
+		<Height>32</Height>
+		<MapJM>Dungeons/4.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>

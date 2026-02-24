@@ -852,6 +852,27 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5050" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>64</Index>
+	</Texture>
+    <Class>Equipment</Class>
+    <Item/>
+    
+    <SlotType>24</SlotType>
+    <Description>It's a stick. You found it on the ground. It's not even a good stick.</Description>
+    <RateOfFire>0.8</RateOfFire>
+    <Sound>weapon/wand</Sound>
+    <Projectile>
+        <ObjectId>White Bullet</ObjectId>
+        <Speed>60</Speed>
+        <MinDamage>5</MinDamage>
+        <MaxDamage>15</MaxDamage>
+        <LifetimeMS>400</LifetimeMS>
+    </Projectile>
+    <BagType>0</BagType>
+</Object>
 </Objects>
 	awd
 	awd
@@ -1354,6 +1375,27 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5050" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>64</Index>
+	</Texture>
+    <Class>Equipment</Class>
+    <Item/>
+    
+    <SlotType>24</SlotType>
+    <Description>It's a stick. You found it on the ground. It's not even a good stick.</Description>
+    <RateOfFire>0.8</RateOfFire>
+    <Sound>weapon/wand</Sound>
+    <Projectile>
+        <ObjectId>White Bullet</ObjectId>
+        <Speed>60</Speed>
+        <MinDamage>5</MinDamage>
+        <MaxDamage>15</MaxDamage>
+        <LifetimeMS>400</LifetimeMS>
+    </Projectile>
+    <BagType>0</BagType>
+</Object>
 </Objects>
 	<Objects>
 	<Texture>
@@ -1965,6 +2007,27 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5050" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>64</Index>
+	</Texture>
+    <Class>Equipment</Class>
+    <Item/>
+    
+    <SlotType>24</SlotType>
+    <Description>It's a stick. You found it on the ground. It's not even a good stick.</Description>
+    <RateOfFire>0.8</RateOfFire>
+    <Sound>weapon/wand</Sound>
+    <Projectile>
+        <ObjectId>White Bullet</ObjectId>
+        <Speed>60</Speed>
+        <MinDamage>5</MinDamage>
+        <MaxDamage>15</MaxDamage>
+        <LifetimeMS>400</LifetimeMS>
+    </Projectile>
+    <BagType>0</BagType>
+</Object>
 </Objects>
 	awd
 	awd
@@ -2467,4 +2530,25 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5050" id="Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>64</Index>
+	</Texture>
+    <Class>Equipment</Class>
+    <Item/>
+    
+    <SlotType>24</SlotType>
+    <Description>It's a stick. You found it on the ground. It's not even a good stick.</Description>
+    <RateOfFire>0.8</RateOfFire>
+    <Sound>weapon/wand</Sound>
+    <Projectile>
+        <ObjectId>White Bullet</ObjectId>
+        <Speed>60</Speed>
+        <MinDamage>5</MinDamage>
+        <MaxDamage>15</MaxDamage>
+        <LifetimeMS>400</LifetimeMS>
+    </Projectile>
+    <BagType>0</BagType>
+</Object>
 </Objects>

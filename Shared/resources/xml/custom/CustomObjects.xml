@@ -1800,4 +1800,26 @@
             <ConditionEffect duration="4">Bleeding</ConditionEffect>
         </Projectile>
     </Object>
+	<Object type="0x504f" id="Cutlass Deckhand">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>61</Index>
+	</Texture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/humans_hit</HitSound>
+    <DeathSound>monster/humans_death</DeathSound>
+    <MaxHitPoints>800</MaxHitPoints>
+    <Size>75</Size>
+    <Defense>5</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+        <ObjectId>Cutlass Deckhand Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <Damage>45</Damage>
+        <Size>40</Size>
+        <LifetimeMS>600</LifetimeMS>
+    </Projectile>
+</Object>
 </Objects>
