@@ -610,6 +610,37 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x503d" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>46</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hit so hard?</Description>
+        <RateOfFire>0.6</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>305</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -867,6 +898,37 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="26" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x503d" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>46</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hit so hard?</Description>
+        <RateOfFire>0.6</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>305</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-3"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
@@ -1239,6 +1301,37 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x503d" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>46</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hit so hard?</Description>
+        <RateOfFire>0.6</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>305</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -1496,6 +1589,37 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="26" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x503d" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>46</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's literally just a stick you found on the ground. Why does it hit so hard?</Description>
+        <RateOfFire>0.6</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>305</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-3"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>

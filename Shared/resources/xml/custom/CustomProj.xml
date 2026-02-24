@@ -191,4 +191,28 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x498c" id="Dreadcaptain Blacktide Proj 0">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>43</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x498d" id="Dreadcaptain Blacktide Proj 1">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>44</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
+	<Object type="0x498e" id="Dreadcaptain Blacktide Proj 2">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>45</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>

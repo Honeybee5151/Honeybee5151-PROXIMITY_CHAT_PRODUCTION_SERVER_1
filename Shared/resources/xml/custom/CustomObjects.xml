@@ -1336,4 +1336,155 @@
             <ConditionEffect duration="2">Slow</ConditionEffect>
         </Projectile>
     </Object>
+	<Object type="0x5038" id="Dreadcaptain Blacktide">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>41</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StunImmune/>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>9000</MaxHitPoints>
+        <Size>140</Size>
+        <Defense>15</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
+            <Speed>55</Speed>
+            <Damage>85</Damage>
+            <Size>100</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="3">Slowed</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Dreadcaptain Blacktide Proj 1</ObjectId>
+            <Speed>90</Speed>
+            <Damage>60</Damage>
+            <Size>50</Size>
+            <LifetimeMS>900</LifetimeMS>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Dreadcaptain Blacktide Proj 2</ObjectId>
+            <Speed>70</Speed>
+            <Damage>70</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ArmorPiercing/>
+            <ConditionEffect duration="2">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5039" id="Saltblood Cannoneer">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>41</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>1100</MaxHitPoints>
+        <Size>85</Size>
+        <Defense>8</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
+            <Speed>50</Speed>
+            <Damage>55</Damage>
+            <Size>90</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <MultiHit/>
+        </Projectile>
+    </Object>
+	<Object type="0x503a" id="Cutthroat Deckhand">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>41</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>700</MaxHitPoints>
+        <Size>70</Size>
+        <Defense>4</Defense>
+        <XpMult>0.05</XpMult>
+        <Projectile id="0">
+            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>45</Damage>
+            <Size>40</Size>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Bleeding</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x503b" id="Bilgerat Swashbuckler">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>41</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/humans_hit</HitSound>
+        <DeathSound>monster/humans_death</DeathSound>
+        <MaxHitPoints>900</MaxHitPoints>
+        <Size>75</Size>
+        <Defense>5</Defense>
+        <XpMult>0.08</XpMult>
+        <Projectile id="0">
+            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
+            <Speed>85</Speed>
+            <Damage>40</Damage>
+            <Size>45</Size>
+            <LifetimeMS>800</LifetimeMS>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Dreadcaptain Blacktide Proj 1</ObjectId>
+            <Speed>95</Speed>
+            <Damage>35</Damage>
+            <Size>35</Size>
+            <LifetimeMS>600</LifetimeMS>
+            <ConditionEffect duration="1">Confused</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x503c" id="Voodoo Sea Witch">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>41</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ghost_hit</HitSound>
+        <DeathSound>monster/ghost_death</DeathSound>
+        <MaxHitPoints>1400</MaxHitPoints>
+        <Size>90</Size>
+        <Defense>12</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Dreadcaptain Blacktide Proj 0</ObjectId>
+            <Speed>65</Speed>
+            <Damage>50</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1100</LifetimeMS>
+            <ConditionEffect duration="3">Sick</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Dreadcaptain Blacktide Proj 1</ObjectId>
+            <Speed>55</Speed>
+            <Damage>60</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1300</LifetimeMS>
+            <ConditionEffect duration="2">Quiet</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>

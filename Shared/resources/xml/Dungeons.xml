@@ -471,4 +471,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 	</World>
+	<World id="stick5">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/stick5.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+	</World>
 </Worlds>
