@@ -237,6 +237,9 @@ namespace AdminDashboard.Controllers
                 // Track item renames so loot injection in behavior JSON uses the correct name
                 var itemRenames = new Dictionary<string, string>(); // oldName -> newName
 
+                // mobSpriteIndices needs to be accessible in behavior injection below
+                var mobSpriteIndices = new Dictionary<int, List<int>>();
+
                 if (hasMobs || hasItems)
                 {
                     // 4a. Build sprite sheets and assign indices
@@ -301,7 +304,6 @@ namespace AdminDashboard.Controllers
 
                     // Process each sprite size group
                     // mobSpriteIndices[mobIdx] = [spriteIdx0, spriteIdx1, ...] (index 0=base, 1+=AltTextures)
-                    var mobSpriteIndices = new Dictionary<int, List<int>>();
                     var itemSpriteIndices = new Dictionary<int, int>();
                     var projSpriteIndices = new Dictionary<int, Dictionary<string, int>>(); // mobIdx → {projId → sheetIndex}
 
