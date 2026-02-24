@@ -596,6 +596,8 @@ namespace AdminDashboard.Controllers
                         assetsXml += "</SpriteSheets>\n<Objects>\n";
 
                         // Emit mob entries: swap shared sheet texture → per-dungeon sheet texture
+                        // Use isMob: false (Texture, not AnimatedTexture) because per-dungeon sheets
+                        // are registered in AssetLibrary on the client, not AnimatedChars
                         foreach (var (mobIdx, processedXml) in processedMobBlocks)
                         {
                             var xml = processedXml;
@@ -603,7 +605,7 @@ namespace AdminDashboard.Controllers
                             {
                                 var size = mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8;
                                 var pdSheetName = $"dungeon_{request.DungeonId}_{size}x{size}";
-                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: true);
+                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
                             }
                             assetsXml += xml + "\n";
                         }
