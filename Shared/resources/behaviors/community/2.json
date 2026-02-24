@@ -1,0 +1,72 @@
+{
+  "Warchief Groznak the Undying": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Ironhide Brute": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Bone Hurler": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc War Drummer": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  },
+  "Orc Bloodfang Worg": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle"
+  }
+}

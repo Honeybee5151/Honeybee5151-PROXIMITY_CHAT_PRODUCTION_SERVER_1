@@ -768,6 +768,90 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x504c" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's... a stick. You found it on the ground. It's surprisingly effective when wielded with conviction.</Description>
+        <RateOfFire>0.7</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x504d" id="Gnarled Branch of the Ancients">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>A twisted branch torn from a tree older than the realm itself. Hums with dormant power that awakens at your touch.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>90</Speed>
+            <MinDamage>70</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x504e" id="Worldtree Scepterstick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>The heartwood of the Worldtree, shaped by centuries of wind into a perfect wand. Those who wield it feel roots spreading beneath their feet.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>6</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>105</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="40"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -1183,6 +1267,90 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="0" amount="-40"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x504c" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's... a stick. You found it on the ground. It's surprisingly effective when wielded with conviction.</Description>
+        <RateOfFire>0.7</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x504d" id="Gnarled Branch of the Ancients">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>A twisted branch torn from a tree older than the realm itself. Hums with dormant power that awakens at your touch.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>90</Speed>
+            <MinDamage>70</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x504e" id="Worldtree Scepterstick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>The heartwood of the Worldtree, shaped by centuries of wind into a perfect wand. Those who wield it feel roots spreading beneath their feet.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>6</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>105</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="40"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
@@ -1713,6 +1881,90 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x504c" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's... a stick. You found it on the ground. It's surprisingly effective when wielded with conviction.</Description>
+        <RateOfFire>0.7</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x504d" id="Gnarled Branch of the Ancients">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>A twisted branch torn from a tree older than the realm itself. Hums with dormant power that awakens at your touch.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>90</Speed>
+            <MinDamage>70</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x504e" id="Worldtree Scepterstick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>The heartwood of the Worldtree, shaped by centuries of wind into a perfect wand. Those who wield it feel roots spreading beneath their feet.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>6</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>105</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="40"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
 </Objects>
 	awd
 	awd
@@ -2128,6 +2380,90 @@
         </ActivateOnEquip>
         <ActivateOnEquip>
             <AddStat stat="0" amount="-40"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x504c" id="The Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>It's... a stick. You found it on the ground. It's surprisingly effective when wielded with conviction.</Description>
+        <RateOfFire>0.7</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>White Bullet</ObjectId>
+            <Speed>60</Speed>
+            <MinDamage>5</MinDamage>
+            <MaxDamage>15</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+        </Projectile>
+        <BagType>0</BagType>
+    </Object>
+	<Object type="0x504d" id="Gnarled Branch of the Ancients">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>A twisted branch torn from a tree older than the realm itself. Hums with dormant power that awakens at your touch.</Description>
+        <RateOfFire>0.9</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>2</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>90</Speed>
+            <MinDamage>70</MinDamage>
+            <MaxDamage>120</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+    </Object>
+	<Object type="0x504e" id="Worldtree Scepterstick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>60</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>24</SlotType>
+        <Description>The heartwood of the Worldtree, shaped by centuries of wind into a perfect wand. Those who wield it feel roots spreading beneath their feet.</Description>
+        <RateOfFire>1.0</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>6</ArcGap>
+        <Projectile>
+            <ObjectId>Green Bullet</ObjectId>
+            <Speed>105</Speed>
+            <MinDamage>80</MinDamage>
+            <MaxDamage>140</MaxDamage>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="2">Slowed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="40"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="-3"/>
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>

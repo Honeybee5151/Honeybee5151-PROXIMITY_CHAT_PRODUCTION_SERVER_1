@@ -1646,4 +1646,158 @@
         <LifetimeMS>800</LifetimeMS>
     </Projectile>
 </Object>
+	<Object type="0x5047" id="Warchief Groznak the Undying">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>54</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        <Quest/>
+        <God/>
+        <StasisImmune/>
+        <ParalyzeImmune/>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>32000</MaxHitPoints>
+        <Size>170</Size>
+        <Defense>32</Defense>
+        <XpMult>0.8</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Groznak the Undying Proj 0</ObjectId>
+            <Speed>55</Speed>
+            <Damage>140</Damage>
+            <Size>110</Size>
+            <LifetimeMS>1600</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="3">ArmorBroken</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Warchief Groznak the Undying Proj 1</ObjectId>
+            <Speed>80</Speed>
+            <Damage>95</Damage>
+            <Size>70</Size>
+            <LifetimeMS>1200</LifetimeMS>
+            <ConditionEffect duration="2">Slowed</ConditionEffect>
+        </Projectile>
+        <Projectile id="2">
+            <ObjectId>Warchief Groznak the Undying Proj 2</ObjectId>
+            <Speed>65</Speed>
+            <Damage>170</Damage>
+            <Size>90</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ArmorPiercing/>
+            <ConditionEffect duration="3">Bleeding</ConditionEffect>
+        </Projectile>
+        <Projectile id="3">
+            <ObjectId>Warchief Groznak the Undying Proj 3</ObjectId>
+            <Speed>90</Speed>
+            <Damage>80</Damage>
+            <Size>50</Size>
+            <LifetimeMS>900</LifetimeMS>
+            <ConditionEffect duration="2">Weak</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5048" id="Orc Ironhide Brute">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>54</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>4500</MaxHitPoints>
+        <Size>120</Size>
+        <Defense>35</Defense>
+        <XpMult>0.15</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Groznak the Undying Proj 0</ObjectId>
+            <Speed>50</Speed>
+            <Damage>100</Damage>
+            <Size>90</Size>
+            <LifetimeMS>600</LifetimeMS>
+            <ConditionEffect duration="2">Stunned</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x5049" id="Orc Bone Hurler">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>54</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/ogre_hit</HitSound>
+        <DeathSound>monster/ogre_death</DeathSound>
+        <MaxHitPoints>2200</MaxHitPoints>
+        <Size>85</Size>
+        <Defense>15</Defense>
+        <XpMult>0.1</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Groznak the Undying Proj 0</ObjectId>
+            <Speed>95</Speed>
+            <Damage>75</Damage>
+            <Size>55</Size>
+            <LifetimeMS>1400</LifetimeMS>
+            <ConditionEffect duration="2">Dazed</ConditionEffect>
+        </Projectile>
+        <Projectile id="1">
+            <ObjectId>Warchief Groznak the Undying Proj 1</ObjectId>
+            <Speed>85</Speed>
+            <Damage>60</Damage>
+            <Size>45</Size>
+            <LifetimeMS>1100</LifetimeMS>
+            <ConditionEffect duration="3">Sick</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x504a" id="Orc War Drummer">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>54</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/giants_hit</HitSound>
+        <DeathSound>monster/giants_death</DeathSound>
+        <MaxHitPoints>3200</MaxHitPoints>
+        <Size>95</Size>
+        <Defense>20</Defense>
+        <XpMult>0.12</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Groznak the Undying Proj 0</ObjectId>
+            <Speed>70</Speed>
+            <Damage>55</Damage>
+            <Size>60</Size>
+            <LifetimeMS>1000</LifetimeMS>
+            <MultiHit/>
+            <ConditionEffect duration="3">Confused</ConditionEffect>
+        </Projectile>
+    </Object>
+	<Object type="0x504b" id="Orc Bloodfang Worg">
+	<AnimatedTexture>
+		<File>communitySprites8x8</File>
+		<Index>54</Index>
+	</AnimatedTexture>
+        <Enemy/>
+        <Class>Character</Class>
+        
+        <HitSound>monster/bats_hit</HitSound>
+        <DeathSound>monster/bats_death</DeathSound>
+        <MaxHitPoints>1800</MaxHitPoints>
+        <Size>75</Size>
+        <Defense>10</Defense>
+        <XpMult>0.08</XpMult>
+        <Projectile id="0">
+            <ObjectId>Warchief Groznak the Undying Proj 0</ObjectId>
+            <Speed>100</Speed>
+            <Damage>90</Damage>
+            <Size>45</Size>
+            <LifetimeMS>500</LifetimeMS>
+            <ConditionEffect duration="4">Bleeding</ConditionEffect>
+        </Projectile>
+    </Object>
 </Objects>
