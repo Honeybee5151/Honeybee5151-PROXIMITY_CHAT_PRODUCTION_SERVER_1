@@ -1,0 +1,82 @@
+{
+  "Cave Goblin Scrapper": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 8,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "Chase",
+            "range": 3,
+            "speed": 5,
+            "sightRange": 10
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 7,
+            "coolDown": 600,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 12,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "Chase",
+            "range": 1.5,
+            "speed": 6.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 7,
+            "coolDown": 400,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 12,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Rusty Sword",
+        "probability": 1.0
+      }
+    ]
+  }
+}

@@ -1776,4 +1776,26 @@
         <LifetimeMS>600</LifetimeMS>
     </Projectile>
 </Object>
+	<Object type="0x5053" id="Cave Goblin Scrapper">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>69</Index>
+	</Texture>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>600</MaxHitPoints>
+    <Size>70</Size>
+    <Defense>3</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+        <ObjectId>Cave Goblin Scrapper Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <Damage>35</Damage>
+        <Size>40</Size>
+        <LifetimeMS>600</LifetimeMS>
+    </Projectile>
+</Object>
 </Objects>

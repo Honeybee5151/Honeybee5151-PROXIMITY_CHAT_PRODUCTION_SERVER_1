@@ -1,0 +1,68 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_64a0c4bf-ada2-48f9-b825-c58a34b88f65_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAHhJREFUWIVjfOMx8z8DHsD8ZzU+aQbBPXsYYWzrpm//j9ZxMeJSm13U8J+BgYFhal8DTjWjgL6AiZ6WwSI+u6jhPywxjIKBBSz0tGy0BBh8gK4lAAPDaOQPNkD3BDAKBhcYTQAjHNA1AZzbv4ie1o0CIsBoCTDCAQCdgxxB25WBRAAAAABJRU5ErkJggg==</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x5053" id="Cave Goblin Scrapper">
+	<Texture>
+		<File>dungeon_64a0c4bf-ada2-48f9-b825-c58a34b88f65_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ogre_hit</HitSound>
+    <DeathSound>monster/ogre_death</DeathSound>
+    <MaxHitPoints>600</MaxHitPoints>
+    <Size>70</Size>
+    <Defense>3</Defense>
+    <XpMult>0.05</XpMult>
+    <Projectile id="0">
+        <ObjectId>Cave Goblin Scrapper Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <Damage>35</Damage>
+        <Size>40</Size>
+        <LifetimeMS>600</LifetimeMS>
+    </Projectile>
+</Object>
+<Object type="0x4999" id="Cave Goblin Scrapper Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_64a0c4bf-ada2-48f9-b825-c58a34b88f65_8x8</File>
+		<Index>2</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x5054" id="Rusty Sword">
+	<Texture>
+		<File>dungeon_64a0c4bf-ada2-48f9-b825-c58a34b88f65_8x8</File>
+		<Index>3</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A corroded blade caked in oxidized iron. Its jagged, pitted edge tears flesh in ugly ways, but the brittle metal could snap at any moment.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Orange Missile</ObjectId>
+            <Speed>85</Speed>
+            <MinDamage>45</MinDamage>
+            <MaxDamage>130</MaxDamage>
+            <LifetimeMS>450</LifetimeMS>
+            <ConditionEffect duration="3">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-2"/>
+        </ActivateOnEquip>
+        <BagType>0</BagType>
+    </Object>
+</Objects>
+</DungeonAssets>
