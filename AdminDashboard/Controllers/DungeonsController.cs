@@ -190,6 +190,9 @@ namespace AdminDashboard.Controllers
                 var files = new List<(string Path, string Content)>();
                 var binaryFiles = new List<(string Path, byte[] Content)>();
 
+                // 1b. Inject mob placements + spawn region into JM if missing
+                InjectMobsAndSpawn(mapJm, dungeon);
+
                 // 2. Write .jm map file
                 var jmContent = mapJm.ToString(Newtonsoft.Json.Formatting.None);
                 files.Add(($"Shared/resources/worlds/Dungeons/{safeTitle}.jm", jmContent));
@@ -712,6 +715,154 @@ namespace AdminDashboard.Controllers
             .Replace("<", "&lt;")
             .Replace(">", "&gt;")
             .Replace("\"", "&quot;");
+
+        /// <summary>
+        /// Inject mob placements and spawn region into JM dict if the editor didn't place them.
+        /// The game server reads mobs from JM objs entries — without this, mobs won't spawn.
+        /// </summary>
+        private static void InjectMobsAndSpawn(JToken mapJm, JObject dungeon)
+        {
+            var dict = mapJm["dict"] as JArray;
+            var dataB64 = mapJm["data"]?.ToString();
+            var width = mapJm["width"]?.Value<int>() ?? 0;
+            var height = mapJm["height"]?.Value<int>() ?? 0;
+            if (dict == null || width == 0 || height == 0 || string.IsNullOrEmpty(dataB64)) return;
+
+            var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;
+            if (mobs == null || mobs.Count == 0) return;
+
+            // Check if JM already has mob placements
+            bool hasExistingMobs = false;
+            foreach (var entry in dict)
+            {
+                if (entry["objs"] is JArray objs && objs.Count > 0)
+                {
+                    hasExistingMobs = true;
+                    break;
+                }
+            }
+            if (hasExistingMobs) return; // Editor already placed mobs — don't override
+
+            // Decode grid to find non-empty ground tiles
+            byte[] inflated;
+            try
+            {
+                var compressed = Convert.FromBase64String(dataB64);
+                using var input = new System.IO.MemoryStream(compressed);
+                using var zlib = new System.IO.Compression.ZLibStream(input, System.IO.Compression.CompressionMode.Decompress);
+                using var output = new System.IO.MemoryStream();
+                zlib.CopyTo(output);
+                inflated = output.ToArray();
+            }
+            catch { return; }
+
+            var totalTiles = width * height;
+            var groundTiles = new List<(int x, int y, int dictIdx)>();
+            for (int i = 0; i < totalTiles && i * 2 + 1 < inflated.Length; i++)
+            {
+                int idx = (inflated[i * 2] << 8) | inflated[i * 2 + 1];
+                if (idx < 0 || idx >= dict.Count) continue;
+                var ground = dict[idx]?["ground"]?.ToString();
+                if (!string.IsNullOrEmpty(ground) && ground != "Empty")
+                    groundTiles.Add((i % width, i / width, idx));
+            }
+
+            if (groundTiles.Count == 0) return;
+
+            // Extract mob names from XML
+            var mobNames = new List<(string name, bool isBoss)>();
+            foreach (var mob in mobs)
+            {
+                var xml = mob["xml"]?.ToString() ?? "";
+                var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
+                if (!nameMatch.Success) continue;
+                var isBoss = mob["isBoss"]?.Value<bool>() ?? xml.Contains("<Quest/>");
+                mobNames.Add((nameMatch.Groups[1].Value, isBoss));
+            }
+            if (mobNames.Count == 0) return;
+
+            var rng = new Random(42); // deterministic for reproducibility
+
+            // We need new dict entries for tiles with mobs (ground + objs together)
+            // Strategy: pick random ground tiles, create new dict entries with same ground + objs
+            var gridBytes = new short[totalTiles];
+            for (int i = 0; i < totalTiles && i * 2 + 1 < inflated.Length; i++)
+                gridBytes[i] = (short)((inflated[i * 2] << 8) | inflated[i * 2 + 1]);
+
+            // Shuffle ground tiles for random placement
+            var shuffled = groundTiles.OrderBy(_ => rng.Next()).ToList();
+            int placeIdx = 0;
+
+            // Place each mob: boss once, minions 2-4 times
+            foreach (var (mobName, isBoss) in mobNames)
+            {
+                int count = isBoss ? 1 : Math.Min(2 + rng.Next(3), shuffled.Count / Math.Max(mobNames.Count, 1));
+                count = Math.Max(1, count);
+
+                for (int c = 0; c < count && placeIdx < shuffled.Count; c++)
+                {
+                    var (tx, ty, origDictIdx) = shuffled[placeIdx++];
+                    var origEntry = dict[origDictIdx] as JObject;
+                    if (origEntry == null) continue;
+
+                    // Create new dict entry: same ground (+ groundPixels if present) + objs
+                    var newEntry = new JObject();
+                    if (origEntry["ground"] != null)
+                        newEntry["ground"] = origEntry["ground"].DeepClone();
+                    if (origEntry["groundPixels"] != null)
+                        newEntry["groundPixels"] = origEntry["groundPixels"].DeepClone();
+                    newEntry["objs"] = new JArray(new JObject { ["id"] = mobName });
+
+                    // Add new dict entry and update grid
+                    int newDictIdx = dict.Count;
+                    dict.Add(newEntry);
+                    int tileOff = ty * width + tx;
+                    gridBytes[tileOff] = (short)newDictIdx;
+                }
+            }
+
+            // Inject spawn region at first ground tile (player start)
+            bool hasSpawn = false;
+            foreach (var entry in dict)
+            {
+                if (entry["regions"] is JArray regions)
+                    foreach (var r in regions)
+                        if (r["id"]?.ToString() == "Spawn") { hasSpawn = true; break; }
+                if (hasSpawn) break;
+            }
+
+            if (!hasSpawn && groundTiles.Count > 0)
+            {
+                // Place spawn at first ground tile (top-left area)
+                var (sx, sy, spawnOrigIdx) = groundTiles[0];
+                var spawnOrig = dict[spawnOrigIdx] as JObject;
+                var spawnEntry = new JObject();
+                if (spawnOrig?["ground"] != null)
+                    spawnEntry["ground"] = spawnOrig["ground"].DeepClone();
+                if (spawnOrig?["groundPixels"] != null)
+                    spawnEntry["groundPixels"] = spawnOrig["groundPixels"].DeepClone();
+                spawnEntry["regions"] = new JArray(new JObject { ["id"] = "Spawn" });
+
+                int spawnDictIdx = dict.Count;
+                dict.Add(spawnEntry);
+                gridBytes[sy * width + sx] = (short)spawnDictIdx;
+            }
+
+            // Re-encode grid → zlib → base64 and update mapJm
+            var rawBytes = new byte[totalTiles * 2];
+            for (int i = 0; i < totalTiles; i++)
+            {
+                rawBytes[i * 2] = (byte)(gridBytes[i] >> 8);
+                rawBytes[i * 2 + 1] = (byte)(gridBytes[i] & 0xFF);
+            }
+
+            using var compressOut = new System.IO.MemoryStream();
+            using (var zlibOut = new System.IO.Compression.ZLibStream(compressOut, System.IO.Compression.CompressionLevel.Optimal))
+            {
+                zlibOut.Write(rawBytes, 0, rawBytes.Length);
+            }
+            mapJm["data"] = Convert.ToBase64String(compressOut.ToArray());
+        }
     }
 
     public class ApproveRequest
