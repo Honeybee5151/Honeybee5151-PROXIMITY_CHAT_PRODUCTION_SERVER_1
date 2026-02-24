@@ -82,7 +82,7 @@ namespace App.Controllers
                 return;
             }
 
-            difficulty = Math.Clamp(difficulty, 1, 5);
+            difficulty = Math.Clamp(difficulty, 0, 10);
             var db = _core.Database.Conn;
 
             // Check if player already voted
