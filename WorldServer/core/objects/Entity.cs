@@ -191,6 +191,7 @@ namespace WorldServer.core.objects
                 case "CharacterChanger":
                 case "MoneyChanger":
                 case "NameChanger":
+                case "DungeonBrowserNPC":
                     return new StaticObject(gameServer, objectType, hp, true, false, true);
                 case "Character":   //Other characters means enemy
                     return new Enemy(gameServer, objectType);
