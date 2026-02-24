@@ -302,12 +302,8 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Process each sprite size group
+                    // Per-dungeon indices (start at 0, memory-only on client via CUSTOM_DUNGEON_ASSETS)
                     // mobSpriteIndices[mobIdx] = [spriteIdx0, spriteIdx1, ...] (index 0=base, 1+=AltTextures)
-                    var itemSpriteIndices = new Dictionary<int, int>();
-                    var projSpriteIndices = new Dictionary<int, Dictionary<string, int>>(); // mobIdx → {projId → sheetIndex}
-
-                    // Per-dungeon indices (start at 0, used for DungeonAssets XML)
                     var pdMobSpriteIndices = new Dictionary<int, List<int>>();
                     var pdItemSpriteIndices = new Dictionary<int, int>();
                     var pdProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
@@ -318,13 +314,7 @@ namespace AdminDashboard.Controllers
                     {
                         var spriteSize = sizeGroup.Key;
                         var entries = sizeGroup.ToList();
-                        var sheetName = spriteSize == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                        var pdSheetName = spriteSize == 16
-                            ? $"dungeon_{request.DungeonId}_16x16"
-                            : $"dungeon_{request.DungeonId}_8x8";
-
-                        // Load existing shared sheet
-                        var (sheet, meta) = await spriteService.LoadSheet(spriteSize);
+                        var pdSheetName = $"dungeon_{request.DungeonId}_{spriteSize}x{spriteSize}";
 
                         // Decode all sprites in this size group
                         var bitmaps = new List<SKBitmap>();
@@ -333,11 +323,7 @@ namespace AdminDashboard.Controllers
                             foreach (var entry in entries)
                                 bitmaps.Add(SpriteSheetService.DecodeDataUrl(entry.dataUrl));
 
-                            // Pack into shared sheet (backward compat)
-                            var (updatedSheet, indices) = spriteService.AddSprites(sheet, meta, bitmaps, spriteSize);
-                            sheet = updatedSheet;
-
-                            // Also create per-dungeon sheet (fresh, indices start at 0)
+                            // Create per-dungeon sheet (fresh, indices start at 0) — memory-only on client
                             var pdMeta = new SheetMetadata { NextIndex = 0 };
                             var pdSheetWidth = 16 * spriteSize; // 16 columns
                             var pdSheet = new SKBitmap(pdSheetWidth, spriteSize, SKColorType.Rgba8888, SKAlphaType.Premul);
@@ -345,7 +331,7 @@ namespace AdminDashboard.Controllers
                             var (pdUpdatedSheet, pdIndices) = spriteService.AddSprites(pdSheet, pdMeta, bitmaps, spriteSize);
                             pdSheet = pdUpdatedSheet;
 
-                            // Map indices back to entities (shared + per-dungeon)
+                            // Map indices back to entities (per-dungeon only)
                             for (int i = 0; i < entries.Count; i++)
                             {
                                 var e = entries[i];
@@ -354,10 +340,6 @@ namespace AdminDashboard.Controllers
                                     if (e.frame.StartsWith("proj_"))
                                     {
                                         var projId = e.frame.Substring(5);
-                                        if (!projSpriteIndices.ContainsKey(e.entityIdx))
-                                            projSpriteIndices[e.entityIdx] = new Dictionary<string, int>();
-                                        projSpriteIndices[e.entityIdx][projId] = indices[i];
-
                                         if (!pdProjSpriteIndices.ContainsKey(e.entityIdx))
                                             pdProjSpriteIndices[e.entityIdx] = new Dictionary<string, int>();
                                         pdProjSpriteIndices[e.entityIdx][projId] = pdIndices[i];
@@ -371,7 +353,7 @@ namespace AdminDashboard.Controllers
                                             mobSpriteIndices[e.entityIdx] = new List<int>();
                                         while (mobSpriteIndices[e.entityIdx].Count <= slotIdx)
                                             mobSpriteIndices[e.entityIdx].Add(-1);
-                                        mobSpriteIndices[e.entityIdx][slotIdx] = indices[i];
+                                        mobSpriteIndices[e.entityIdx][slotIdx] = pdIndices[i];
 
                                         if (!pdMobSpriteIndices.ContainsKey(e.entityIdx))
                                             pdMobSpriteIndices[e.entityIdx] = new List<int>();
@@ -382,16 +364,9 @@ namespace AdminDashboard.Controllers
                                 }
                                 else
                                 {
-                                    itemSpriteIndices[e.entityIdx] = indices[i];
                                     pdItemSpriteIndices[e.entityIdx] = pdIndices[i];
                                 }
                             }
-
-                            // Add shared sheet PNG + metadata to commit
-                            var pngBytes = SpriteSheetService.EncodePng(sheet);
-                            binaryFiles.Add(($"Shared/resources/sprites/{sheetName}.png", pngBytes));
-                            files.Add(($"Shared/resources/sprites/{sheetName}.meta.json",
-                                JsonConvert.SerializeObject(meta, Newtonsoft.Json.Formatting.Indented)));
 
                             // Store per-dungeon sheet as base64 for DungeonAssets XML
                             var pdPngBytes = SpriteSheetService.EncodePng(pdSheet);
@@ -401,12 +376,11 @@ namespace AdminDashboard.Controllers
                         finally
                         {
                             foreach (var bmp in bitmaps) bmp.Dispose();
-                            sheet.Dispose();
                         }
                     }
 
                     // 4b. Generate custom projectile definitions + rewrite mob ObjectIds
-                    if (projSpriteIndices.Count > 0)
+                    if (pdProjSpriteIndices.Count > 0)
                     {
                         var (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
                         var projNextType = FindNextTypeCode(projXml, 0x4970);
@@ -414,7 +388,7 @@ namespace AdminDashboard.Controllers
 
                         for (int i = 0; i < mobs!.Count; i++)
                         {
-                            if (!projSpriteIndices.TryGetValue(i, out var projMap)) continue;
+                            if (!pdProjSpriteIndices.TryGetValue(i, out var projMap)) continue;
 
                             var rawXml = mobs[i]["xml"]?.ToString() ?? "";
                             var mobName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
@@ -422,14 +396,14 @@ namespace AdminDashboard.Controllers
                             foreach (var kvp in projMap)
                             {
                                 var projId = kvp.Key;
-                                var sheetIdx = kvp.Value;
                                 var projName = $"{mobName} Proj {projId}";
 
+                                // Placeholder texture in CustomProj.xml — per-dungeon sheet overrides at runtime
                                 newProjEntries += $"\t<Object type=\"0x{projNextType:x4}\" id=\"{EscapeXml(projName)}\">\n";
                                 newProjEntries += $"\t\t<Class>Projectile</Class>\n";
                                 newProjEntries += $"\t\t<Texture>\n";
-                                newProjEntries += $"\t\t\t<File>communitySprites8x8</File>\n";
-                                newProjEntries += $"\t\t\t<Index>{sheetIdx}</Index>\n";
+                                newProjEntries += $"\t\t\t<File>lofiObj5</File>\n";
+                                newProjEntries += $"\t\t\t<Index>0</Index>\n";
                                 newProjEntries += $"\t\t</Texture>\n";
                                 newProjEntries += $"\t\t<AngleCorrection>1</AngleCorrection>\n";
                                 newProjEntries += $"\t</Object>\n";
@@ -526,12 +500,10 @@ namespace AdminDashboard.Controllers
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
-                                // Inject sprite texture references (base + N AltTextures)
+                                // Inject placeholder texture in CustomObjects.xml (per-dungeon sheet overrides at runtime)
                                 if (mobSpriteIndices.TryGetValue(i, out var sprIndices))
                                 {
-                                    var size = mobs[i]["spriteSize"]?.Value<int>() ?? 8;
-                                    var sheetName = size == 16 ? "communitySprites16x16" : "communitySprites8x8";
-                                    xml = InjectSpriteTexture(xml, sheetName, sprIndices, isMob: false);
+                                    xml = InjectSpriteTexture(xml, "chars8x8rEncounters", new List<int> { 0 }, isMob: true);
                                 }
 
                                 // Save processed block (with type code + texture) for DungeonAssets
@@ -595,9 +567,9 @@ namespace AdminDashboard.Controllers
                                 xml = InjectTypeCode(xml, nextType);
                                 nextType++;
 
-                                // Inject sprite texture reference
-                                if (itemSpriteIndices.TryGetValue(i, out var sprIdx))
-                                    xml = InjectSpriteTexture(xml, "communitySprites8x8", sprIdx, isMob: false);
+                                // Inject placeholder texture in CustomItems.xml (per-dungeon sheet overrides at runtime)
+                                if (pdItemSpriteIndices.TryGetValue(i, out var pdSprIdx2))
+                                    xml = InjectSpriteTexture(xml, "lofiObj5", 0, isMob: false);
 
                                 // Save processed block (with type code + texture) for DungeonAssets
                                 processedItemBlocks.Add((i, xml.Trim()));
@@ -629,10 +601,8 @@ namespace AdminDashboard.Controllers
                             if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIndices))
                             {
                                 var size = mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8;
-                                var pdSheetName = size == 16
-                                    ? $"dungeon_{request.DungeonId}_16x16"
-                                    : $"dungeon_{request.DungeonId}_8x8";
-                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
+                                var pdSheetName = $"dungeon_{request.DungeonId}_{size}x{size}";
+                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: true);
                             }
                             assetsXml += xml + "\n";
                         }
@@ -645,7 +615,7 @@ namespace AdminDashboard.Controllers
                             var projFileEntry = files.FirstOrDefault(f => f.Path.Contains("CustomProj.xml"));
                             var projXmlContent = projFileEntry.Content ?? "";
 
-                            var pdProjSheetName = $"dungeon_{request.DungeonId}_8x8";
+                            var pdProjSheetName = $"dungeon_{request.DungeonId}_8x8"; // projectiles always 8x8
                             for (int i = 0; i < mobs!.Count; i++)
                             {
                                 if (!pdProjSpriteIndices.TryGetValue(i, out var pdProjMap)) continue;
@@ -673,10 +643,10 @@ namespace AdminDashboard.Controllers
                         foreach (var (itemIdx, processedXml) in processedItemBlocks)
                         {
                             var xml = processedXml;
-                            if (pdItemSpriteIndices.TryGetValue(itemIdx, out var pdSprIdx))
+                            if (pdItemSpriteIndices.TryGetValue(itemIdx, out var pdItemIdx))
                             {
-                                var pdItemSheetName = $"dungeon_{request.DungeonId}_8x8";
-                                xml = InjectSpriteTexture(xml, pdItemSheetName, pdSprIdx, isMob: false);
+                                var pdItemSheetName = $"dungeon_{request.DungeonId}_8x8"; // items always 8x8
+                                xml = InjectSpriteTexture(xml, pdItemSheetName, pdItemIdx, isMob: false);
                             }
                             assetsXml += xml + "\n";
                         }
