@@ -915,8 +915,8 @@ namespace AdminDashboard.Controllers
                 if (!_supabase.IsConfigured)
                     return StatusCode(500, new { error = "Supabase not configured" });
 
-                await _supabase.UpdateStatus(request.DungeonId, "rejected");
-                return Ok(new { success = true, message = "Dungeon rejected" });
+                await _supabase.DeleteDungeon(request.DungeonId);
+                return Ok(new { success = true, message = "Dungeon rejected and deleted" });
             }
             catch (Exception ex)
             {

@@ -52,6 +52,20 @@ namespace AdminDashboard.Services
             return list?.Count > 0 ? list[0] : null;
         }
 
+        /// <summary>Delete a dungeon by ID</summary>
+        public async Task DeleteDungeon(string id)
+        {
+            var req = new HttpRequestMessage(HttpMethod.Delete, $"{_url}/rest/v1/dungeons?id=eq.{id}");
+            req.Headers.Add("apikey", _serviceKey);
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _serviceKey);
+            var res = await _http.SendAsync(req);
+            if (!res.IsSuccessStatusCode)
+            {
+                var err = await res.Content.ReadAsStringAsync();
+                throw new Exception($"Supabase delete error: {res.StatusCode} - {err}");
+            }
+        }
+
         /// <summary>Update dungeon status</summary>
         public async Task UpdateStatus(string id, string status)
         {
