@@ -683,4 +683,57 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	<Object type="0x5051" id="Bigger Stick">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>68</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>1</SlotType>
+        <Description>A slightly bigger stick. Found next to the smaller one. Together they are unstoppable.</Description>
+        <RateOfFire>0.7</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>1</NumProjectiles>
+        <Projectile>
+            <ObjectId>Heavy Cannonball</ObjectId>
+            <Speed>70</Speed>
+            <MinDamage>200</MinDamage>
+            <MaxDamage>280</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+            <ConditionEffect duration="1.5">Stunned</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+    </Object>
+	<Object type="0x5052" id="Ring of the Twig">
+	<Texture>
+		<File>communitySprites8x8</File>
+		<Index>68</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>9</SlotType>
+        <Description>A small twig bent into a circle. Somehow it channels the raw primal energy of being extremely basic.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-50"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+    </Object>
 </Objects>

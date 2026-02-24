@@ -287,4 +287,12 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x4998" id="Cutlass Deckhand Proj 0">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>67</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>
