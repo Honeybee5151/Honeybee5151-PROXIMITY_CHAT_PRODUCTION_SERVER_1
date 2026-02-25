@@ -191,13 +191,7 @@ namespace WorldServer.core.miscfile
                 BubbleTime = 5,
                 Recipient = "",
                 Txt = text,
-                NameColor = player.Rank switch
-                {
-                    1 => 0x6b7280, // Mute - grey
-                    2 => 0x8b5cf6, // Whisperer - purple
-                    3 => 0xef4444, // Chatter - red
-                    _ => player.ColorNameChat != 0 ? player.ColorNameChat : 0x123456
-                },
+                NameColor = player.ColorNameChat != 0 ? player.ColorNameChat : 0x123456,
                 TextColor = player.ColorChat != 0 ? player.ColorChat : 0xFFFFFF
             };
 
