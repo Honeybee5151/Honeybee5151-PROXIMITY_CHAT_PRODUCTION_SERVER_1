@@ -172,12 +172,20 @@ namespace WorldServer.core.miscfile
             var nameTag = "";
             if (player.Client.Account.Admin)
                 nameTag = "[*] ";
-            if (player.Client.Account.Rank == (int)RankingType.Moderator)
+            else if (player.Client.Account.Rank == (int)RankingType.Moderator)
                 nameTag = "[!] ";
+
+            var donationTag = player.Rank switch
+            {
+                1 => "[Mute] ",
+                2 => "[Whisperer] ",
+                3 => "[Chatter] ",
+                _ => ""
+            };
 
             var tp = new Text()
             {
-                Name = $"{nameTag}{player.Name}",
+                Name = $"{nameTag}{donationTag}{player.Name}",
                 ObjectId = player.Id,
                 NumStars = player.Stars,
                 BubbleTime = 5,
