@@ -103,22 +103,23 @@ namespace WorldServer.core.net.handlers
             };
 
             // Clear inventory (0xffff = empty slot)
-            for (int i = 0; i < chr.Items.Length; i++)
-                chr.Items[i] = 0xffff;
-            if (chr.Datas != null)
-                for (int i = 0; i < chr.Datas.Length; i++)
-                    chr.Datas[i] = null;
+            // Must assign new array — chr.Items is Redis-backed, in-place edits don't persist
+            var items = new ushort[chr.Items.Length];
+            for (int i = 0; i < items.Length; i++)
+                items[i] = 0xffff;
 
             // Give starting equipment from dungeon config
             if (target.StartingEquipment != null)
             {
-                for (int i = 0; i < target.StartingEquipment.Length && i < chr.Items.Length; i++)
+                for (int i = 0; i < target.StartingEquipment.Length && i < items.Length; i++)
                 {
                     var itemName = target.StartingEquipment[i].Trim();
                     if (!string.IsNullOrEmpty(itemName) && gameData.IdToObjectType.TryGetValue(itemName, out var itemType))
-                        chr.Items[i] = itemType;
+                        items[i] = itemType;
                 }
             }
+            chr.Items = items;
+            chr.Datas = new ItemData[chr.Datas?.Length ?? 20];
 
             // Set level 20, max stats for a warrior-like baseline
             chr.Level = 20;
