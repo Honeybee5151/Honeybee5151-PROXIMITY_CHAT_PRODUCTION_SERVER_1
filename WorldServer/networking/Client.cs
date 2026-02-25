@@ -212,6 +212,7 @@ namespace WorldServer.networking
             PacketSpamAmount = 0;
             Account = null;
             Character = null;
+            DungeonBackup = null;
             IpAddress = null;
             Player?.CleanupPlayerUpdate();
             Player = null;

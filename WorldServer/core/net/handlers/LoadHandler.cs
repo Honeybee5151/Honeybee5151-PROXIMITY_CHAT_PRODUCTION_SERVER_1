@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using Shared;
 using Shared.database.character.inventory;
@@ -50,10 +49,8 @@ namespace WorldServer.core.net.handlers
                 }
 
                 // Community dungeon: backup real character and override with temp classless character
-                Console.WriteLine($"[CommunityDungeon] World={target.IdName} IsCommunityDungeon={target.IsCommunityDungeon} Items[0..3]={string.Join(",", client.Character.Items.Take(4).Select(i => $"0x{i:X4}"))}");
                 if (target.IsCommunityDungeon)
                     SetupCommunityDungeonCharacter(client, target);
-                Console.WriteLine($"[CommunityDungeon] After setup: Items[0..3]={string.Join(",", client.Character.Items.Take(4).Select(i => $"0x{i:X4}"))} DungeonBackup={client.DungeonBackup != null}");
 
                 var player = client.Player = target.CreateNewPlayer(client, client.Character.ObjectType, x, y);
 
@@ -81,6 +78,10 @@ namespace WorldServer.core.net.handlers
         {
             var chr = client.Character;
             var gameData = client.GameServer.Resources.GameData;
+
+            // If already backed up (dungeon-to-dungeon transition), don't overwrite original
+            if (client.DungeonBackup != null)
+                return;
 
             // Backup the real character state
             client.DungeonBackup = new CharacterBackup
@@ -121,13 +122,14 @@ namespace WorldServer.core.net.handlers
             chr.Items = items;
             chr.Datas = new ItemData[chr.Datas?.Length ?? 20];
 
-            // Set level 20, max stats for a warrior-like baseline
-            chr.Level = 20;
+            // Set level 1, universal base stats (classless)
+            chr.Level = 1;
             chr.Experience = 0;
             // Stats: [HP, MP, Att, Def, Spd, Dex, Vit, Wis]
-            chr.Stats = new int[] { 770, 252, 75, 25, 50, 50, 75, 50 };
-            chr.Health = 770;
-            chr.MP = 252;
+            chr.Stats = new int[] { 100, 100, 10, 0, 10, 10, 10, 10 };
+            chr.Health = 100;
+            chr.MP = 100;
+            chr.Fame = 0;
 
             // Override class to Warrior (0x031d) so Skeleton Warrior skin (0x745E) works for all classes
             chr.ObjectType = 0x031d;

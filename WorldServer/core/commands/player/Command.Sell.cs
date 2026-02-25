@@ -16,6 +16,13 @@ namespace WorldServer.core.commands
 
             protected override bool Process(Player player, TickTime time, string args)
             {
+                // Block sell in community dungeons (temp items)
+                if (player.World?.IsCommunityDungeon == true)
+                {
+                    player.SendError("You cannot sell items in a community dungeon.");
+                    return false;
+                }
+
                 var index = args.IndexOf(" "); //here we search for the space which divides the price and the inventory slot
 
                 //check if the command it's correctly writted

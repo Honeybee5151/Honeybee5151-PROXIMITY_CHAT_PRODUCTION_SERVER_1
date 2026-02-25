@@ -31,6 +31,17 @@ namespace WorldServer.core.net.handlers.market
 
             var player = client.Player;
 
+            // Block market listing in community dungeons (temp items)
+            if (player.World?.IsCommunityDungeon == true)
+            {
+                client.SendPacket(new MarketAddResult
+                {
+                    Code = MarketAddResult.SLOT_IS_NULL,
+                    Description = "You cannot use the market in a community dungeon."
+                });
+                return;
+            }
+
             if (!HandleInvalidUptime(client, hours) || !HandleInvalidPrice(client, price) || !HandleInvalidCurrency(client, currency))
                 return;
 

@@ -182,8 +182,8 @@ namespace WorldServer.core.objects
                 return false;
             }
 
-            // save character
-            if (!(World is TestWorld))
+            // save character (skip in community dungeon — temp state, real data is in DungeonBackup)
+            if (!(World is TestWorld) && Client.DungeonBackup == null)
             {
                 SaveToCharacter();
                 Client.Character?.FlushAsync();
