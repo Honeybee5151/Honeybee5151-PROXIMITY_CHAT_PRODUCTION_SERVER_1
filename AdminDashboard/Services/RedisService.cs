@@ -54,21 +54,22 @@ namespace AdminDashboard.Services
         }
 
         /// <summary>
-        /// SCAN keys with pattern, returns page of results
+        /// SCAN keys with pattern, returns page of results using raw SCAN command
         /// </summary>
         public (List<string> Keys, long Cursor) ScanKeys(string pattern, int count, long cursor)
         {
             var keys = new List<string>();
-            int fetched = 0;
 
-            foreach (var key in _server.Keys(pattern: pattern, pageSize: count, cursor: cursor))
-            {
+            // Use raw SCAN for proper cursor-based pagination
+            var result = _db.Execute("SCAN", cursor.ToString(), "MATCH", pattern, "COUNT", count.ToString());
+            var arr = (RedisResult[])result;
+            var nextCursor = long.Parse((string)arr[0]);
+            var keyArr = (RedisResult[])arr[1];
+
+            foreach (var key in keyArr)
                 keys.Add(key.ToString());
-                fetched++;
-                if (fetched >= count) break;
-            }
 
-            return (keys, keys.Count < count ? 0 : cursor + count);
+            return (keys, nextCursor);
         }
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace AdminDashboard.Services
                     return ("hash", dict);
 
                 case RedisType.List:
-                    var list = _db.ListRange(key, 0, 100);
+                    var list = _db.ListRange(key, 0, -1);
                     return ("list", list.Select(v => v.ToString()).ToArray());
 
                 case RedisType.Set:
@@ -97,7 +98,7 @@ namespace AdminDashboard.Services
                     return ("set", set.Select(v => v.ToString()).ToArray());
 
                 case RedisType.SortedSet:
-                    var zset = _db.SortedSetRangeByRankWithScores(key, 0, 100);
+                    var zset = _db.SortedSetRangeByRankWithScores(key, 0, -1);
                     var entries = zset.Select(e => new { Member = e.Element.ToString(), e.Score }).ToArray();
                     return ("sortedset", entries);
 

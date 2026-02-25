@@ -371,11 +371,12 @@ async function loadRedisKeys(append = false) {
             headerTr.style.background = '#1e293b';
             headerTr.style.userSelect = 'none';
             headerTr.onclick = () => {
-                redisGroupState[group] = !redisGroupState[group] !== false ? false : true;
+                const collapsed = redisGroupState[group] !== false;
+                redisGroupState[group] = collapsed ? false : true;
                 const rows = tbody.querySelectorAll(`.${groupId}`);
                 const arrow = headerTr.querySelector('.group-arrow');
-                rows.forEach(r => r.style.display = redisGroupState[group] === false ? 'none' : '');
-                arrow.textContent = redisGroupState[group] === false ? '▶' : '▼';
+                rows.forEach(r => r.style.display = collapsed ? 'none' : '');
+                arrow.textContent = collapsed ? '▶' : '▼';
             };
             headerTr.innerHTML = `<td colspan="3" style="font-weight:600;color:#94a3b8;padding:6px 10px;font-size:13px;"><span class="group-arrow" style="display:inline-block;width:16px;">${isCollapsed ? '▶' : '▼'}</span> ${esc(group)} <span style="color:#475569;font-weight:400;">(${keys.length})</span></td>`;
             tbody.appendChild(headerTr);
@@ -458,89 +459,154 @@ function renderStringEditor(container, key, value) {
 
 function renderHashEditor(container, key, hash) {
     const entries = Object.entries(hash);
-    let html = `<div class="redis-editor">
-        <table class="redis-edit-table"><thead><tr><th>Field</th><th>Value</th><th></th></tr></thead><tbody>`;
-    entries.forEach(([field, val]) => {
-        const safeField = field.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<tr>
-            <td class="redis-field-name">${esc(field)}</td>
-            <td><input class="redis-edit-input" data-field="${esc(field)}" value="${esc(val)}" /></td>
-            <td class="redis-row-actions">
-                <button class="btn btn-success btn-xs" onclick="redisSaveHashField(this)" title="Save">&#10003;</button>
-                <button class="btn btn-danger btn-xs" onclick="redisDeleteHashField('${safeField}')" title="Delete">&#10005;</button>
-            </td></tr>`;
-    });
-    html += `</tbody></table>
+    container.innerHTML = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Field</th><th>Value</th><th></th></tr></thead><tbody id="redis-hash-tbody"></tbody></table>
         <div class="redis-add-row">
             <input class="redis-edit-input" id="redis-new-hash-field" placeholder="New field name" />
             <input class="redis-edit-input" id="redis-new-hash-value" placeholder="Value" />
             <button class="btn btn-primary btn-sm" onclick="redisAddHashField()">Add Field</button>
         </div></div>`;
-    container.innerHTML = html;
+    const tbody = document.getElementById('redis-hash-tbody');
+    entries.forEach(([field, val]) => {
+        const tr = document.createElement('tr');
+        const tdField = document.createElement('td');
+        tdField.className = 'redis-field-name';
+        tdField.textContent = field;
+        const tdVal = document.createElement('td');
+        const input = document.createElement('input');
+        input.className = 'redis-edit-input';
+        input.dataset.field = field;
+        input.value = val;
+        tdVal.appendChild(input);
+        const tdActions = document.createElement('td');
+        tdActions.className = 'redis-row-actions';
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-success btn-xs';
+        saveBtn.title = 'Save';
+        saveBtn.innerHTML = '&#10003;';
+        saveBtn.onclick = () => redisSaveHashField(saveBtn);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-danger btn-xs';
+        delBtn.title = 'Delete';
+        delBtn.innerHTML = '&#10005;';
+        delBtn.onclick = () => redisDeleteHashField(field);
+        tdActions.appendChild(saveBtn);
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdField);
+        tr.appendChild(tdVal);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+    });
 }
 
 function renderListEditor(container, key, items) {
-    let html = `<div class="redis-editor">
-        <table class="redis-edit-table"><thead><tr><th>#</th><th>Value</th><th></th></tr></thead><tbody>`;
-    items.forEach((val, i) => {
-        const safeVal = val.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<tr>
-            <td class="redis-field-name">${i}</td>
-            <td><input class="redis-edit-input" data-index="${i}" value="${esc(val)}" /></td>
-            <td class="redis-row-actions">
-                <button class="btn btn-success btn-xs" onclick="redisSaveListItem(this)" title="Save">&#10003;</button>
-                <button class="btn btn-danger btn-xs" onclick="redisDeleteListItem('${safeVal}')" title="Delete">&#10005;</button>
-            </td></tr>`;
-    });
-    html += `</tbody></table>
+    container.innerHTML = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>#</th><th>Value</th><th></th></tr></thead><tbody id="redis-list-tbody"></tbody></table>
         <div class="redis-add-row">
             <input class="redis-edit-input" id="redis-new-list-value" placeholder="New value" style="flex:1" />
             <button class="btn btn-primary btn-sm" onclick="redisAddListItem()">Push</button>
         </div></div>`;
-    container.innerHTML = html;
+    const tbody = document.getElementById('redis-list-tbody');
+    items.forEach((val, i) => {
+        const tr = document.createElement('tr');
+        const tdIdx = document.createElement('td');
+        tdIdx.className = 'redis-field-name';
+        tdIdx.textContent = i;
+        const tdVal = document.createElement('td');
+        const input = document.createElement('input');
+        input.className = 'redis-edit-input';
+        input.dataset.index = i;
+        input.value = val;
+        tdVal.appendChild(input);
+        const tdActions = document.createElement('td');
+        tdActions.className = 'redis-row-actions';
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-success btn-xs';
+        saveBtn.title = 'Save';
+        saveBtn.innerHTML = '&#10003;';
+        saveBtn.onclick = () => redisSaveListItem(saveBtn);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-danger btn-xs';
+        delBtn.title = 'Delete';
+        delBtn.innerHTML = '&#10005;';
+        delBtn.onclick = () => redisDeleteListItem(val);
+        tdActions.appendChild(saveBtn);
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdIdx);
+        tr.appendChild(tdVal);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+    });
 }
 
 function renderSetEditor(container, key, members) {
-    let html = `<div class="redis-editor">
-        <table class="redis-edit-table"><thead><tr><th>Member</th><th></th></tr></thead><tbody>`;
-    members.forEach(val => {
-        const safeVal = val.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<tr>
-            <td>${esc(val)}</td>
-            <td class="redis-row-actions">
-                <button class="btn btn-danger btn-xs" onclick="redisDeleteSetMember('${safeVal}')" title="Remove">&#10005;</button>
-            </td></tr>`;
-    });
-    html += `</tbody></table>
+    container.innerHTML = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Member</th><th></th></tr></thead><tbody id="redis-set-tbody"></tbody></table>
         <div class="redis-add-row">
             <input class="redis-edit-input" id="redis-new-set-value" placeholder="New member" style="flex:1" />
             <button class="btn btn-primary btn-sm" onclick="redisAddSetMember()">Add</button>
         </div></div>`;
-    container.innerHTML = html;
+    const tbody = document.getElementById('redis-set-tbody');
+    members.forEach(val => {
+        const tr = document.createElement('tr');
+        const tdVal = document.createElement('td');
+        tdVal.textContent = val;
+        const tdActions = document.createElement('td');
+        tdActions.className = 'redis-row-actions';
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-danger btn-xs';
+        delBtn.title = 'Remove';
+        delBtn.innerHTML = '&#10005;';
+        delBtn.onclick = () => redisDeleteSetMember(val);
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdVal);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+    });
 }
 
 function renderSortedSetEditor(container, key, entries) {
-    let html = `<div class="redis-editor">
-        <table class="redis-edit-table"><thead><tr><th>Member</th><th>Score</th><th></th></tr></thead><tbody>`;
-    entries.forEach(e => {
-        const member = e.member || e.Member || '';
-        const score = e.score ?? e.Score ?? 0;
-        const safeMember = member.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<tr>
-            <td>${esc(member)}</td>
-            <td><input class="redis-edit-input redis-score-input" data-member="${esc(member)}" value="${score}" type="number" step="any" /></td>
-            <td class="redis-row-actions">
-                <button class="btn btn-success btn-xs" onclick="redisSaveZSetScore(this)" title="Save">&#10003;</button>
-                <button class="btn btn-danger btn-xs" onclick="redisDeleteZSetMember('${safeMember}')" title="Remove">&#10005;</button>
-            </td></tr>`;
-    });
-    html += `</tbody></table>
+    container.innerHTML = `<div class="redis-editor">
+        <table class="redis-edit-table"><thead><tr><th>Member</th><th>Score</th><th></th></tr></thead><tbody id="redis-zset-tbody"></tbody></table>
         <div class="redis-add-row">
             <input class="redis-edit-input" id="redis-new-zset-member" placeholder="Member" />
             <input class="redis-edit-input redis-score-input" id="redis-new-zset-score" placeholder="Score" type="number" step="any" value="0" />
             <button class="btn btn-primary btn-sm" onclick="redisAddZSetMember()">Add</button>
         </div></div>`;
-    container.innerHTML = html;
+    const tbody = document.getElementById('redis-zset-tbody');
+    entries.forEach(e => {
+        const member = e.member || e.Member || '';
+        const score = e.score ?? e.Score ?? 0;
+        const tr = document.createElement('tr');
+        const tdMember = document.createElement('td');
+        tdMember.textContent = member;
+        const tdScore = document.createElement('td');
+        const input = document.createElement('input');
+        input.className = 'redis-edit-input redis-score-input';
+        input.dataset.member = member;
+        input.value = score;
+        input.type = 'number';
+        input.step = 'any';
+        tdScore.appendChild(input);
+        const tdActions = document.createElement('td');
+        tdActions.className = 'redis-row-actions';
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-success btn-xs';
+        saveBtn.title = 'Save';
+        saveBtn.innerHTML = '&#10003;';
+        saveBtn.onclick = () => redisSaveZSetScore(saveBtn);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-danger btn-xs';
+        delBtn.title = 'Remove';
+        delBtn.innerHTML = '&#10005;';
+        delBtn.onclick = () => redisDeleteZSetMember(member);
+        tdActions.appendChild(saveBtn);
+        tdActions.appendChild(delBtn);
+        tr.appendChild(tdMember);
+        tr.appendChild(tdScore);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+    });
 }
 
 // ---- Redis write operations ----
