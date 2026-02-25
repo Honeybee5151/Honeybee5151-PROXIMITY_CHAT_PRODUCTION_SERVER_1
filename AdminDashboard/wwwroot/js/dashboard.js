@@ -312,6 +312,25 @@ function getKeysTbodyId() {
 }
 
 // ---- All Keys tab ----
+const redisGroupState = {}; // tracks collapsed/expanded state per group
+
+function getKeyGroup(key) {
+    const groupPrefixes = [
+        { prefix: 'account.', label: 'Accounts' },
+        { prefix: 'vault.', label: 'Vaults' },
+        { prefix: 'char.', label: 'Characters' },
+        { prefix: 'classStats.', label: 'Class Stats' },
+        { prefix: 'alive.', label: 'Alive' },
+        { prefix: 'dead.', label: 'Dead' },
+        { prefix: 'market.', label: 'Market' },
+        { prefix: 'legends.', label: 'Legends' },
+    ];
+    for (const g of groupPrefixes) {
+        if (key.startsWith(g.prefix)) return g.label;
+    }
+    return 'Other';
+}
+
 async function loadRedisKeys(append = false) {
     try {
         const pattern = document.getElementById('redis-pattern').value || '*';
@@ -322,24 +341,55 @@ async function loadRedisKeys(append = false) {
         if (!append) tbody.innerHTML = '';
         if (data.keys.length === 0 && !append) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">No keys found</td></tr>';
+            return;
         }
 
-        // Sort: non-account keys first, then account-related keys
-        const accountPrefixes = ['account.', 'vault.', 'char.', 'classStats.', 'alive.', 'dead.'];
-        const isAccountKey = k => accountPrefixes.some(p => k.startsWith(p));
-        const sorted = [...data.keys].sort((a, b) => {
-            const aIsAcc = isAccountKey(a);
-            const bIsAcc = isAccountKey(b);
-            if (aIsAcc !== bIsAcc) return aIsAcc ? 1 : -1;
+        // Group keys by prefix
+        const groups = {};
+        data.keys.forEach(key => {
+            const group = getKeyGroup(key);
+            if (!groups[group]) groups[group] = [];
+            groups[group].push(key);
+        });
+
+        // Sort groups: Other first, then alphabetical
+        const groupOrder = Object.keys(groups).sort((a, b) => {
+            if (a === 'Other') return -1;
+            if (b === 'Other') return 1;
             return a.localeCompare(b);
         });
 
-        sorted.forEach(key => {
-            const tr = document.createElement('tr');
-            tr.style.cursor = 'pointer';
-            tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
-            tr.innerHTML = `<td>${esc(key)}</td><td>-</td><td>-</td>`;
-            tbody.appendChild(tr);
+        groupOrder.forEach(group => {
+            const keys = groups[group].sort((a, b) => a.localeCompare(b));
+            const isCollapsed = redisGroupState[group] === false;
+            const groupId = 'redis-group-' + group.replace(/\s+/g, '-');
+
+            // Group header row
+            const headerTr = document.createElement('tr');
+            headerTr.className = 'redis-group-header';
+            headerTr.style.cursor = 'pointer';
+            headerTr.style.background = '#1e293b';
+            headerTr.style.userSelect = 'none';
+            headerTr.onclick = () => {
+                redisGroupState[group] = !redisGroupState[group] !== false ? false : true;
+                const rows = tbody.querySelectorAll(`.${groupId}`);
+                const arrow = headerTr.querySelector('.group-arrow');
+                rows.forEach(r => r.style.display = redisGroupState[group] === false ? 'none' : '');
+                arrow.textContent = redisGroupState[group] === false ? '▶' : '▼';
+            };
+            headerTr.innerHTML = `<td colspan="3" style="font-weight:600;color:#94a3b8;padding:6px 10px;font-size:13px;"><span class="group-arrow" style="display:inline-block;width:16px;">${isCollapsed ? '▶' : '▼'}</span> ${esc(group)} <span style="color:#475569;font-weight:400;">(${keys.length})</span></td>`;
+            tbody.appendChild(headerTr);
+
+            // Key rows
+            keys.forEach(key => {
+                const tr = document.createElement('tr');
+                tr.className = groupId;
+                tr.style.cursor = 'pointer';
+                if (isCollapsed) tr.style.display = 'none';
+                tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
+                tr.innerHTML = `<td style="padding-left:26px;">${esc(key)}</td><td>-</td><td>-</td>`;
+                tbody.appendChild(tr);
+            });
         });
 
         redisCursor = data.nextCursor;
