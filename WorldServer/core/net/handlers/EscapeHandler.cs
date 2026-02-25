@@ -24,12 +24,7 @@ namespace WorldServer.core.net.handlers
 
             //client.Player.SendInfo("You issued a nexus, if you die its because you dont see this");
 
-            // Leaving community dungeon via /nexus: restore real character
-            if (map.IsCommunityDungeon && client.DungeonBackup != null)
-            {
-                client.RestoreFromBackup();
-                client.DungeonBackup = null;
-            }
+            // Community dungeon restore is handled by Save() on disconnect
 
             client.Player.ApplyPermanentConditionEffect(ConditionEffectIndex.Invincible);
             client.Reconnect(new Reconnect()

@@ -212,7 +212,8 @@ namespace WorldServer.core
                     AllowPlayerTeleport = world.AllowTeleport,
                     ShowDisplays = world.ShowDisplays,
                     DisableShooting = world.DisableShooting,
-                    DisableAbilities = world.DisableAbilities
+                    DisableAbilities = world.DisableAbilities,
+                    CommunityDungeon = world.IsCommunityDungeon
                 }
             };
 

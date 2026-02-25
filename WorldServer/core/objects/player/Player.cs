@@ -450,13 +450,7 @@ namespace WorldServer.core.objects
                 return;
             }
 
-            // Leaving community dungeon: restore real character
-            if (World != null && World.IsCommunityDungeon && Client.DungeonBackup != null
-                && (world == null || !world.IsCommunityDungeon))
-            {
-                Client.RestoreFromBackup();
-                Client.DungeonBackup = null;
-            }
+            // Community dungeon restore is handled by Save() on disconnect
 
             Client.Reconnect(new Reconnect()
             {

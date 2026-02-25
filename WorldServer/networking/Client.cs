@@ -122,13 +122,16 @@ namespace WorldServer.networking
             }
 
             // Restore real character before saving if in community dungeon
+            // Skip SaveToCharacter — the backup IS the real state, don't let Player overwrite it
             if (DungeonBackup != null)
             {
                 RestoreFromBackup();
                 DungeonBackup = null;
             }
-
-            Player.SaveToCharacter();
+            else
+            {
+                Player.SaveToCharacter();
+            }
             acc.RefreshLastSeen();
             acc.FlushAsync();
 

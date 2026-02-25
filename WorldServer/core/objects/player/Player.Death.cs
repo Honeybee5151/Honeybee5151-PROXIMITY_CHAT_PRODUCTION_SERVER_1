@@ -138,10 +138,8 @@ namespace WorldServer.core.objects
             if (World == null || !World.IsCommunityDungeon)
                 return false;
 
-            // Restore real character from backup before reconnecting
-            Client.RestoreFromBackup();
-            Client.DungeonBackup = null;
-
+            // Don't restore here — Save() handles it on disconnect
+            // Just reconnect to nexus without permadeath
             ReconnectToNexus();
             return true;
         }

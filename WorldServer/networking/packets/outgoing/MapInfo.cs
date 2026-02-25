@@ -16,6 +16,7 @@ namespace WorldServer.networking.packets.outgoing
         public string Music { get; set; }
         public bool DisableShooting { get; set; }
         public bool DisableAbilities { get; set; }
+        public bool CommunityDungeon { get; set; }
 
 
         public override MessageId MessageId => MessageId.MAPINFO;
@@ -34,6 +35,7 @@ namespace WorldServer.networking.packets.outgoing
             wtr.WriteUTF16(Music);
             wtr.Write(DisableShooting);
             wtr.Write(DisableAbilities);
+            wtr.Write(CommunityDungeon);
         }
     }
 }
