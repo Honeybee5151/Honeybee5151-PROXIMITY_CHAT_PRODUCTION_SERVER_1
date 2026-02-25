@@ -1,0 +1,995 @@
+{
+  "Vorthak the Tidecaller": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.35
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 12,
+            "type": "PlayerWithinTransition",
+            "target": "tideRising"
+          }
+        ]
+      },
+      "maelstrom": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "The ocean swallows all!",
+              "Drown in the maelstrom!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 255,
+            "period": 0.15,
+            "repeats": 8
+          },
+          {
+            "max": 190,
+            "rate": 10,
+            "type": "ChangeSize"
+          },
+          {
+            "type": "Orbit",
+            "speed": 2.5,
+            "radius": 3.5
+          },
+          {
+            "type": "Shoot",
+            "count": 8,
+            "radius": 10,
+            "coolDown": 700,
+            "shootAngle": 45,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 800,
+            "predictive": 0.8,
+            "shootAngle": 15,
+            "projectileIndex": 1
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 9,
+            "coolDown": 2000,
+            "shootAngle": 40,
+            "projectileIndex": 2
+          },
+          {
+            "type": "Spawn",
+            "child": "Tidal Elemental",
+            "coolDown": 6000,
+            "maxChildren": 3
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "abyssalFury",
+            "threshold": 0.25
+          }
+        ]
+      },
+      "tidalSurge": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Chase",
+            "range": 4,
+            "speed": 5,
+            "sightRange": 14
+          },
+          {
+            "type": "Shoot",
+            "count": 6,
+            "radius": 10,
+            "coolDown": 900,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 8,
+            "coolDown": 2500,
+            "predictive": 0.7,
+            "projectileIndex": 2
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 7,
+            "coolDown": 600,
+            "shootAngle": 25,
+            "projectileIndex": 3
+          },
+          {
+            "type": "Grenade",
+            "range": 7,
+            "damage": 120,
+            "radius": 3.5,
+            "coolDown": 3000
+          }
+        ],
+        "transitions": [
+          {
+            "time": 7000,
+            "type": "TimedTransition",
+            "target": "tideRising"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "maelstrom",
+            "threshold": 0.6
+          }
+        ]
+      },
+      "tideRising": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "text": [
+              "The tides obey my call...",
+              "You dare trespass in my waters?"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 3381759,
+            "period": 0.3,
+            "repeats": 5
+          },
+          {
+            "type": "Orbit",
+            "speed": 1.2,
+            "radius": 5
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 9,
+            "coolDown": 1200,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 7,
+            "coolDown": 1500,
+            "predictive": 0.6,
+            "shootAngle": 30,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 6000,
+            "type": "TimedTransition",
+            "target": "tidalSurge"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "maelstrom",
+            "threshold": 0.6
+          }
+        ]
+      },
+      "abyssalFury": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "THE ABYSS HUNGERS!",
+              "None escape the deep!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 1118719,
+            "period": 0.1,
+            "repeats": 10
+          },
+          {
+            "max": 200,
+            "rate": 15,
+            "type": "ChangeSize"
+          },
+          {
+            "type": "Chase",
+            "range": 2,
+            "speed": 6.5,
+            "sightRange": 16
+          },
+          {
+            "type": "Shoot",
+            "count": 10,
+            "radius": 10,
+            "coolDown": 500,
+            "shootAngle": 36,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 8,
+            "coolDown": 600,
+            "predictive": 0.9,
+            "shootAngle": 10,
+            "projectileIndex": 1
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 9,
+            "coolDown": 1500,
+            "predictive": 0.6,
+            "shootAngle": 25,
+            "projectileIndex": 2
+          },
+          {
+            "type": "Shoot",
+            "count": 6,
+            "radius": 7,
+            "coolDown": 400,
+            "shootAngle": 15,
+            "projectileIndex": 3
+          },
+          {
+            "type": "Grenade",
+            "range": 8,
+            "damage": 150,
+            "radius": 4,
+            "coolDown": 2000
+          },
+          {
+            "type": "HealSelf",
+            "amount": 1500,
+            "coolDown": 8000
+          },
+          {
+            "type": "Spawn",
+            "child": "Tidal Elemental",
+            "coolDown": 5000,
+            "maxChildren": 5
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Crooked Twig",
+        "probability": 0.33
+      },
+      {
+        "item": "Windreaver Katana",
+        "probability": 1.0
+      }
+    ]
+  },
+  "Abyssal Leviathan Spawn": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Chase",
+            "range": 5,
+            "speed": 3.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 1000,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 7,
+            "coolDown": 1800,
+            "predictive": 0.6,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "aggressive",
+            "threshold": 0.6
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Flash",
+            "color": 2237183,
+            "period": 0.3,
+            "repeats": 8
+          },
+          {
+            "type": "Charge",
+            "range": 10,
+            "speed": 6,
+            "coolDown": 2500
+          },
+          {
+            "type": "Shoot",
+            "count": 7,
+            "radius": 10,
+            "coolDown": 600,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 9,
+            "coolDown": 900,
+            "predictive": 0.9,
+            "shootAngle": 25,
+            "projectileIndex": 1
+          },
+          {
+            "type": "HealSelf",
+            "amount": 300,
+            "coolDown": 6000
+          }
+        ],
+        "transitions": []
+      },
+      "aggressive": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Orbit",
+            "speed": 2.5,
+            "radius": 4
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 9,
+            "coolDown": 800,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 8,
+            "coolDown": 1200,
+            "predictive": 0.7,
+            "shootAngle": 30,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.25
+          }
+        ]
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Windreaver Katana",
+        "probability": 1.0
+      }
+    ]
+  },
+  "Drowned Cultist": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.35
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "approach"
+          }
+        ]
+      },
+      "ritual": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Orbit",
+            "speed": 1.2,
+            "radius": 4
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 800,
+            "predictive": 0.7,
+            "shootAngle": 30,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 6,
+            "coolDown": 400,
+            "predictive": 0.9,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.4
+          },
+          {
+            "dist": 10,
+            "type": "NoPlayerWithinTransition",
+            "target": "approach"
+          },
+          {
+            "time": 6000,
+            "type": "TimedTransition",
+            "target": "approach"
+          }
+        ]
+      },
+      "approach": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Chase",
+            "range": 6,
+            "speed": 3.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 8,
+            "coolDown": 1200,
+            "predictive": 0.5,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 6,
+            "type": "PlayerWithinTransition",
+            "target": "ritual"
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "The depths consume all...",
+              "You will drown in silence!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 6684774,
+            "period": 0.3,
+            "repeats": 5
+          },
+          {
+            "type": "Chase",
+            "range": 2,
+            "speed": 5,
+            "sightRange": 14
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 9,
+            "coolDown": 600,
+            "predictive": 0.6,
+            "shootAngle": 18,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 7,
+            "coolDown": 350,
+            "predictive": 1,
+            "shootAngle": 45,
+            "projectileIndex": 0
+          },
+          {
+            "type": "HealSelf",
+            "amount": 200,
+            "coolDown": 5000
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 16,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Windreaver Katana",
+        "probability": 1.0
+      }
+    ]
+  },
+  "Tidesurge Crab": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.3
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "rage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "The tides surge with fury!",
+              "CLACK CLACK CLACK!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 16729600,
+            "period": 0.3,
+            "repeats": 5
+          },
+          {
+            "type": "Chase",
+            "range": 2,
+            "speed": 5.5,
+            "sightRange": 14
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 9,
+            "coolDown": 600,
+            "predictive": 0.7,
+            "shootAngle": 18,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Charge",
+            "range": 10,
+            "speed": 7,
+            "coolDown": 2500
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 16,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "*clicks claws menacingly*"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Chase",
+            "range": 5,
+            "speed": 3.5,
+            "sightRange": 10
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 8,
+            "coolDown": 1200,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "time": 4000,
+            "type": "TimedTransition",
+            "target": "charge_phase"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "rage",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "retreat": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Orbit",
+            "speed": 1.2,
+            "radius": 5
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 8,
+            "coolDown": 1000,
+            "predictive": 0.6,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3000,
+            "type": "TimedTransition",
+            "target": "engage"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "rage",
+            "threshold": 0.4
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "charge_phase": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Charge",
+            "range": 8,
+            "speed": 6,
+            "coolDown": 1500
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 7,
+            "coolDown": 900,
+            "shootAngle": 30,
+            "projectileIndex": 0
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3500,
+            "type": "TimedTransition",
+            "target": "retreat"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "rage",
+            "threshold": 0.4
+          }
+        ]
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Windreaver Katana",
+        "probability": 1.0
+      }
+    ]
+  },
+  "Riptide Wraith": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.5
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 10,
+            "type": "PlayerWithinTransition",
+            "target": "haunt"
+          }
+        ]
+      },
+      "haunt": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Orbit",
+            "speed": 1.8,
+            "radius": 5
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 8,
+            "coolDown": 900,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 7,
+            "coolDown": 1500,
+            "predictive": 0.7,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "surge",
+            "threshold": 0.6
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "surge": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "The tide consumes all...",
+              "You cannot escape the current!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 4456703,
+            "period": 0.3,
+            "repeats": 4
+          },
+          {
+            "type": "Chase",
+            "range": 3,
+            "speed": 5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 9,
+            "coolDown": 700,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 8,
+            "coolDown": 1200,
+            "predictive": 0.6,
+            "shootAngle": 30,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "maelstrom",
+            "threshold": 0.3
+          }
+        ]
+      },
+      "maelstrom": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "DROWN IN THE ABYSS!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 255,
+            "period": 0.15,
+            "repeats": 8
+          },
+          {
+            "max": 110,
+            "rate": 15,
+            "type": "ChangeSize"
+          },
+          {
+            "type": "Charge",
+            "range": 10,
+            "speed": 6,
+            "coolDown": 2500
+          },
+          {
+            "type": "Shoot",
+            "count": 8,
+            "radius": 10,
+            "coolDown": 500,
+            "shootAngle": 45,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 9,
+            "coolDown": 800,
+            "predictive": 0.9,
+            "shootAngle": 25,
+            "projectileIndex": 1
+          },
+          {
+            "type": "HealSelf",
+            "amount": 200,
+            "coolDown": 5000
+          }
+        ],
+        "transitions": []
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Windreaver Katana",
+        "probability": 1.0
+      }
+    ]
+  }
+}

@@ -552,4 +552,18 @@
 		<Dungeon/>
 		<CommunityDungeon/>
 	</World>
+	<World id="9">
+		<Width>32</Width>
+		<Height>32</Height>
+		<MapJM>Dungeons/9.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Windreaver Katana,,,</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>1000,1290,100,70,10,10,10,10</PresetStats>
+		<PresetHealthPotions>6</PresetHealthPotions>
+		<PresetManaPotions>6</PresetManaPotions>
+		<PresetHasBackpack>true</PresetHasBackpack>
+	</World>
 </Worlds>
