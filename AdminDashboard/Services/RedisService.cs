@@ -54,22 +54,29 @@ namespace AdminDashboard.Services
         }
 
         /// <summary>
-        /// SCAN keys with pattern, returns page of results using raw SCAN command
+        /// SCAN keys with pattern, loops until we have enough keys or scan completes
         /// </summary>
         public (List<string> Keys, long Cursor) ScanKeys(string pattern, int count, long cursor)
         {
             var keys = new List<string>();
+            var currentCursor = cursor;
 
-            // Use raw SCAN for proper cursor-based pagination
-            var result = _db.Execute("SCAN", cursor.ToString(), "MATCH", pattern, "COUNT", count.ToString());
-            var arr = (RedisResult[])result;
-            var nextCursor = long.Parse((string)arr[0]);
-            var keyArr = (RedisResult[])arr[1];
+            // Loop SCAN until we have enough keys or cursor returns to 0
+            while (keys.Count < count)
+            {
+                var result = _db.Execute("SCAN", currentCursor.ToString(), "MATCH", pattern, "COUNT", "200");
+                var arr = (RedisResult[])result;
+                currentCursor = long.Parse((string)arr[0]);
+                var keyArr = (RedisResult[])arr[1];
 
-            foreach (var key in keyArr)
-                keys.Add(key.ToString());
+                foreach (var key in keyArr)
+                    keys.Add(key.ToString());
 
-            return (keys, nextCursor);
+                // Cursor 0 means full scan complete
+                if (currentCursor == 0) break;
+            }
+
+            return (keys, currentCursor);
         }
 
         /// <summary>
