@@ -50,8 +50,10 @@ namespace WorldServer.core.net.handlers
                 }
 
                 // Community dungeon: backup real character and override with temp classless character
+                Console.WriteLine($"[CommunityDungeon] World={target.IdName} IsCommunityDungeon={target.IsCommunityDungeon} Items[0..3]={string.Join(",", client.Character.Items.Take(4).Select(i => $"0x{i:X4}"))}");
                 if (target.IsCommunityDungeon)
                     SetupCommunityDungeonCharacter(client, target);
+                Console.WriteLine($"[CommunityDungeon] After setup: Items[0..3]={string.Join(",", client.Character.Items.Take(4).Select(i => $"0x{i:X4}"))} DungeonBackup={client.DungeonBackup != null}");
 
                 var player = client.Player = target.CreateNewPlayer(client, client.Character.ObjectType, x, y);
 
