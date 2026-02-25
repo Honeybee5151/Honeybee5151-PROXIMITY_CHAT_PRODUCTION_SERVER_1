@@ -171,7 +171,7 @@ namespace WorldServer.core.miscfile
 
             var nameTag = "";
             if (player.Client.Account.Admin)
-                nameTag = "[*] ";
+                nameTag = "[Owner] ";
             else if (player.Client.Account.Rank == (int)RankingType.Moderator)
                 nameTag = "[!] ";
 
