@@ -16,12 +16,26 @@ using WorldServer.networking.packets.outgoing;
 
 namespace WorldServer.networking
 {
+    public class CharacterBackup
+    {
+        public ushort ObjectType;
+        public ushort[] Items;
+        public Shared.database.character.inventory.ItemData[] Datas;
+        public int[] Stats;
+        public int Level, Experience, Health, MP, Fame;
+        public int Skin, Tex1, Tex2;
+        public bool HasBackpack;
+        public int HealthStackCount, MagicStackCount;
+    }
+
     public partial class Client
     {
         internal object DcLock = new object();
 
         //Temporary connection state
         internal int TargetWorld = -1;
+
+        public CharacterBackup DungeonBackup { get; set; }
 
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -107,6 +121,13 @@ namespace WorldServer.networking
                 return;
             }
 
+            // Restore real character before saving if in community dungeon
+            if (DungeonBackup != null)
+            {
+                RestoreFromBackup();
+                DungeonBackup = null;
+            }
+
             Player.SaveToCharacter();
             acc.RefreshLastSeen();
             acc.FlushAsync();
@@ -114,6 +135,27 @@ namespace WorldServer.networking
             if (GameServer != null && GameServer.Database != null && Player.FameCounter != null && Player.FameCounter.ClassStats != null)
                 if (GameServer.Database.SaveCharacter(acc, Character, Player.FameCounter.ClassStats, true))
                     GameServer.Database.ReleaseLock(acc);
+        }
+
+        public void RestoreFromBackup()
+        {
+            if (DungeonBackup == null || Character == null) return;
+            var b = DungeonBackup;
+            Character.ObjectType = b.ObjectType;
+            Character.Items = b.Items;
+            Character.Datas = b.Datas;
+            Character.Stats = b.Stats;
+            Character.Level = b.Level;
+            Character.Experience = b.Experience;
+            Character.Health = b.Health;
+            Character.MP = b.MP;
+            Character.Fame = b.Fame;
+            Character.Skin = (ushort)b.Skin;
+            Character.Tex1 = b.Tex1;
+            Character.Tex2 = b.Tex2;
+            Character.HasBackpack = b.HasBackpack;
+            Character.HealthStackCount = b.HealthStackCount;
+            Character.MagicStackCount = b.MagicStackCount;
         }
 
         public void Reconnect(Reconnect pkt)

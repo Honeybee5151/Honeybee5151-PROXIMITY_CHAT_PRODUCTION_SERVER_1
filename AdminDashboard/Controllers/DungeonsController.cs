@@ -669,12 +669,23 @@ namespace AdminDashboard.Controllers
                 var width = mapJm["width"]?.Value<int>() ?? 256;
                 var height = mapJm["height"]?.Value<int>() ?? 256;
 
+                // Build starting equipment element from Supabase data
+                var startingEquipStr = "";
+                var startEquipArr = dungeon["starting_equipment"] as JArray;
+                if (startEquipArr != null && startEquipArr.Count > 0)
+                {
+                    var equipNames = string.Join(",", startEquipArr.Select(e => e.ToString()));
+                    startingEquipStr = $"\t\t<StartingEquipment>{EscapeXml(equipNames)}</StartingEquipment>\n";
+                }
+
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
                     $"\t\t<Width>{width}</Width>\n" +
                     $"\t\t<Height>{height}</Height>\n" +
                     $"\t\t<MapJM>Dungeons/{safeTitle}.jm</MapJM>\n" +
                     $"\t\t<VisibilityType>1</VisibilityType>\n" +
                     $"\t\t<Dungeon/>\n" +
+                    $"\t\t<CommunityDungeon/>\n" +
+                    startingEquipStr +
                     $"\t</World>\n";
 
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");

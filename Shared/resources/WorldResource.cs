@@ -33,6 +33,8 @@ namespace Shared.resources
         public readonly bool DisableShooting;
         public readonly bool DisableAbilities;
         public readonly bool CreateInstance;
+        public readonly bool IsCommunityDungeon;
+        public readonly string[] StartingEquipment;
 
         public WorldResource(XElement elem)
         {
@@ -51,6 +53,9 @@ namespace Shared.resources
             DisableShooting = elem.HasElement("DisableShooting");
             DisableAbilities = elem.HasElement("DisableAbilities");
             CreateInstance = elem.HasElement("CreateInstance");
+            IsCommunityDungeon = elem.HasElement("CommunityDungeon");
+            var startEquip = elem.GetValue<string>("StartingEquipment", null);
+            StartingEquipment = string.IsNullOrEmpty(startEquip) ? Array.Empty<string>() : startEquip.Split(',');
 
             MapJM = new List<string>();
             foreach (var map in elem.Elements("MapJM"))

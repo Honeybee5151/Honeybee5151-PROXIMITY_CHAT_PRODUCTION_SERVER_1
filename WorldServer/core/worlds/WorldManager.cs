@@ -139,6 +139,13 @@ namespace WorldServer.core.worlds
             }
 
             world.Init();
+
+            if (worldResource.IsCommunityDungeon)
+            {
+                world.IsCommunityDungeon = true;
+                world.StartingEquipment = worldResource.StartingEquipment;
+            }
+
             _ = Worlds.TryAdd(world.Id, world);
             // null parents are threaded as they get treated as the root
             if (parent == null)

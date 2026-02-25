@@ -97,7 +97,10 @@ namespace WorldServer.core.objects
 
             if (HandleTestWorld())
                 return;
-            
+
+            if (HandleCommunityDungeon())
+                return;
+
             if (rekt)
             {
                 GenerateGravestone(true);
@@ -126,6 +129,19 @@ namespace WorldServer.core.objects
             if (World is not TestWorld)
                 return false;
             GenerateGravestone();
+            ReconnectToNexus();
+            return true;
+        }
+
+        private bool HandleCommunityDungeon()
+        {
+            if (World == null || !World.IsCommunityDungeon)
+                return false;
+
+            // Restore real character from backup before reconnecting
+            Client.RestoreFromBackup();
+            Client.DungeonBackup = null;
+
             ReconnectToNexus();
             return true;
         }

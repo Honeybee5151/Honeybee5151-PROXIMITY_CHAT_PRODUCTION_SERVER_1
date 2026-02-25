@@ -49,6 +49,8 @@ namespace WorldServer.core.worlds
         public bool isWeekend { get; set; } = false;
         public string CustomGroundsXml { get; set; }
         public string CustomDungeonAssetsXml { get; set; }
+        public bool IsCommunityDungeon { get; set; } = false;
+        public string[] StartingEquipment { get; set; }
 
         public readonly Wmap Map;
         public readonly GameServer GameServer;
