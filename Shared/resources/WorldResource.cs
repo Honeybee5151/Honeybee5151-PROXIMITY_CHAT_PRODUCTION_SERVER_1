@@ -35,6 +35,12 @@ namespace Shared.resources
         public readonly bool CreateInstance;
         public readonly bool IsCommunityDungeon;
         public readonly string[] StartingEquipment;
+        public readonly string[] InventoryItems;
+        public readonly int PresetLevel;
+        public readonly int[] PresetStats;    // [HP, MP, Att, Def, Spd, Dex, Vit, Wis]
+        public readonly int PresetHealthPotions;
+        public readonly int PresetManaPotions;
+        public readonly bool PresetHasBackpack;
 
         public WorldResource(XElement elem)
         {
@@ -56,6 +62,28 @@ namespace Shared.resources
             IsCommunityDungeon = elem.HasElement("CommunityDungeon");
             var startEquip = elem.GetValue<string>("StartingEquipment", null);
             StartingEquipment = string.IsNullOrEmpty(startEquip) ? Array.Empty<string>() : startEquip.Split(',');
+
+            var invItems = elem.GetValue<string>("InventoryItems", null);
+            InventoryItems = string.IsNullOrEmpty(invItems) ? Array.Empty<string>() : invItems.Split(',');
+
+            PresetLevel = elem.GetValue("PresetLevel", 1);
+
+            var statsStr = elem.GetValue<string>("PresetStats", null);
+            if (!string.IsNullOrEmpty(statsStr))
+            {
+                var parts = statsStr.Split(',');
+                PresetStats = new int[parts.Length];
+                for (int i = 0; i < parts.Length; i++)
+                    int.TryParse(parts[i].Trim(), out PresetStats[i]);
+            }
+            else
+            {
+                PresetStats = new int[] { 100, 100, 10, 0, 10, 10, 10, 10 };
+            }
+
+            PresetHealthPotions = elem.GetValue("PresetHealthPotions", 0);
+            PresetManaPotions = elem.GetValue("PresetManaPotions", 0);
+            PresetHasBackpack = elem.HasElement("PresetHasBackpack") && elem.GetValue<string>("PresetHasBackpack", "false").Equals("true", StringComparison.OrdinalIgnoreCase);
 
             MapJM = new List<string>();
             foreach (var map in elem.Elements("MapJM"))

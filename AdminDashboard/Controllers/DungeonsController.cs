@@ -669,13 +669,50 @@ namespace AdminDashboard.Controllers
                 var width = mapJm["width"]?.Value<int>() ?? 256;
                 var height = mapJm["height"]?.Value<int>() ?? 256;
 
-                // Build starting equipment element from Supabase data
-                var startingEquipStr = "";
-                var startEquipArr = dungeon["starting_equipment"] as JArray;
-                if (startEquipArr != null && startEquipArr.Count > 0)
+                // Build character preset elements from Supabase data
+                var presetStr = "";
+                var preset = dungeon["character_preset"] as JObject;
+                if (preset != null)
                 {
-                    var equipNames = string.Join(",", startEquipArr.Select(e => e.ToString()));
-                    startingEquipStr = $"\t\t<StartingEquipment>{EscapeXml(equipNames)}</StartingEquipment>\n";
+                    // Equipped items (slots 0-3)
+                    var equipped = preset["equippedItems"] as JArray;
+                    if (equipped != null && equipped.Count > 0)
+                    {
+                        var names = string.Join(",", equipped.Select(e => e.ToString()));
+                        presetStr += $"\t\t<StartingEquipment>{EscapeXml(names)}</StartingEquipment>\n";
+                    }
+                    // Inventory items (slots 4+)
+                    var inventory = preset["inventoryItems"] as JArray;
+                    if (inventory != null && inventory.Count > 0)
+                    {
+                        var names = string.Join(",", inventory.Select(e => e.ToString()));
+                        presetStr += $"\t\t<InventoryItems>{EscapeXml(names)}</InventoryItems>\n";
+                    }
+                    // Level
+                    var level = preset["level"]?.Value<int>() ?? 1;
+                    presetStr += $"\t\t<PresetLevel>{level}</PresetLevel>\n";
+                    // Stats
+                    var stats = preset["stats"] as JObject;
+                    if (stats != null)
+                    {
+                        var s = $"{stats["hp"]?.Value<int>() ?? 100},{stats["mp"]?.Value<int>() ?? 100},{stats["att"]?.Value<int>() ?? 10},{stats["def"]?.Value<int>() ?? 0},{stats["spd"]?.Value<int>() ?? 10},{stats["dex"]?.Value<int>() ?? 10},{stats["vit"]?.Value<int>() ?? 10},{stats["wis"]?.Value<int>() ?? 10}";
+                        presetStr += $"\t\t<PresetStats>{s}</PresetStats>\n";
+                    }
+                    // Potions
+                    presetStr += $"\t\t<PresetHealthPotions>{preset["healthPotions"]?.Value<int>() ?? 0}</PresetHealthPotions>\n";
+                    presetStr += $"\t\t<PresetManaPotions>{preset["manaPotions"]?.Value<int>() ?? 0}</PresetManaPotions>\n";
+                    // Backpack
+                    presetStr += $"\t\t<PresetHasBackpack>{(preset["hasBackpack"]?.Value<bool>() ?? false).ToString().ToLower()}</PresetHasBackpack>\n";
+                }
+                else
+                {
+                    // Backward compat: use old starting_equipment array
+                    var startEquipArr = dungeon["starting_equipment"] as JArray;
+                    if (startEquipArr != null && startEquipArr.Count > 0)
+                    {
+                        var equipNames = string.Join(",", startEquipArr.Select(e => e.ToString()));
+                        presetStr = $"\t\t<StartingEquipment>{EscapeXml(equipNames)}</StartingEquipment>\n";
+                    }
                 }
 
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
@@ -685,7 +722,7 @@ namespace AdminDashboard.Controllers
                     $"\t\t<VisibilityType>1</VisibilityType>\n" +
                     $"\t\t<Dungeon/>\n" +
                     $"\t\t<CommunityDungeon/>\n" +
-                    startingEquipStr +
+                    presetStr +
                     $"\t</World>\n";
 
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");

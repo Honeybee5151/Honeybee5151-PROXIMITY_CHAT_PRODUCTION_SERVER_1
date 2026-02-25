@@ -500,14 +500,11 @@ namespace WorldServer.core.objects
             {
                 if (ShowDeltaTimeLog)
                     SendInfo($"[DeltaTime]: {World.DisplayName} -> {time.ElapsedMsDelta}");
-                if (!_checkedRankNotification)
+                _rankNotificationTimer -= time.ElapsedMsDelta;
+                if (_rankNotificationTimer <= 0)
                 {
-                    _rankNotificationTimer -= time.ElapsedMsDelta;
-                    if (_rankNotificationTimer <= 0)
-                    {
-                        _rankNotificationTimer = 30000; // check every 30s
-                        CheckRankNotification();
-                    }
+                    _rankNotificationTimer = 30000; // check every 30s
+                    RefreshAccountRank();
                 }
                 HandleOxygen(time);
                 CheckTradeTimeout(time);
@@ -525,32 +522,39 @@ namespace WorldServer.core.objects
             base.Tick(ref time);
         }
 
-        private void CheckRankNotification()
+        private void RefreshAccountRank()
         {
             try
             {
-                var db = GameServer.Database.Conn;
-                var key = $"rank_notification:{AccountId}";
-                var value = db.StringGet(key);
-                if (!value.IsNullOrEmpty)
+                // Refresh admin/rank from Redis so chat prefixes update live
+                Client.Account.Reload("admin");
+                Client.Account.Reload("rank");
+
+                // Also sync donation rank stat to match Redis
+                var donationRank = Client.Account.Rank;
+                if (donationRank != Rank)
+                    Rank = donationRank;
+
+                // Check for pending rank notification (one-time)
+                if (!_checkedRankNotification)
                 {
-                    var json = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>((string)value);
-                    string rankName = json?.rankName;
-                    if (!string.IsNullOrEmpty(rankName))
+                    var db = GameServer.Database.Conn;
+                    var key = $"rank_notification:{AccountId}";
+                    var value = db.StringGet(key);
+                    if (!value.IsNullOrEmpty)
                     {
-                        SendInfo($"Thank you for your purchase! You are now a {rankName}!");
-                        // Reload rank from Redis
-                        var rankStr = db.HashGet($"account.{AccountId}", "rank");
-                        if (!rankStr.IsNullOrEmpty && int.TryParse((string)rankStr, out var newRank))
-                            Rank = newRank;
+                        var json = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>((string)value);
+                        string rankName = json?.rankName;
+                        if (!string.IsNullOrEmpty(rankName))
+                            SendInfo($"Thank you for your purchase! You are now a {rankName}!");
+                        db.KeyDelete(key);
+                        _checkedRankNotification = true;
                     }
-                    db.KeyDelete(key);
-                    _checkedRankNotification = true; // stop polling after consuming
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[RankNotification] Error for account {AccountId}: {ex.Message}");
+                Console.WriteLine($"[RankRefresh] Error for account {AccountId}: {ex.Message}");
             }
         }
 

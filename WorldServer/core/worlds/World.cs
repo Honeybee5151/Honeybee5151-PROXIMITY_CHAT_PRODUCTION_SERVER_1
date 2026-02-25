@@ -51,6 +51,12 @@ namespace WorldServer.core.worlds
         public string CustomDungeonAssetsXml { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
         public string[] StartingEquipment { get; set; }
+        public string[] InventoryItems { get; set; }
+        public int PresetLevel { get; set; } = 1;
+        public int[] PresetStats { get; set; }
+        public int PresetHealthPotions { get; set; }
+        public int PresetManaPotions { get; set; }
+        public bool PresetHasBackpack { get; set; }
 
         public readonly Wmap Map;
         public readonly GameServer GameServer;

@@ -109,26 +109,37 @@ namespace WorldServer.core.net.handlers
             for (int i = 0; i < items.Length; i++)
                 items[i] = 0xffff;
 
-            // Give starting equipment from dungeon config
+            // Give starting equipment from dungeon config (slots 0-3: equipped)
             if (target.StartingEquipment != null)
             {
-                for (int i = 0; i < target.StartingEquipment.Length && i < items.Length; i++)
+                for (int i = 0; i < target.StartingEquipment.Length && i < 4 && i < items.Length; i++)
                 {
                     var itemName = target.StartingEquipment[i].Trim();
                     if (!string.IsNullOrEmpty(itemName) && gameData.IdToObjectType.TryGetValue(itemName, out var itemType))
                         items[i] = itemType;
                 }
             }
+
+            // Inventory items from preset (slots 4+)
+            if (target.InventoryItems != null)
+            {
+                for (int i = 0; i < target.InventoryItems.Length && (i + 4) < items.Length; i++)
+                {
+                    var itemName = target.InventoryItems[i].Trim();
+                    if (!string.IsNullOrEmpty(itemName) && gameData.IdToObjectType.TryGetValue(itemName, out var itemType))
+                        items[i + 4] = itemType;
+                }
+            }
             chr.Items = items;
             chr.Datas = new ItemData[chr.Datas?.Length ?? 20];
 
-            // Set level 1, universal base stats (classless)
-            chr.Level = 1;
+            // Level and stats from dungeon preset (with defaults)
+            var presetStats = target.PresetStats ?? new int[] { 100, 100, 10, 0, 10, 10, 10, 10 };
+            chr.Level = target.PresetLevel > 0 ? target.PresetLevel : 1;
             chr.Experience = 0;
-            // Stats: [HP, MP, Att, Def, Spd, Dex, Vit, Wis]
-            chr.Stats = new int[] { 100, 100, 10, 0, 10, 10, 10, 10 };
-            chr.Health = 100;
-            chr.MP = 100;
+            chr.Stats = (int[])presetStats.Clone();
+            chr.Health = presetStats[0];
+            chr.MP = presetStats[1];
             chr.Fame = 0;
 
             // Override class to Warrior (0x031d) so Skeleton Warrior skin (0x745E) works for all classes
@@ -137,10 +148,10 @@ namespace WorldServer.core.net.handlers
             chr.Tex1 = 0;
             chr.Tex2 = 0;
 
-            // Clear potion stacks and backpack
-            chr.HasBackpack = false;
-            chr.HealthStackCount = 0;
-            chr.MagicStackCount = 0;
+            // Potions and backpack from preset
+            chr.HasBackpack = target.PresetHasBackpack;
+            chr.HealthStackCount = target.PresetHealthPotions;
+            chr.MagicStackCount = target.PresetManaPotions;
         }
 
         private static readonly HttpClient _httpClient = new HttpClient();

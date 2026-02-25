@@ -144,6 +144,12 @@ namespace WorldServer.core.worlds
             {
                 world.IsCommunityDungeon = true;
                 world.StartingEquipment = worldResource.StartingEquipment;
+                world.InventoryItems = worldResource.InventoryItems;
+                world.PresetLevel = worldResource.PresetLevel;
+                world.PresetStats = worldResource.PresetStats;
+                world.PresetHealthPotions = worldResource.PresetHealthPotions;
+                world.PresetManaPotions = worldResource.PresetManaPotions;
+                world.PresetHasBackpack = worldResource.PresetHasBackpack;
             }
 
             _ = Worlds.TryAdd(world.Id, world);
