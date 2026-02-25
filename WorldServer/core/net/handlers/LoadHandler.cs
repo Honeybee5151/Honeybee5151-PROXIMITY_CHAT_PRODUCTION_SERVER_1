@@ -126,7 +126,8 @@ namespace WorldServer.core.net.handlers
             chr.Health = 770;
             chr.MP = 252;
 
-            // Skeleton Warrior skin (0x745E)
+            // Override class to Warrior (0x031d) so Skeleton Warrior skin (0x745E) works for all classes
+            chr.ObjectType = 0x031d;
             chr.Skin = 0x745E;
             chr.Tex1 = 0;
             chr.Tex2 = 0;
