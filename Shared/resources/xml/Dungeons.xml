@@ -358,6 +358,7 @@
 		<MapJM>Dungeons/laggy.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="hello">
 		<Width>64</Width>
@@ -365,6 +366,7 @@
 		<MapJM>Dungeons/hello.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="ty">
 		<Width>8</Width>
@@ -372,6 +374,7 @@
 		<MapJM>Dungeons/ty.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="Pirate">
 		<Width>8</Width>
@@ -379,6 +382,7 @@
 		<MapJM>Dungeons/Pirate.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="cavern">
 		<Width>8</Width>
@@ -386,6 +390,7 @@
 		<MapJM>Dungeons/cavern.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="awd">
 		<Width>8</Width>
@@ -393,6 +398,7 @@
 		<MapJM>Dungeons/awd.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="awdww">
 		<Width>8</Width>
@@ -400,6 +406,7 @@
 		<MapJM>Dungeons/awdww.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="fdddd">
 		<Width>8</Width>
@@ -407,6 +414,7 @@
 		<MapJM>Dungeons/fdddd.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="awdawd">
 		<Width>8</Width>
@@ -414,6 +422,7 @@
 		<MapJM>Dungeons/awdawd.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="lean">
 		<Width>8</Width>
@@ -421,6 +430,7 @@
 		<MapJM>Dungeons/lean.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="mrsus">
 		<Width>8</Width>
@@ -428,6 +438,7 @@
 		<MapJM>Dungeons/mrsus.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="goblin1">
 		<Width>8</Width>
@@ -435,6 +446,7 @@
 		<MapJM>Dungeons/goblin1.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="now">
 		<Width>8</Width>
@@ -442,6 +454,7 @@
 		<MapJM>Dungeons/now.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="plz2323">
 		<Width>8</Width>
@@ -449,6 +462,7 @@
 		<MapJM>Dungeons/plz2323.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="update1000">
 		<Width>8</Width>
@@ -456,6 +470,7 @@
 		<MapJM>Dungeons/update1000.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="placeholder">
 		<Width>8</Width>
@@ -463,6 +478,7 @@
 		<MapJM>Dungeons/placeholder.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="orc">
 		<Width>8</Width>
@@ -470,6 +486,7 @@
 		<MapJM>Dungeons/orc.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="stick5">
 		<Width>8</Width>
@@ -477,6 +494,7 @@
 		<MapJM>Dungeons/stick5.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="1">
 		<Width>8</Width>
@@ -484,6 +502,7 @@
 		<MapJM>Dungeons/1.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="2">
 		<Width>8</Width>
@@ -491,6 +510,7 @@
 		<MapJM>Dungeons/2.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="4">
 		<Width>32</Width>
@@ -498,6 +518,7 @@
 		<MapJM>Dungeons/4.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="5">
 		<Width>32</Width>
@@ -505,6 +526,7 @@
 		<MapJM>Dungeons/5.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="6">
 		<Width>32</Width>
@@ -512,6 +534,7 @@
 		<MapJM>Dungeons/6.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="7">
 		<Width>32</Width>
@@ -519,6 +542,7 @@
 		<MapJM>Dungeons/7.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 	<World id="8">
 		<Width>32</Width>
@@ -526,5 +550,6 @@
 		<MapJM>Dungeons/8.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 	</World>
 </Worlds>
