@@ -69,6 +69,13 @@ namespace AdminDashboard
                     return;
                 }
 
+                // Allow donation webhook (has its own X-Webhook-Secret auth)
+                if (path == "/api/donations/grant-rank")
+                {
+                    await next();
+                    return;
+                }
+
                 // Check Bearer token
                 var authHeader = context.Request.Headers["Authorization"].ToString();
                 if (authHeader == $"Bearer {adminToken}")
