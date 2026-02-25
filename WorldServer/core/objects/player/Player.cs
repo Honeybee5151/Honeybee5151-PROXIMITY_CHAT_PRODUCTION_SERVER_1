@@ -30,6 +30,7 @@ namespace WorldServer.core.objects
     {
         public Client Client { get; private set; }
         private bool _voiceAuthSent = false;
+        private bool _checkedRankNotification = false;
         public bool ShowDeltaTimeLog { get; set; }
         public FameCounter FameCounter { get; private set; }
         public ConcurrentQueue<InboundBuffer> IncomingMessages { get; private set; } = new ConcurrentQueue<InboundBuffer>();
@@ -496,6 +497,11 @@ namespace WorldServer.core.objects
             {
                 if (ShowDeltaTimeLog)
                     SendInfo($"[DeltaTime]: {World.DisplayName} -> {time.ElapsedMsDelta}");
+                if (!_checkedRankNotification)
+                {
+                    _checkedRankNotification = true;
+                    CheckRankNotification();
+                }
                 HandleOxygen(time);
                 CheckTradeTimeout(time);
                 HandleQuest(time);
@@ -510,6 +516,34 @@ namespace WorldServer.core.objects
                 TickCount++;
             }
             base.Tick(ref time);
+        }
+
+        private void CheckRankNotification()
+        {
+            try
+            {
+                var db = GameServer.Database.Conn;
+                var key = $"rank_notification:{AccountId}";
+                var value = db.StringGet(key);
+                if (!value.IsNullOrEmpty)
+                {
+                    var json = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>((string)value);
+                    string rankName = json?.rankName;
+                    if (!string.IsNullOrEmpty(rankName))
+                    {
+                        SendInfo($"Thank you for your purchase! You are now a {rankName}!");
+                        // Reload rank from Redis
+                        var rankStr = db.HashGet($"account.{AccountId}", "rank");
+                        if (!rankStr.IsNullOrEmpty && int.TryParse((string)rankStr, out var newRank))
+                            Rank = newRank;
+                    }
+                    db.KeyDelete(key);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[RankNotification] Error for account {AccountId}: {ex.Message}");
+            }
         }
 
         public bool IsInMarket { get; private set; }

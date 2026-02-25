@@ -66,6 +66,43 @@ namespace AdminDashboard.Services
             }
         }
 
+        /// <summary>Get pending (ungranted) purchases for a player</summary>
+        public async Task<List<JObject>> GetPendingPurchases(string gameName)
+        {
+            var url = $"{_url}/rest/v1/purchases?game_name=eq.{Uri.EscapeDataString(gameName)}&granted_in_game=eq.false&select=*";
+            var res = await _http.GetAsync(url);
+            var json = await res.Content.ReadAsStringAsync();
+            if (!res.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[Supabase] GetPendingPurchases error: {res.StatusCode} - {json}");
+                return new List<JObject>();
+            }
+            return JsonConvert.DeserializeObject<List<JObject>>(json) ?? new List<JObject>();
+        }
+
+        /// <summary>Mark a purchase as granted in-game</summary>
+        public async Task MarkPurchaseGranted(string stripeSessionId)
+        {
+            var content = new StringContent(
+                JsonConvert.SerializeObject(new { granted_in_game = true }),
+                Encoding.UTF8, "application/json"
+            );
+            content.Headers.Add("Prefer", "return=minimal");
+            var req = new HttpRequestMessage(HttpMethod.Patch,
+                $"{_url}/rest/v1/purchases?stripe_session_id=eq.{Uri.EscapeDataString(stripeSessionId)}")
+            {
+                Content = content
+            };
+            req.Headers.Add("apikey", _serviceKey);
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _serviceKey);
+            var res = await _http.SendAsync(req);
+            if (!res.IsSuccessStatusCode)
+            {
+                var err = await res.Content.ReadAsStringAsync();
+                Console.WriteLine($"[Supabase] MarkPurchaseGranted error: {res.StatusCode} - {err}");
+            }
+        }
+
         /// <summary>Update dungeon status</summary>
         public async Task UpdateStatus(string id, string status)
         {

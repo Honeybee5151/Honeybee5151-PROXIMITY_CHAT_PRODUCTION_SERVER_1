@@ -183,6 +183,12 @@ namespace AdminDashboard.Services
             return _db.KeyDelete(key);
         }
 
+        /// <summary>Set expiry on a key</summary>
+        public bool KeyExpire(string key, TimeSpan expiry)
+        {
+            return _db.KeyExpire(key, expiry);
+        }
+
         /// <summary>Add a new hash field</summary>
         public void HashAddField(string key, string field, string value)
         {

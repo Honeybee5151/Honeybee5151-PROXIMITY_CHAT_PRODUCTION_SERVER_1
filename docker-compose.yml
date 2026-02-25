@@ -17,6 +17,7 @@ services:
     environment:
       - IS_DOCKER=true
       - ADMIN_DASHBOARD=true #8812938
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
     ports:
       - "2050:2050"
       - "2051:2051"
@@ -50,6 +51,7 @@ services:
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
       - GITHUB_PAT=${GITHUB_PAT}
       - GITHUB_REPO=${GITHUB_REPO}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
     ports:
       - "8889:8080"
 
