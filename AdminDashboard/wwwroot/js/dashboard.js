@@ -331,7 +331,7 @@ async function loadRedisGroups() {
         }
 
         groups.forEach(g => {
-            // Init group state if not exists
+            // Init group state if not exists — default closed
             if (!redisGroupData[g.prefix]) {
                 redisGroupData[g.prefix] = { expanded: false, keys: [], cursor: 0, loaded: false };
             }
