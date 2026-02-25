@@ -31,6 +31,7 @@ namespace WorldServer.core.objects
         public Client Client { get; private set; }
         private bool _voiceAuthSent = false;
         private bool _checkedRankNotification = false;
+        private int _rankNotificationTimer = 0;
         public bool ShowDeltaTimeLog { get; set; }
         public FameCounter FameCounter { get; private set; }
         public ConcurrentQueue<InboundBuffer> IncomingMessages { get; private set; } = new ConcurrentQueue<InboundBuffer>();
@@ -499,8 +500,12 @@ namespace WorldServer.core.objects
                     SendInfo($"[DeltaTime]: {World.DisplayName} -> {time.ElapsedMsDelta}");
                 if (!_checkedRankNotification)
                 {
-                    _checkedRankNotification = true;
-                    CheckRankNotification();
+                    _rankNotificationTimer -= time.ElapsedMsDelta;
+                    if (_rankNotificationTimer <= 0)
+                    {
+                        _rankNotificationTimer = 30000; // check every 30s
+                        CheckRankNotification();
+                    }
                 }
                 HandleOxygen(time);
                 CheckTradeTimeout(time);
@@ -538,6 +543,7 @@ namespace WorldServer.core.objects
                             Rank = newRank;
                     }
                     db.KeyDelete(key);
+                    _checkedRankNotification = true; // stop polling after consuming
                 }
             }
             catch (Exception ex)
