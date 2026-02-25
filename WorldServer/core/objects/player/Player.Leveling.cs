@@ -135,15 +135,31 @@ namespace WorldServer.core.objects
 
                 if (Level < 20)
                 {
-                    var statInfo = GameServer.Resources.GameData.Classes[ObjectType].Stats;
-                    for (var i = 0; i < statInfo.Length; i++)
+                    if (World?.IsCommunityDungeon == true)
                     {
-                        var min = statInfo[i].MinIncrease;
-                        var max = statInfo[i].MaxIncrease + 1;
+                        // Universal flat stat gains per level (classless)
+                        // Max at level 20: HP=480, MP=480, Att=30, Def=30, Spd=30, Dex=30, Vit=30, Wis=30
+                        int[] gains = { 20, 20, 1, 1, 1, 1, 1, 1 };
+                        int[] maxVals = { 480, 480, 30, 30, 30, 30, 30, 30 };
+                        for (var i = 0; i < Math.Min(gains.Length, StatsManager.NumStatTypes); i++)
+                        {
+                            Stats.Base[i] += gains[i];
+                            if (Stats.Base[i] > maxVals[i])
+                                Stats.Base[i] = maxVals[i];
+                        }
+                    }
+                    else
+                    {
+                        var statInfo = GameServer.Resources.GameData.Classes[ObjectType].Stats;
+                        for (var i = 0; i < statInfo.Length; i++)
+                        {
+                            var min = statInfo[i].MinIncrease;
+                            var max = statInfo[i].MaxIncrease + 1;
 
-                        Stats.Base[i] += Random.Shared.Next(min, max);
-                        if (Stats.Base[i] > statInfo[i].MaxValue)
-                            Stats.Base[i] = statInfo[i].MaxValue;
+                            Stats.Base[i] += Random.Shared.Next(min, max);
+                            if (Stats.Base[i] > statInfo[i].MaxValue)
+                                Stats.Base[i] = statInfo[i].MaxValue;
+                        }
                     }
                 }
 
