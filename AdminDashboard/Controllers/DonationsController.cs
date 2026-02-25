@@ -13,9 +13,9 @@ namespace AdminDashboard.Controllers
 
         private static readonly Dictionary<string, int> RankMap = new()
         {
-            { "chatter", 1 },    // Donator
-            { "yapper", 2 },     // Supporter
-            { "megaphone", 3 },  // Sponsor
+            { "mute", 1 },       // Mute ($1)
+            { "whisperer", 2 },  // Whisperer ($10)
+            { "chatter", 3 },    // Chatter ($100)
         };
 
         public DonationsController(RedisService redis)
