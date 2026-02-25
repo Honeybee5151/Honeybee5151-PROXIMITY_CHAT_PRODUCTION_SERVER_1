@@ -311,96 +311,191 @@ function getKeysTbodyId() {
     return redisActiveTab === 'players' ? 'player-keys-tbody' : 'redis-keys-tbody';
 }
 
-// ---- All Keys tab ----
-const redisGroupState = {}; // tracks collapsed/expanded state per group
+// ---- All Keys tab (group-based) ----
+const redisGroupData = {}; // { prefix: { expanded, keys, cursor, loaded } }
+let redisSearchMode = false;
 
-function getKeyGroup(key) {
-    const groupPrefixes = [
-        { prefix: 'account.', label: 'Accounts' },
-        { prefix: 'vault.', label: 'Vaults' },
-        { prefix: 'char.', label: 'Characters' },
-        { prefix: 'classStats.', label: 'Class Stats' },
-        { prefix: 'alive.', label: 'Alive' },
-        { prefix: 'dead.', label: 'Dead' },
-        { prefix: 'market.', label: 'Market' },
-        { prefix: 'legends.', label: 'Legends' },
-    ];
-    for (const g of groupPrefixes) {
-        if (key.startsWith(g.prefix)) return g.label;
-    }
-    return 'Other';
-}
+async function loadRedisGroups() {
+    const tbody = document.getElementById('redis-keys-tbody');
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">Loading groups...</td></tr>';
+    document.getElementById('redis-load-more').style.display = 'none';
+    redisSearchMode = false;
 
-async function loadRedisKeys(append = false) {
     try {
-        const pattern = document.getElementById('redis-pattern').value || '*';
-        if (!append) redisCursor = 0;
-        const data = await apiFetch(`/api/redis/keys?pattern=${encodeURIComponent(pattern)}&count=50&cursor=${redisCursor}`);
-        const tbody = document.getElementById('redis-keys-tbody');
+        const groups = await apiFetch('/api/redis/groups');
+        tbody.innerHTML = '';
 
-        if (!append) tbody.innerHTML = '';
-        if (data.keys.length === 0 && !append) {
+        if (groups.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">No keys found</td></tr>';
             return;
         }
 
-        // Group keys by prefix
-        const groups = {};
-        data.keys.forEach(key => {
-            const group = getKeyGroup(key);
-            if (!groups[group]) groups[group] = [];
-            groups[group].push(key);
-        });
+        groups.forEach(g => {
+            // Init group state if not exists
+            if (!redisGroupData[g.prefix]) {
+                redisGroupData[g.prefix] = { expanded: false, keys: [], cursor: 0, loaded: false };
+            }
+            redisGroupData[g.prefix].count = g.count;
 
-        // Sort groups: Other first, then alphabetical
-        const groupOrder = Object.keys(groups).sort((a, b) => {
-            if (a === 'Other') return -1;
-            if (b === 'Other') return 1;
-            return a.localeCompare(b);
-        });
-
-        groupOrder.forEach(group => {
-            const keys = groups[group].sort((a, b) => a.localeCompare(b));
-            const isCollapsed = redisGroupState[group] === false;
-            const groupId = 'redis-group-' + group.replace(/\s+/g, '-');
-
-            // Group header row
             const headerTr = document.createElement('tr');
             headerTr.className = 'redis-group-header';
             headerTr.style.cursor = 'pointer';
             headerTr.style.background = '#1e293b';
             headerTr.style.userSelect = 'none';
-            headerTr.onclick = () => {
-                const collapsed = redisGroupState[group] !== false;
-                redisGroupState[group] = collapsed ? false : true;
-                const rows = tbody.querySelectorAll(`.${groupId}`);
-                const arrow = headerTr.querySelector('.group-arrow');
-                rows.forEach(r => r.style.display = collapsed ? 'none' : '');
-                arrow.textContent = collapsed ? '▶' : '▼';
-            };
-            headerTr.innerHTML = `<td colspan="3" style="font-weight:600;color:#94a3b8;padding:6px 10px;font-size:13px;"><span class="group-arrow" style="display:inline-block;width:16px;">${isCollapsed ? '▶' : '▼'}</span> ${esc(group)} <span style="color:#475569;font-weight:400;">(${keys.length})</span></td>`;
+            headerTr.dataset.prefix = g.prefix;
+
+            const state = redisGroupData[g.prefix];
+            headerTr.innerHTML = `<td colspan="3" style="font-weight:600;color:#94a3b8;padding:6px 10px;font-size:13px;">
+                <span class="group-arrow" style="display:inline-block;width:16px;">${state.expanded ? '▼' : '▶'}</span>
+                ${esc(g.label)} <span style="color:#475569;font-weight:400;">(${g.count})</span>
+            </td>`;
+
+            headerTr.onclick = () => toggleRedisGroup(g.prefix, g.label, headerTr);
             tbody.appendChild(headerTr);
 
-            // Key rows
-            keys.forEach(key => {
-                const tr = document.createElement('tr');
-                tr.className = groupId;
-                tr.style.cursor = 'pointer';
-                if (isCollapsed) tr.style.display = 'none';
-                tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
-                tr.innerHTML = `<td style="padding-left:26px;">${esc(key)}</td><td>-</td><td>-</td>`;
-                tbody.appendChild(tr);
-            });
+            // If group was previously expanded, re-render its keys
+            if (state.expanded && state.keys.length > 0) {
+                renderGroupKeys(tbody, headerTr, g.prefix, state);
+            }
         });
-
-        redisCursor = data.nextCursor;
-        document.getElementById('redis-load-more').style.display = data.nextCursor > 0 ? 'inline-block' : 'none';
     } catch (e) {
-        console.error('Redis keys error:', e);
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#f87171;">Error: ${esc(e.message)}</td></tr>`;
     }
 }
 
-function loadMoreRedisKeys() { loadRedisKeys(true); }
+async function toggleRedisGroup(prefix, label, headerTr) {
+    const state = redisGroupData[prefix];
+    const tbody = document.getElementById('redis-keys-tbody');
+
+    if (state.expanded) {
+        // Collapse: remove key rows and load-more row
+        state.expanded = false;
+        headerTr.querySelector('.group-arrow').textContent = '▶';
+        removeGroupRows(prefix);
+        return;
+    }
+
+    // Expand
+    state.expanded = true;
+    headerTr.querySelector('.group-arrow').textContent = '▼';
+
+    if (!state.loaded) {
+        await loadGroupKeys(prefix);
+    }
+    renderGroupKeys(tbody, headerTr, prefix, state);
+}
+
+function removeGroupRows(prefix) {
+    const groupClass = 'redis-gkey-' + prefix.replace(/\./g, '-');
+    document.querySelectorAll(`.${groupClass}`).forEach(r => r.remove());
+    const loadMoreRow = document.getElementById('redis-gmore-' + prefix.replace(/\./g, '-'));
+    if (loadMoreRow) loadMoreRow.remove();
+}
+
+function renderGroupKeys(tbody, headerTr, prefix, state) {
+    const groupClass = 'redis-gkey-' + prefix.replace(/\./g, '-');
+    // Remove existing rows first
+    removeGroupRows(prefix);
+
+    // Find where to insert (after headerTr)
+    let insertAfter = headerTr;
+    state.keys.forEach(key => {
+        const tr = document.createElement('tr');
+        tr.className = groupClass;
+        tr.style.cursor = 'pointer';
+        tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
+        tr.innerHTML = `<td style="padding-left:26px;">${esc(key)}</td><td></td><td></td>`;
+        insertAfter.after(tr);
+        insertAfter = tr;
+    });
+
+    // Add "Load More" row if there are more keys
+    if (state.cursor > 0) {
+        const moreTr = document.createElement('tr');
+        moreTr.className = groupClass;
+        moreTr.id = 'redis-gmore-' + prefix.replace(/\./g, '-');
+        moreTr.innerHTML = `<td colspan="3" style="text-align:center;padding:4px;">
+            <button class="btn btn-secondary btn-sm" style="font-size:11px;">Load More</button>
+        </td>`;
+        moreTr.querySelector('button').onclick = async (e) => {
+            e.stopPropagation();
+            await loadGroupKeys(prefix);
+            renderGroupKeys(tbody, headerTr, prefix, state);
+        };
+        insertAfter.after(moreTr);
+    }
+}
+
+async function loadGroupKeys(prefix) {
+    const state = redisGroupData[prefix];
+    const pattern = prefix ? prefix + '*' : '*';
+
+    try {
+        // For "Other" group (empty prefix), we need a different approach:
+        // load all keys and filter out known prefixes
+        if (prefix === '') {
+            const data = await apiFetch(`/api/redis/keys?pattern=*&count=500&cursor=${state.cursor}`);
+            const knownPrefixes = ['account.', 'vault.', 'char.', 'classStats.', 'alive.', 'dead.', 'market.', 'legends.'];
+            const otherKeys = data.keys.filter(k => !knownPrefixes.some(p => k.startsWith(p)));
+            state.keys = [...state.keys, ...otherKeys];
+            state.cursor = data.nextCursor;
+        } else {
+            const data = await apiFetch(`/api/redis/keys?pattern=${encodeURIComponent(pattern)}&count=50&cursor=${state.cursor}`);
+            state.keys = [...state.keys, ...data.keys];
+            state.cursor = data.nextCursor;
+        }
+        state.keys.sort();
+        state.loaded = true;
+    } catch (e) {
+        console.error('Load group keys error:', e);
+    }
+}
+
+// Search within All Keys — falls back to flat SCAN results
+async function searchRedisKeys() {
+    const pattern = document.getElementById('redis-pattern').value || '*';
+    if (pattern === '*') {
+        redisSearchMode = false;
+        loadRedisGroups();
+        return;
+    }
+    redisSearchMode = true;
+    const tbody = document.getElementById('redis-keys-tbody');
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">Searching...</td></tr>';
+    document.getElementById('redis-load-more').style.display = 'none';
+
+    try {
+        const data = await apiFetch(`/api/redis/keys?pattern=${encodeURIComponent(pattern)}&count=200&cursor=0`);
+        tbody.innerHTML = '';
+
+        if (data.keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">No keys found</td></tr>';
+            return;
+        }
+
+        const headerTr = document.createElement('tr');
+        headerTr.className = 'redis-group-header';
+        headerTr.style.background = '#1e293b';
+        headerTr.innerHTML = `<td colspan="3" style="font-weight:600;color:#94a3b8;padding:6px 10px;font-size:13px;">
+            Search Results <span style="color:#475569;font-weight:400;">(${data.keys.length})</span>
+        </td>`;
+        tbody.appendChild(headerTr);
+
+        data.keys.sort().forEach(key => {
+            const tr = document.createElement('tr');
+            tr.style.cursor = 'pointer';
+            tr.onclick = () => { redisActiveTab = 'allkeys'; loadRedisKeyValue(key); };
+            tr.innerHTML = `<td style="padding-left:26px;">${esc(key)}</td><td></td><td></td>`;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#f87171;">Error: ${esc(e.message)}</td></tr>`;
+    }
+}
+
+// Keep old name for compat with initial tab load
+function loadRedisKeys() { loadRedisGroups(); }
+function loadMoreRedisKeys() { /* no-op, per-group now */ }
 
 // ---- Shared key value loader ----
 async function loadRedisKeyValue(key) {
@@ -758,7 +853,7 @@ function redisRefreshKey() {
 }
 
 document.getElementById('redis-pattern')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadRedisKeys();
+    if (e.key === 'Enter') searchRedisKeys();
 });
 
 // ========== Admin Commands ==========

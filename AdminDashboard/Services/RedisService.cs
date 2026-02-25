@@ -80,6 +80,51 @@ namespace AdminDashboard.Services
         }
 
         /// <summary>
+        /// Get key counts per group prefix
+        /// </summary>
+        public List<(string Label, string Prefix, int Count)> GetGroupCounts()
+        {
+            var groups = new[]
+            {
+                ("Accounts", "account."),
+                ("Vaults", "vault."),
+                ("Characters", "char."),
+                ("Class Stats", "classStats."),
+                ("Alive", "alive."),
+                ("Dead", "dead."),
+                ("Market", "market."),
+                ("Legends", "legends."),
+            };
+
+            var result = new List<(string Label, string Prefix, int Count)>();
+            var countedKeys = new HashSet<string>();
+
+            foreach (var (label, prefix) in groups)
+            {
+                var count = 0;
+                foreach (var key in _server.Keys(pattern: prefix + "*", pageSize: 500))
+                {
+                    count++;
+                    countedKeys.Add(key.ToString());
+                }
+                if (count > 0)
+                    result.Add((label, prefix, count));
+            }
+
+            // Count "Other" keys (not matching any known prefix)
+            var otherCount = 0;
+            foreach (var key in _server.Keys(pattern: "*", pageSize: 500))
+            {
+                if (!countedKeys.Contains(key.ToString()))
+                    otherCount++;
+            }
+            if (otherCount > 0)
+                result.Add(("Other", "", otherCount));
+
+            return result;
+        }
+
+        /// <summary>
         /// Get key type and value
         /// </summary>
         public (string Type, object Value) GetKeyValue(string key)

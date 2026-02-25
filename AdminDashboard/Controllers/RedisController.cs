@@ -31,6 +31,20 @@ namespace AdminDashboard.Controllers
             }
         }
 
+        [HttpGet("groups")]
+        public IActionResult GetGroups()
+        {
+            try
+            {
+                var groups = _redis.GetGroupCounts();
+                return Ok(groups.Select(g => new { label = g.Label, prefix = g.Prefix, count = g.Count }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
         [HttpGet("keys")]
         public IActionResult GetKeys([FromQuery] string pattern = "*", [FromQuery] int count = 50, [FromQuery] long cursor = 0)
         {
