@@ -169,23 +169,23 @@ namespace WorldServer.core.miscfile
                 return;
             }
 
-            var nameTag = "";
+            var tag = "";
             if (player.Client.Account.Admin)
-                nameTag = "[Owner] ";
+                tag = "[Owner] ";
             else if (player.Client.Account.Rank == (int)RankingType.Moderator)
-                nameTag = "[!] ";
-
-            var donationTag = player.Rank switch
-            {
-                1 => "[Mute] ",
-                2 => "[Whisperer] ",
-                3 => "[Chatter] ",
-                _ => ""
-            };
+                tag = "[!] ";
+            else
+                tag = player.Rank switch
+                {
+                    1 => "[Mute] ",
+                    2 => "[Whisperer] ",
+                    3 => "[Chatter] ",
+                    _ => ""
+                };
 
             var tp = new Text()
             {
-                Name = $"{nameTag}{donationTag}{player.Name}",
+                Name = $"{tag}{player.Name}",
                 ObjectId = player.Id,
                 NumStars = player.Stars,
                 BubbleTime = 5,
