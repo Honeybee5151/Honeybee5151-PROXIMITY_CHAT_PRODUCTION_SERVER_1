@@ -462,7 +462,7 @@ namespace WorldServer.core.worlds
 
         protected void FromWorldMap(Stream dat)
         {
-            NextEntityId += Map.Load(dat, NextEntityId);
+            NextEntityId += Map.Load(dat, NextEntityId) + 1;
             InitMap();
         }
 
