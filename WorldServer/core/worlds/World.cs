@@ -498,7 +498,7 @@ namespace WorldServer.core.worlds
             return true;
         }
 
-        private void PreCompressCustomChunks()
+        protected void PreCompressCustomChunks()
         {
             const int chunkSize = 500;
 

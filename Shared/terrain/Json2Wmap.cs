@@ -8,7 +8,7 @@ using Shared.resources;
 
 namespace Shared.terrain
 {
-    internal class Json2Wmap
+    public class Json2Wmap
     {
         public static void Convert(XmlData data, string from, string to)
         {
