@@ -39,15 +39,19 @@ namespace WorldServer.networking.packets.outgoing
                     foreach (var entry in entries)
                     {
                         bw.Write(entry.TypeCode);
-                        var pixels = entry.DecodedPixels ?? new byte[192];
-                        bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
-                        if (pixels.Length < 192)
-                            bw.Write(new byte[192 - pixels.Length]);
-                        // 0=Object(2D solid), 1=Destructible(3D breakable), 2=Decoration(2D walkable), 3=Wall(3D solid)
+                        bw.Write(entry.SpriteSize);
+                        if (entry.SpriteSize > 0 && entry.DecodedPixels != null)
+                        {
+                            int expectedBytes = entry.SpriteSize * entry.SpriteSize * 3;
+                            bw.Write(entry.DecodedPixels, 0, Math.Min(entry.DecodedPixels.Length, expectedBytes));
+                            if (entry.DecodedPixels.Length < expectedBytes)
+                                bw.Write(new byte[expectedBytes - entry.DecodedPixels.Length]);
+                        }
                         byte classFlag = 0;
                         if (entry.ObjectClass == "Destructible") classFlag = 1;
                         else if (entry.ObjectClass == "Decoration") classFlag = 2;
                         else if (entry.ObjectClass == "Wall") classFlag = 3;
+                        else if (entry.ObjectClass == "Blocker") classFlag = 4;
                         bw.Write(classFlag);
                     }
                     bw.Flush();

@@ -25,9 +25,10 @@ namespace Shared.resources
     {
         public ushort TypeCode;      // 0x9000+ assigned in Json2Wmap
         public string ObjectId;      // "custom_xxx" from JM
-        public string ObjectPixels;  // base64 RGB (192 bytes = 8x8x3)
-        public string ObjectClass;   // "Wall", "DestructibleWall", "Decoration"
-        public byte[] DecodedPixels; // cached decoded RGB bytes (192), set once at load
+        public string ObjectPixels;  // base64 RGB pixels
+        public string ObjectClass;   // "Object", "Wall", "Destructible", "Decoration", "Blocker"
+        public byte SpriteSize;      // 8, 16, or 32 — sprite dimension in pixels
+        public byte[] DecodedPixels; // cached decoded RGB bytes (size*size*3), set once at load
     }
 
     public class XmlData
@@ -89,6 +90,18 @@ namespace Shared.resources
 
         private static System.Xml.Linq.XElement BuildCustomObjectXml(CustomObjectEntry co)
         {
+            // Blocker = invisible tile for multi-tile object collision
+            if (co.ObjectClass == "Blocker")
+            {
+                return new System.Xml.Linq.XElement("Object",
+                    new System.Xml.Linq.XAttribute("type", $"0x{co.TypeCode:x4}"),
+                    new System.Xml.Linq.XAttribute("id", co.ObjectId),
+                    new System.Xml.Linq.XElement("Class", "GameObject"),
+                    new System.Xml.Linq.XElement("Static"),
+                    new System.Xml.Linq.XElement("OccupySquare"),
+                    new System.Xml.Linq.XElement("EnemyOccupySquare")
+                );
+            }
             // Object/Decoration = flat 2D (GameObject), Wall/Destructible = 3D cube (Wall)
             var is3D = co.ObjectClass == "Wall" || co.ObjectClass == "Destructible";
             var className = is3D ? "Wall" : "GameObject";

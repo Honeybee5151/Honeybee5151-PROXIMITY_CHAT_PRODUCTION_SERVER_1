@@ -72,6 +72,8 @@ namespace Shared.terrain
                 if (o.objs != null && o.objs.Length > 0 && !string.IsNullOrEmpty(o.objs[0].objectPixels))
                 {
                     var objClass = o.objs[0].objectClass ?? "Object";
+                    byte spriteSize = (byte)(o.objs[0].objectSize > 0 ? o.objs[0].objectSize : 8);
+                    int expectedBytes = spriteSize * spriteSize * 3;
                     var dedupKey = o.objs[0].objectPixels + "|" + objClass;
                     if (!customObjMap.TryGetValue(dedupKey, out _))
                     {
@@ -79,13 +81,12 @@ namespace Shared.terrain
                         var objId = $"cobj_{typeCode:x4}";
                         customObjMap[dedupKey] = typeCode;
                         customObjPixelsMap[dedupKey] = objId;
-                        // Decode base64 pixels once at load time
                         byte[] decodedPixels;
                         try { decodedPixels = System.Convert.FromBase64String(o.objs[0].objectPixels ?? ""); }
-                        catch { decodedPixels = new byte[192]; }
-                        if (decodedPixels.Length < 192)
+                        catch { decodedPixels = new byte[expectedBytes]; }
+                        if (decodedPixels.Length < expectedBytes)
                         {
-                            var padded = new byte[192];
+                            var padded = new byte[expectedBytes];
                             Buffer.BlockCopy(decodedPixels, 0, padded, 0, decodedPixels.Length);
                             decodedPixels = padded;
                         }
@@ -95,7 +96,29 @@ namespace Shared.terrain
                             ObjectId = objId,
                             ObjectPixels = o.objs[0].objectPixels,
                             ObjectClass = objClass,
+                            SpriteSize = spriteSize,
                             DecodedPixels = decodedPixels
+                        });
+                    }
+                    tileObjId = customObjPixelsMap[dedupKey];
+                }
+                else if (o.objs != null && o.objs.Length > 0 && o.objs[0].objectClass == "Blocker")
+                {
+                    // Invisible blocker for multi-tile objects (no pixel data)
+                    var dedupKey = "blocker";
+                    if (!customObjMap.TryGetValue(dedupKey, out _))
+                    {
+                        var typeCode = data.AllocateCustomObjTypeCode();
+                        var objId = $"cobj_{typeCode:x4}";
+                        customObjMap[dedupKey] = typeCode;
+                        customObjPixelsMap[dedupKey] = objId;
+                        customObjects.Add(new CustomObjectEntry
+                        {
+                            TypeCode = typeCode,
+                            ObjectId = objId,
+                            ObjectClass = "Blocker",
+                            SpriteSize = 0, // no sprite
+                            DecodedPixels = null
                         });
                     }
                     tileObjId = customObjPixelsMap[dedupKey];
@@ -147,6 +170,7 @@ namespace Shared.terrain
             public string name;
             public string objectPixels;
             public string objectClass;
+            public int objectSize;
         }
     }
 }

@@ -547,14 +547,20 @@ namespace WorldServer.core.worlds
             foreach (var entry in entries)
             {
                 bw.Write(entry.TypeCode);
-                var pixels = entry.DecodedPixels ?? new byte[192];
-                bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
-                if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
-                // 0=Object(2D solid), 1=Destructible(3D breakable), 2=Decoration(2D walkable), 3=Wall(3D solid)
+                bw.Write(entry.SpriteSize); // 0=blocker(no sprite), 8, 16, or 32
+                if (entry.SpriteSize > 0 && entry.DecodedPixels != null)
+                {
+                    int expectedBytes = entry.SpriteSize * entry.SpriteSize * 3;
+                    bw.Write(entry.DecodedPixels, 0, Math.Min(entry.DecodedPixels.Length, expectedBytes));
+                    if (entry.DecodedPixels.Length < expectedBytes)
+                        bw.Write(new byte[expectedBytes - entry.DecodedPixels.Length]);
+                }
+                // 0=Object(2D solid), 1=Destructible(3D breakable), 2=Decoration(2D walkable), 3=Wall(3D solid), 4=Blocker(invisible)
                 byte classFlag = 0;
                 if (entry.ObjectClass == "Destructible") classFlag = 1;
                 else if (entry.ObjectClass == "Decoration") classFlag = 2;
                 else if (entry.ObjectClass == "Wall") classFlag = 3;
+                else if (entry.ObjectClass == "Blocker") classFlag = 4;
                 bw.Write(classFlag);
             }
             bw.Flush();
