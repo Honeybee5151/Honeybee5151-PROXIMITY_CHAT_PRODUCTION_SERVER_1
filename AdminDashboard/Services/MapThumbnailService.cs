@@ -8,9 +8,8 @@ using System.IO.Compression;
 namespace AdminDashboard.Services
 {
     /// <summary>
-    /// Generates a top-down color thumbnail of a JM map for admin preview.
-    /// Each tile = 1 pixel. Ground tiles use sprite-colors.json mapping,
-    /// custom tiles use their hex color, objects rendered as semi-transparent overlay.
+    /// Generates top-down color thumbnails of a JM map for admin preview.
+    /// Produces separate ground-only and objects-only PNG thumbnails.
     /// </summary>
     public class MapThumbnailService
     {
@@ -54,11 +53,17 @@ namespace AdminDashboard.Services
             }
         }
 
+        public class ThumbnailResult
+        {
+            public string GroundPng { get; set; }
+            public string ObjectsPng { get; set; }
+        }
+
         /// <summary>
-        /// Generate a PNG thumbnail from JM map data.
-        /// Returns base64-encoded PNG string, or null on failure.
+        /// Generate separate ground and objects PNG thumbnails from JM map data.
+        /// Returns base64-encoded PNG strings, or null on failure.
         /// </summary>
-        public string GenerateThumbnail(JToken mapJm, JObject customTiles, int maxDim = 512)
+        public ThumbnailResult GenerateThumbnails(JToken mapJm, JObject customTiles)
         {
             try
             {
@@ -102,126 +107,189 @@ namespace AdminDashboard.Services
                     }
                 }
 
-                // Create bitmap — scale each tile to TILE_PX pixels so the thumbnail is visible
                 const int TILE_PX = 8;
                 var bmpW = width * TILE_PX;
                 var bmpH = height * TILE_PX;
-                using var bitmap = new SKBitmap(bmpW, bmpH);
-                var bgColor = new SKColor(0xFF111111); // dark background for empty
+                var bgColor = new SKColor(0xFF111111);
 
-                // Helper to fill a tile-sized block
-                void FillTile(int tx, int ty, SKColor color)
-                {
-                    for (int py = 0; py < TILE_PX; py++)
-                        for (int px = 0; px < TILE_PX; px++)
-                            bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, color);
-                }
-
-                // Pre-decode groundPixels for each dict entry (base64 → 8×8 RGB bytes)
-                var dictPixels = new byte[dict.Count][];
+                // Pre-decode groundPixels for each dict entry
+                var dictGroundPixels = new byte[dict.Count][];
                 for (int d = 0; d < dict.Count; d++)
                 {
                     var gpB64 = dict[d]?["groundPixels"]?.ToString();
                     if (!string.IsNullOrEmpty(gpB64))
                     {
-                        try { dictPixels[d] = Convert.FromBase64String(gpB64); }
-                        catch { dictPixels[d] = null; }
+                        try { dictGroundPixels[d] = Convert.FromBase64String(gpB64); }
+                        catch { dictGroundPixels[d] = null; }
                     }
                 }
 
-                // Pass 1: Ground layer
-                for (int ty = 0; ty < height; ty++)
+                // Pre-decode objectPixels for each dict entry
+                var dictObjPixels = new byte[dict.Count][];
+                var dictObjSize = new int[dict.Count];
+                for (int d = 0; d < dict.Count; d++)
                 {
-                    for (int tx = 0; tx < width; tx++)
+                    var objs = dict[d]?["objs"] as JArray;
+                    if (objs != null && objs.Count > 0)
                     {
-                        var idx = grid[ty * width + tx];
-                        if (idx < 0 || idx >= dict.Count)
+                        var opB64 = objs[0]?["objectPixels"]?.ToString();
+                        var objSize = objs[0]?["objectSize"]?.Value<int>() ?? 8;
+                        dictObjSize[d] = objSize;
+                        if (!string.IsNullOrEmpty(opB64))
                         {
-                            FillTile(tx, ty, bgColor);
-                            continue;
+                            try { dictObjPixels[d] = Convert.FromBase64String(opB64); }
+                            catch { dictObjPixels[d] = null; }
                         }
-
-                        var entry = dict[idx];
-                        var groundId = entry?["ground"]?.ToString();
-
-                        if (string.IsNullOrEmpty(groundId) || groundId == "Empty")
-                        {
-                            FillTile(tx, ty, bgColor);
-                            continue;
-                        }
-
-                        // Use per-pixel groundPixels data if available (8×8 RGB = 192 bytes)
-                        var pixels = dictPixels[idx];
-                        if (pixels != null && pixels.Length >= TILE_PX * TILE_PX * 3)
-                        {
-                            for (int py = 0; py < TILE_PX; py++)
-                                for (int px = 0; px < TILE_PX; px++)
-                                {
-                                    int off = (py * TILE_PX + px) * 3;
-                                    bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py,
-                                        new SKColor(pixels[off], pixels[off + 1], pixels[off + 2]));
-                                }
-                        }
-                        // Try standard color, then custom color
-                        else if (_groundColors.TryGetValue(groundId, out uint gc))
-                            FillTile(tx, ty, new SKColor(gc));
-                        else if (customColorMap.TryGetValue(groundId, out uint cc))
-                            FillTile(tx, ty, new SKColor(cc));
-                        else
-                            FillTile(tx, ty, new SKColor(0xFF444444)); // unknown tile = grey
                     }
                 }
 
-                // Pass 2: Object overlay (blend into existing tile block)
-                for (int ty = 0; ty < height; ty++)
+                // ===== Ground thumbnail =====
+                string groundPng;
+                using (var groundBmp = new SKBitmap(bmpW, bmpH))
                 {
-                    for (int tx = 0; tx < width; tx++)
+                    void FillGround(int tx, int ty, SKColor color)
                     {
-                        var idx = grid[ty * width + tx];
-                        if (idx < 0 || idx >= dict.Count) continue;
-
-                        var entry = dict[idx];
-                        var objs = entry?["objs"] as JArray;
-                        if (objs == null || objs.Count == 0) continue;
-
-                        var objId = objs[0]?["id"]?.ToString();
-                        if (string.IsNullOrEmpty(objId)) continue;
-
-                        // Get blend color
-                        SKColor blendColor;
-                        float objWeight = 0.6f;
-                        if (_objectColors.TryGetValue(objId, out uint oc))
-                            blendColor = new SKColor(oc);
-                        else
-                        {
-                            blendColor = new SKColor(0, 0, 0);
-                            objWeight = 0.3f; // unknown = slight darken
-                        }
-
                         for (int py = 0; py < TILE_PX; py++)
-                        {
                             for (int px = 0; px < TILE_PX; px++)
+                                groundBmp.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, color);
+                    }
+
+                    for (int ty = 0; ty < height; ty++)
+                    {
+                        for (int tx = 0; tx < width; tx++)
+                        {
+                            var idx = grid[ty * width + tx];
+                            if (idx < 0 || idx >= dict.Count) { FillGround(tx, ty, bgColor); continue; }
+
+                            var entry = dict[idx];
+                            var groundId = entry?["ground"]?.ToString();
+
+                            if (string.IsNullOrEmpty(groundId) || groundId == "Empty")
                             {
-                                var ex = bitmap.GetPixel(tx * TILE_PX + px, ty * TILE_PX + py);
-                                var r = (byte)(blendColor.Red * objWeight + ex.Red * (1 - objWeight));
-                                var g = (byte)(blendColor.Green * objWeight + ex.Green * (1 - objWeight));
-                                var b = (byte)(blendColor.Blue * objWeight + ex.Blue * (1 - objWeight));
-                                bitmap.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, new SKColor(r, g, b));
+                                FillGround(tx, ty, bgColor);
+                                continue;
+                            }
+
+                            var pixels = dictGroundPixels[idx];
+                            if (pixels != null && pixels.Length >= TILE_PX * TILE_PX * 3)
+                            {
+                                for (int py = 0; py < TILE_PX; py++)
+                                    for (int px = 0; px < TILE_PX; px++)
+                                    {
+                                        int off = (py * TILE_PX + px) * 3;
+                                        groundBmp.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py,
+                                            new SKColor(pixels[off], pixels[off + 1], pixels[off + 2]));
+                                    }
+                            }
+                            else if (_groundColors.TryGetValue(groundId, out uint gc))
+                                FillGround(tx, ty, new SKColor(gc));
+                            else if (customColorMap.TryGetValue(groundId, out uint cc))
+                                FillGround(tx, ty, new SKColor(cc));
+                            else
+                                FillGround(tx, ty, new SKColor(0xFF444444));
+                        }
+                    }
+
+                    using var gImg = SKImage.FromBitmap(groundBmp);
+                    using var gData = gImg.Encode(SKEncodedImageFormat.Png, 100);
+                    groundPng = Convert.ToBase64String(gData.ToArray());
+                }
+
+                // ===== Objects thumbnail =====
+                string objectsPng;
+                using (var objBmp = new SKBitmap(bmpW, bmpH))
+                {
+                    // Fill with transparent-ish dark background
+                    var objBg = new SKColor(0xFF1a1a1a);
+                    for (int y = 0; y < bmpH; y++)
+                        for (int x = 0; x < bmpW; x++)
+                            objBmp.SetPixel(x, y, objBg);
+
+                    for (int ty = 0; ty < height; ty++)
+                    {
+                        for (int tx = 0; tx < width; tx++)
+                        {
+                            var idx = grid[ty * width + tx];
+                            if (idx < 0 || idx >= dict.Count) continue;
+
+                            var entry = dict[idx];
+                            var objs = entry?["objs"] as JArray;
+                            if (objs == null || objs.Count == 0) continue;
+
+                            var objId = objs[0]?["id"]?.ToString();
+                            if (string.IsNullOrEmpty(objId)) continue;
+
+                            var objClass = objs[0]?["objectClass"]?.ToString() ?? "";
+
+                            // Use objectPixels if available (pixel-accurate custom object)
+                            var objPixels = dictObjPixels[idx];
+                            var objSize = dictObjSize[idx];
+                            if (objPixels != null && objSize > 0)
+                            {
+                                // For multi-tile anchors (16x16, 32x32), render the full sprite
+                                int renderPx = objSize; // pixels to render
+                                int expectedBytes = objSize * objSize * 3;
+                                if (objPixels.Length >= expectedBytes)
+                                {
+                                    for (int py = 0; py < renderPx && (ty * TILE_PX + py) < bmpH; py++)
+                                        for (int px = 0; px < renderPx && (tx * TILE_PX + px) < bmpW; px++)
+                                        {
+                                            int off = (py * objSize + px) * 3;
+                                            var r = objPixels[off];
+                                            var g = objPixels[off + 1];
+                                            var b = objPixels[off + 2];
+                                            // Skip near-black pixels (0x2a2a2a = empty/transparent)
+                                            if (r <= 0x2a && g <= 0x2a && b <= 0x2a) continue;
+                                            objBmp.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py,
+                                                new SKColor(r, g, b));
+                                        }
+                                }
+                            }
+                            else if (objClass == "Blocker")
+                            {
+                                // Blocker tiles: show as subtle outline
+                                for (int py = 0; py < TILE_PX; py++)
+                                    for (int px = 0; px < TILE_PX; px++)
+                                    {
+                                        if (py == 0 || py == TILE_PX - 1 || px == 0 || px == TILE_PX - 1)
+                                            objBmp.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, new SKColor(0xFF333333));
+                                    }
+                            }
+                            else
+                            {
+                                // Standard object: use color map
+                                SKColor color;
+                                if (_objectColors.TryGetValue(objId, out uint oc))
+                                    color = new SKColor(oc);
+                                else
+                                    color = new SKColor(0xFF666666);
+
+                                for (int py = 0; py < TILE_PX; py++)
+                                    for (int px = 0; px < TILE_PX; px++)
+                                        objBmp.SetPixel(tx * TILE_PX + px, ty * TILE_PX + py, color);
                             }
                         }
                     }
+
+                    using var oImg = SKImage.FromBitmap(objBmp);
+                    using var oData = oImg.Encode(SKEncodedImageFormat.Png, 100);
+                    objectsPng = Convert.ToBase64String(oData.ToArray());
                 }
 
-                // Encode to PNG
-                using var image = SKImage.FromBitmap(bitmap);
-                using var pngData = image.Encode(SKEncodedImageFormat.Png, 100);
-                return Convert.ToBase64String(pngData.ToArray());
+                return new ThumbnailResult { GroundPng = groundPng, ObjectsPng = objectsPng };
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MapThumbnail] Error generating thumbnail: {ex.Message}");
+                Console.WriteLine($"[MapThumbnail] Error generating thumbnails: {ex.Message}");
                 return null;
             }
+        }
+
+        // Legacy single thumbnail (kept for backward compat if needed)
+        public string GenerateThumbnail(JToken mapJm, JObject customTiles, int maxDim = 512)
+        {
+            var result = GenerateThumbnails(mapJm, customTiles);
+            return result?.GroundPng;
         }
     }
 }

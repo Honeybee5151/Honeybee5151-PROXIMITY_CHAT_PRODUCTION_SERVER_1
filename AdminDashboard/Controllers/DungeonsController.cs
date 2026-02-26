@@ -204,9 +204,10 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // Map info + thumbnail
+                // Map info + thumbnails (separate ground and objects)
                 object mapInfo = null;
-                string mapThumbnail = null;
+                string mapGroundThumbnail = null;
+                string mapObjectsThumbnail = null;
                 if (mapJm != null && mapJm.Type != JTokenType.Null)
                 {
                     var dictCount = (mapJm["dict"] as JArray)?.Count ?? 0;
@@ -217,11 +218,16 @@ namespace AdminDashboard.Controllers
                         dictEntries = dictCount,
                     };
 
-                    // Generate visual thumbnail
+                    // Generate visual thumbnails
                     var colorsPath = Path.Combine(
                         AppContext.BaseDirectory, "wwwroot", "data", "sprite-colors.json");
                     _mapThumb.LoadColors(colorsPath);
-                    mapThumbnail = _mapThumb.GenerateThumbnail(mapJm, customTiles);
+                    var thumbs = _mapThumb.GenerateThumbnails(mapJm, customTiles);
+                    if (thumbs != null)
+                    {
+                        mapGroundThumbnail = thumbs.GroundPng;
+                        mapObjectsThumbnail = thumbs.ObjectsPng;
+                    }
                 }
 
                 // Custom tiles
@@ -241,7 +247,8 @@ namespace AdminDashboard.Controllers
                     mobs = mobList,
                     items = itemList,
                     map = mapInfo,
-                    mapThumbnail,
+                    mapGroundThumbnail,
+                    mapObjectsThumbnail,
                     customTiles = tileList,
                     startingEquipment = dungeon["starting_equipment"] as JArray,
                     characterPreset = dungeon["character_preset"],

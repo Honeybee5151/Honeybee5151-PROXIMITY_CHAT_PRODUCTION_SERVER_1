@@ -1327,7 +1327,7 @@ function renderPreview(data) {
         html += `</div>`;
     }
 
-    // Map info + thumbnail
+    // Map info + thumbnails (ground + objects)
     if (data.map) {
         html += `<div class="preview-section">
             <h4>Map</h4>
@@ -1335,13 +1335,44 @@ function renderPreview(data) {
                 <div>Size: <span>${data.map.width} x ${data.map.height}</span></div>
                 <div>Unique tiles: <span>${data.map.dictEntries}</span></div>
             </div>`;
-        if (data.mapThumbnail) {
-            html += `<div style="margin-top:10px;text-align:center;overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
-                <img src="data:image/png;base64,${data.mapThumbnail}"
-                     style="image-rendering:pixelated;display:block;margin:0 auto;"
-                     title="Map preview — pixel-accurate">
+
+        // Zoom controls
+        html += `<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
+            <span style="color:#888;font-size:12px;">Zoom:</span>
+            <button class="map-zoom-btn" onclick="setMapZoom(1)" data-zoom="1">1x</button>
+            <button class="map-zoom-btn active" onclick="setMapZoom(2)" data-zoom="2">2x</button>
+            <button class="map-zoom-btn" onclick="setMapZoom(4)" data-zoom="4">4x</button>
+            <button class="map-zoom-btn" onclick="setMapZoom(8)" data-zoom="8">8x</button>
+        </div>`;
+
+        // Side-by-side maps
+        html += `<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">`;
+
+        if (data.mapGroundThumbnail) {
+            html += `<div style="flex:1;min-width:200px;">
+                <div style="color:#888;font-size:12px;margin-bottom:4px;text-align:center;">Ground</div>
+                <div class="map-viewport" style="overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
+                    <img src="data:image/png;base64,${data.mapGroundThumbnail}"
+                         class="map-thumb-img"
+                         style="image-rendering:pixelated;display:block;transform-origin:top left;"
+                         title="Ground layer">
+                </div>
             </div>`;
         }
+
+        if (data.mapObjectsThumbnail) {
+            html += `<div style="flex:1;min-width:200px;">
+                <div style="color:#888;font-size:12px;margin-bottom:4px;text-align:center;">Objects</div>
+                <div class="map-viewport" style="overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
+                    <img src="data:image/png;base64,${data.mapObjectsThumbnail}"
+                         class="map-thumb-img"
+                         style="image-rendering:pixelated;display:block;transform-origin:top left;"
+                         title="Objects layer">
+                </div>
+            </div>`;
+        }
+
+        html += `</div>`;
         html += `</div>`;
     }
 
@@ -1509,6 +1540,16 @@ function renderPreview(data) {
     }
 
     return html;
+}
+
+function setMapZoom(level) {
+    document.querySelectorAll('.map-thumb-img').forEach(img => {
+        img.style.transform = `scale(${level})`;
+        img.style.transformOrigin = 'top left';
+    });
+    document.querySelectorAll('.map-zoom-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.zoom) === level);
+    });
 }
 
 function toggleXml(el) {
