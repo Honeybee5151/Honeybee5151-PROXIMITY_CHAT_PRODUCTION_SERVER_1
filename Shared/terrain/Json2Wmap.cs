@@ -27,10 +27,9 @@ namespace Shared.terrain
             ushort nextCustomCode = 0x8000;
             customGrounds = new List<CustomGroundEntry>();
 
-            // Custom objects: dedup by (pixels + class), assign 0x9000+ type codes
+            // Custom objects: dedup by (pixels + class), type codes from global allocator
             var customObjPixelsMap = new Dictionary<string, string>(); // (pixels|class) → objectId
             var customObjMap = new Dictionary<string, ushort>(); // (pixels|class) → typeCode
-            ushort nextCustomObjCode = 0x9000;
             customObjects = new List<CustomObjectEntry>();
 
             for (var i = 0; i < obj.dict.Length; i++)
@@ -46,11 +45,22 @@ namespace Shared.terrain
                     {
                         tileId = nextCustomCode++;
                         customGroundMap[o.ground] = tileId;
+                        // Decode base64 pixels once at load time
+                        byte[] decodedGndPixels;
+                        try { decodedGndPixels = System.Convert.FromBase64String(o.groundPixels ?? ""); }
+                        catch { decodedGndPixels = new byte[192]; }
+                        if (decodedGndPixels.Length < 192)
+                        {
+                            var padded = new byte[192];
+                            Buffer.BlockCopy(decodedGndPixels, 0, padded, 0, decodedGndPixels.Length);
+                            decodedGndPixels = padded;
+                        }
                         customGrounds.Add(new CustomGroundEntry
                         {
                             TypeCode = tileId,
                             GroundId = o.ground,
-                            GroundPixels = o.groundPixels
+                            GroundPixels = o.groundPixels,
+                            DecodedPixels = decodedGndPixels
                         });
                     }
                 }
@@ -65,17 +75,28 @@ namespace Shared.terrain
                     var dedupKey = o.objs[0].objectPixels + "|" + objClass;
                     if (!customObjMap.TryGetValue(dedupKey, out _))
                     {
-                        var objId = $"cobj_{nextCustomObjCode:x4}";
-                        customObjMap[dedupKey] = nextCustomObjCode;
+                        var typeCode = data.AllocateCustomObjTypeCode();
+                        var objId = $"cobj_{typeCode:x4}";
+                        customObjMap[dedupKey] = typeCode;
                         customObjPixelsMap[dedupKey] = objId;
+                        // Decode base64 pixels once at load time
+                        byte[] decodedPixels;
+                        try { decodedPixels = System.Convert.FromBase64String(o.objs[0].objectPixels ?? ""); }
+                        catch { decodedPixels = new byte[192]; }
+                        if (decodedPixels.Length < 192)
+                        {
+                            var padded = new byte[192];
+                            Buffer.BlockCopy(decodedPixels, 0, padded, 0, decodedPixels.Length);
+                            decodedPixels = padded;
+                        }
                         customObjects.Add(new CustomObjectEntry
                         {
-                            TypeCode = nextCustomObjCode,
+                            TypeCode = typeCode,
                             ObjectId = objId,
                             ObjectPixels = o.objs[0].objectPixels,
-                            ObjectClass = objClass
+                            ObjectClass = objClass,
+                            DecodedPixels = decodedPixels
                         });
-                        nextCustomObjCode++;
                     }
                     tileObjId = customObjPixelsMap[dedupKey];
                 }

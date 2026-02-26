@@ -32,25 +32,11 @@ namespace WorldServer.networking.packets.outgoing
                 {
                     bw.Write(entry.TypeCode); // big-endian uint16
 
-                    // Decode base64 objectPixels to raw RGB bytes (192 bytes for 8x8x3)
-                    byte[] pixels;
-                    try
-                    {
-                        pixels = Convert.FromBase64String(entry.ObjectPixels ?? "");
-                    }
-                    catch
-                    {
-                        pixels = new byte[192];
-                    }
-
-                    // Ensure exactly 192 bytes
-                    if (pixels.Length >= 192)
-                        bw.Write(pixels, 0, 192);
-                    else
-                    {
-                        bw.Write(pixels);
+                    // Use pre-decoded pixels (cached at load time in Json2Wmap)
+                    var pixels = entry.DecodedPixels ?? new byte[192];
+                    bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
+                    if (pixels.Length < 192)
                         bw.Write(new byte[192 - pixels.Length]);
-                    }
 
                     // Object class flag: 0=Wall, 1=DestructibleWall, 2=Decoration
                     byte classFlag = 0;

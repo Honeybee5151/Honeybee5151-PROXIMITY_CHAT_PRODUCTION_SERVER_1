@@ -18,6 +18,7 @@ namespace Shared.resources
         public ushort TypeCode;
         public string GroundId;
         public string GroundPixels;
+        public byte[] DecodedPixels; // cached decoded RGB bytes (192), set once at load
     }
 
     public class CustomObjectEntry
@@ -26,6 +27,7 @@ namespace Shared.resources
         public string ObjectId;      // "custom_xxx" from JM
         public string ObjectPixels;  // base64 RGB (192 bytes = 8x8x3)
         public string ObjectClass;   // "Wall", "DestructibleWall", "Decoration"
+        public byte[] DecodedPixels; // cached decoded RGB bytes (192), set once at load
     }
 
     public class XmlData
@@ -46,6 +48,74 @@ namespace Shared.resources
         public Dictionary<string, List<CustomGroundEntry>> JmCustomGrounds = new Dictionary<string, List<CustomGroundEntry>>();
         public Dictionary<string, List<CustomObjectEntry>> JmCustomObjects = new Dictionary<string, List<CustomObjectEntry>>();
         public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
+
+        // Global type code allocator for custom objects (thread-safe, prevents collisions across dungeons)
+        private ushort _nextCustomObjTypeCode = 0x9000;
+        private readonly object _customObjLock = new object();
+
+        /// <summary>Allocate a unique type code for a custom object. Thread-safe.</summary>
+        public ushort AllocateCustomObjTypeCode()
+        {
+            lock (_customObjLock) return _nextCustomObjTypeCode++;
+        }
+
+        /// <summary>Register custom object entries into shared dictionaries. Thread-safe.</summary>
+        public void RegisterCustomObjects(List<CustomObjectEntry> entries)
+        {
+            lock (_customObjLock)
+            {
+                foreach (var co in entries)
+                {
+                    ObjectDescs[co.TypeCode] = new ObjectDesc(co.TypeCode, BuildCustomObjectXml(co));
+                    IdToObjectType[co.ObjectId] = co.TypeCode;
+                    ObjectTypeToId[co.TypeCode] = co.ObjectId;
+                }
+            }
+        }
+
+        /// <summary>Unregister custom object entries from shared dictionaries. Thread-safe.</summary>
+        public void UnregisterCustomObjects(List<CustomObjectEntry> entries)
+        {
+            lock (_customObjLock)
+            {
+                foreach (var co in entries)
+                {
+                    ObjectDescs.Remove(co.TypeCode);
+                    IdToObjectType.Remove(co.ObjectId);
+                    ObjectTypeToId.Remove(co.TypeCode);
+                }
+            }
+        }
+
+        private static System.Xml.Linq.XElement BuildCustomObjectXml(CustomObjectEntry co)
+        {
+            var xml = new System.Xml.Linq.XElement("Object",
+                new System.Xml.Linq.XAttribute("type", $"0x{co.TypeCode:x4}"),
+                new System.Xml.Linq.XAttribute("id", co.ObjectId),
+                new System.Xml.Linq.XElement("Class", "Wall"),
+                new System.Xml.Linq.XElement("Static")
+            );
+            switch (co.ObjectClass)
+            {
+                case "DestructibleWall":
+                    xml.Add(new System.Xml.Linq.XElement("FullOccupy"));
+                    xml.Add(new System.Xml.Linq.XElement("BlocksSight"));
+                    xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
+                    xml.Add(new System.Xml.Linq.XElement("EnemyOccupySquare"));
+                    xml.Add(new System.Xml.Linq.XElement("Enemy"));
+                    xml.Add(new System.Xml.Linq.XElement("MaxHitPoints", 100));
+                    break;
+                case "Decoration":
+                    break;
+                default:
+                    xml.Add(new System.Xml.Linq.XElement("FullOccupy"));
+                    xml.Add(new System.Xml.Linq.XElement("BlocksSight"));
+                    xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
+                    xml.Add(new System.Xml.Linq.XElement("EnemyOccupySquare"));
+                    break;
+            }
+            return xml;
+        }
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
         private readonly Dictionary<string, byte[]> WorldDataCache = new Dictionary<string, byte[]>();

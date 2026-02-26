@@ -475,14 +475,7 @@ namespace WorldServer.core.worlds
             if (gameData.JmCustomObjects.TryGetValue(jmPath, out var customObjects))
             {
                 CustomObjectEntries = customObjects;
-                foreach (var co in customObjects)
-                {
-                    var xml = BuildCustomObjectXml(co);
-                    var desc = new ObjectDesc(co.TypeCode, xml);
-                    gameData.ObjectDescs[co.TypeCode] = desc;
-                    gameData.IdToObjectType[co.ObjectId] = co.TypeCode;
-                    gameData.ObjectTypeToId[co.TypeCode] = co.ObjectId;
-                }
+                gameData.RegisterCustomObjects(customObjects);
             }
 
             FromWorldMap(new MemoryStream(data));
@@ -498,38 +491,7 @@ namespace WorldServer.core.worlds
             return true;
         }
 
-        private static XElement BuildCustomObjectXml(CustomObjectEntry co)
-        {
-            var xml = new XElement("Object",
-                new XAttribute("type", $"0x{co.TypeCode:x4}"),
-                new XAttribute("id", co.ObjectId),
-                new XElement("Class", "Wall"),
-                new XElement("Static")
-            );
-
-            switch (co.ObjectClass)
-            {
-                case "DestructibleWall":
-                    xml.Add(new XElement("FullOccupy"));
-                    xml.Add(new XElement("BlocksSight"));
-                    xml.Add(new XElement("OccupySquare"));
-                    xml.Add(new XElement("EnemyOccupySquare"));
-                    xml.Add(new XElement("Enemy"));
-                    xml.Add(new XElement("MaxHitPoints", 100));
-                    break;
-                case "Decoration":
-                    // No occupy/block flags — walkable decoration
-                    break;
-                default: // "Wall"
-                    xml.Add(new XElement("FullOccupy"));
-                    xml.Add(new XElement("BlocksSight"));
-                    xml.Add(new XElement("OccupySquare"));
-                    xml.Add(new XElement("EnemyOccupySquare"));
-                    break;
-            }
-
-            return xml;
-        }
+        // BuildCustomObjectXml moved to XmlData.cs (centralized with Register/Unregister)
 
         public virtual void Init()
         {
@@ -721,6 +683,13 @@ namespace WorldServer.core.worlds
 
         public void OnRemovedFromWorldManager()
         {
+            // Unregister custom objects from shared dictionaries to prevent memory leak
+            if (CustomObjectEntries != null && CustomObjectEntries.Count > 0)
+            {
+                GameServer.Resources.GameData.UnregisterCustomObjects(CustomObjectEntries);
+                CustomObjectEntries = null;
+            }
+
             Map.Clear();
             CustomGroundEntries = null;
             CustomDungeonAssetsXml = null;
