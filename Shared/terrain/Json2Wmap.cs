@@ -71,7 +71,7 @@ namespace Shared.terrain
                 string tileObjId = null;
                 if (o.objs != null && o.objs.Length > 0 && !string.IsNullOrEmpty(o.objs[0].objectPixels))
                 {
-                    var objClass = o.objs[0].objectClass ?? "Wall";
+                    var objClass = o.objs[0].objectClass ?? "Object";
                     var dedupKey = o.objs[0].objectPixels + "|" + objClass;
                     if (!customObjMap.TryGetValue(dedupKey, out _))
                     {
