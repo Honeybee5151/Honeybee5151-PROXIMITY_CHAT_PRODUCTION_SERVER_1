@@ -89,15 +89,24 @@ namespace Shared.resources
 
         private static System.Xml.Linq.XElement BuildCustomObjectXml(CustomObjectEntry co)
         {
+            // Object/Decoration = flat 2D (GameObject), Wall/Destructible = 3D cube (Wall)
+            var is3D = co.ObjectClass == "Wall" || co.ObjectClass == "Destructible";
+            var className = is3D ? "Wall" : "GameObject";
             var xml = new System.Xml.Linq.XElement("Object",
                 new System.Xml.Linq.XAttribute("type", $"0x{co.TypeCode:x4}"),
                 new System.Xml.Linq.XAttribute("id", co.ObjectId),
-                new System.Xml.Linq.XElement("Class", "Wall"),
+                new System.Xml.Linq.XElement("Class", className),
                 new System.Xml.Linq.XElement("Static")
             );
             switch (co.ObjectClass)
             {
-                case "DestructibleWall":
+                case "Wall": // 3D solid cube
+                    xml.Add(new System.Xml.Linq.XElement("FullOccupy"));
+                    xml.Add(new System.Xml.Linq.XElement("BlocksSight"));
+                    xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
+                    xml.Add(new System.Xml.Linq.XElement("EnemyOccupySquare"));
+                    break;
+                case "Destructible": // 3D breakable cube
                     xml.Add(new System.Xml.Linq.XElement("FullOccupy"));
                     xml.Add(new System.Xml.Linq.XElement("BlocksSight"));
                     xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
@@ -105,11 +114,9 @@ namespace Shared.resources
                     xml.Add(new System.Xml.Linq.XElement("Enemy"));
                     xml.Add(new System.Xml.Linq.XElement("MaxHitPoints", 100));
                     break;
-                case "Decoration":
+                case "Decoration": // 2D flat, walk-through
                     break;
-                default:
-                    xml.Add(new System.Xml.Linq.XElement("FullOccupy"));
-                    xml.Add(new System.Xml.Linq.XElement("BlocksSight"));
+                default: // "Object" — 2D flat, solid (blocks movement)
                     xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
                     xml.Add(new System.Xml.Linq.XElement("EnemyOccupySquare"));
                     break;

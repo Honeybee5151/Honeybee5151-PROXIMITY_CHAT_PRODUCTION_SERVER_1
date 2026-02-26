@@ -550,9 +550,11 @@ namespace WorldServer.core.worlds
                 var pixels = entry.DecodedPixels ?? new byte[192];
                 bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
                 if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
+                // 0=Object(2D solid), 1=Destructible(3D breakable), 2=Decoration(2D walkable), 3=Wall(3D solid)
                 byte classFlag = 0;
-                if (entry.ObjectClass == "DestructibleWall") classFlag = 1;
+                if (entry.ObjectClass == "Destructible") classFlag = 1;
                 else if (entry.ObjectClass == "Decoration") classFlag = 2;
+                else if (entry.ObjectClass == "Wall") classFlag = 3;
                 bw.Write(classFlag);
             }
             bw.Flush();
