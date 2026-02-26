@@ -979,4 +979,152 @@
         </ActivateOnEquip>
         <BagType>6</BagType>
     </Object>
+	awd
+	awdawd
+	awdawdawd
+	<Object type="0x5067" id="Sandals of the Windwalker">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>9</SlotType>
+        <Tier>4</Tier>
+        <Description>Light sandals woven from enchanted reeds. The wearer feels as though they walk on air.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+        <FameBonus>3</FameBonus>
+    </Object>
+	<Object type="0x5068" id="Ironclad Warboots">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>Massive steel boots that shake the earth with every step. Slow but unstoppable.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="80"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-4"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+        <FameBonus>5</FameBonus>
+    </Object>
+	<Object type="0x5069" id="Boots of the Hollow Specter">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>Ghostly boots that phase partially out of reality. The wearer moves between dimensions, trading vitality for impossible agility.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="8"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+	<Object type="0x506a" id="Magma Treads">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>Boots forged in the core of a dying volcano. They radiate searing heat that empowers the wearer's strikes.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="-30"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+	<Object type="0x506b" id="Frostbitten Sabatons">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>Ice-encrusted boots from the frozen wastes. They preserve the wearer's body but slow the mind.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="120"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="6"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+        <FameBonus>5</FameBonus>
+    </Object>
+	<Object type="0x506c" id="Dancer's Slippers">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        
+        <SlotType>9</SlotType>
+        <Tier>3</Tier>
+        <Description>Silk slippers enchanted by a court mage. Grace in every step.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="30"/>
+        </ActivateOnEquip>
+        <BagType>4</BagType>
+        <FameBonus>3</FameBonus>
+    </Object>
 </Objects>

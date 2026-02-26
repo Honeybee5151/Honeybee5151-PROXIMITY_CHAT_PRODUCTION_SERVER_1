@@ -566,4 +566,17 @@
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>true</PresetHasBackpack>
 	</World>
+	<World id="15">
+		<Width>128</Width>
+		<Height>128</Height>
+		<MapJM>Dungeons/15.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>5000,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>

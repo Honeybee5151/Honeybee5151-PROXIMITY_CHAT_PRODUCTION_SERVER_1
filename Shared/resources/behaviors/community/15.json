@@ -1,0 +1,174 @@
+{
+  "Cutlass Corsair": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 0
+          },
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 9,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "type": "Chase",
+            "range": 4,
+            "speed": 4.5,
+            "sightRange": 11
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 5.4,
+            "coolDown": 900,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 1,
+            "radius": 6,
+            "coolDown": 2200,
+            "predictive": 0.6,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "aggressive",
+            "threshold": 0.5
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "desperate": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "I'll drag ye down to Davy Jones!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Charge",
+            "range": 8,
+            "speed": 6,
+            "coolDown": 1800
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 5.4,
+            "coolDown": 500,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 6,
+            "coolDown": 1200,
+            "predictive": 0.8,
+            "shootAngle": 20,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "aggressive": {
+        "behaviors": [
+          {
+            "type": "SetAltTexture",
+            "minValue": 1
+          },
+          {
+            "text": [
+              "Ye'll walk the plank for this!",
+              "No quarter given!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 16711680,
+            "period": 0.3,
+            "repeats": 3
+          },
+          {
+            "type": "Chase",
+            "range": 2.5,
+            "speed": 5.5,
+            "sightRange": 14
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 5.4,
+            "coolDown": 650,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 6,
+            "coolDown": 1500,
+            "predictive": 0.7,
+            "shootAngle": 25,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "desperate",
+            "threshold": 0.2
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle",
+    "loot": [
+      {
+        "item": "Sandals of the Windwalker",
+        "probability": 1.0
+      }
+    ]
+  }
+}
