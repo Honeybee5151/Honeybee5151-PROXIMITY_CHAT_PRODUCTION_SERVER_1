@@ -87,7 +87,7 @@ namespace WorldServer.core.connection
             }
 
             s.BytesSent += e.BytesTransferred;
-            s.BytesAvailable -= s.BytesSent;
+            s.BytesAvailable -= e.BytesTransferred;
 
             if (s.BytesAvailable <= 0)
             {
