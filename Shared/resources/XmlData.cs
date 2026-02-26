@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,13 @@ using Shared.terrain;
 
 namespace Shared.resources
 {
+    public class CustomGroundEntry
+    {
+        public ushort TypeCode;
+        public string GroundId;
+        public string GroundPixels;
+    }
+
     public class XmlData
     {
         public Dictionary<ushort, PlayerDesc> Classes = new Dictionary<ushort, PlayerDesc>();
@@ -28,8 +35,7 @@ namespace Shared.resources
         public Dictionary<ushort, TileDesc> Tiles = new Dictionary<ushort, TileDesc>();
         public Dictionary<ushort, string> TileTypeToId = new Dictionary<ushort, string>();
         public Dictionary<string, XElement> GroundXmlById = new Dictionary<string, XElement>();
-        public Dictionary<string, List<string>> JmCustomGroundIds = new Dictionary<string, List<string>>();
-        public Dictionary<string, string> GroundPixelsById = new Dictionary<string, string>(); // groundId -> base64 groundPixels from JM
+        public Dictionary<string, List<CustomGroundEntry>> JmCustomGrounds = new Dictionary<string, List<CustomGroundEntry>>();
         public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
@@ -49,6 +55,19 @@ namespace Shared.resources
                 CombinedXMLPlayers = new XElement("Objects");
                 GroundCombinedXML = new XElement("Grounds");
                 SkinsCombinedXML = new XElement("Objects");
+            }
+        }
+
+        public void RegisterCustomGroundRange()
+        {
+            var placeholderXml = XElement.Parse(
+                "<Ground type=\"0xF000\" id=\"CustomGround\">" +
+                "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
+                "</Ground>");
+            for (ushort t = 0xF000; t <= 0xF7FF; t++)
+            {
+                if (!Tiles.ContainsKey(t))
+                    Tiles[t] = new TileDesc(t, placeholderXml);
             }
         }
 
@@ -164,7 +183,7 @@ namespace Shared.resources
         public void LoadMaps(string basePath)
         {
 			var isDocker = Environment.GetEnvironmentVariable("IS_DOCKER") != null;
-			
+
             var directories = Directory.GetDirectories(basePath, "*", SearchOption.AllDirectories).ToList();
             directories.Add(basePath);
             foreach (var directory in directories)
@@ -186,31 +205,11 @@ namespace Shared.resources
 
                         try
                         {
-                            var data = Json2Wmap.Convert(this, mapJson);
+                            var data = Json2Wmap.Convert(this, mapJson, out var customGrounds);
                             WorldDataCache.Add(id, data);
 
-                            // Extract custom ground IDs and pixel data from JM dict
-                            var jmObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(mapJson);
-                            if (jmObj.TryGetValue("dict", out var dictObj))
-                            {
-                                var dictArray = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(dictObj.ToString());
-                                var customIds = new List<string>();
-                                foreach (var entry in dictArray)
-                                {
-                                    if (entry.TryGetValue("ground", out var groundObj))
-                                    {
-                                        var groundId = groundObj?.ToString();
-                                        if (groundId != null && groundId.StartsWith("custom_") && !customIds.Contains(groundId))
-                                        {
-                                            customIds.Add(groundId);
-                                            if (entry.TryGetValue("groundPixels", out var pixelsObj))
-                                                GroundPixelsById[groundId] = pixelsObj.ToString();
-                                        }
-                                    }
-                                }
-                                if (customIds.Count > 0)
-                                    JmCustomGroundIds[id] = customIds;
-                            }
+                            if (customGrounds != null && customGrounds.Count > 0)
+                                JmCustomGrounds[id] = customGrounds;
                         }
                         catch (Exception e)
                         {
@@ -282,7 +281,7 @@ namespace Shared.resources
         }
 
         private void ProcessXml(XElement root, bool exportXmls = false)
-        { 
+        {
             AddWorlds(root);
             AddObjects(root, exportXmls);
             AddGrounds(root, exportXmls);

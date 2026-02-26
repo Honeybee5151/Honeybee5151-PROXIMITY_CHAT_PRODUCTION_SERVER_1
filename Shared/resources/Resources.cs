@@ -25,6 +25,7 @@ namespace Shared.resources
             GameData.Initialize(exportXmls);
             GameData.LoadXmls(xmlPath, "*.xml", exportXmls);
             GameData.LoadXmls(xmlPath, "*.dat", exportXmls);
+            GameData.RegisterCustomGroundRange();
 
             Log.Info("Loading Settings...");
             var settingsPath = $"{resourcePath}/data/init.xml";

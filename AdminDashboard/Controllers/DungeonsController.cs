@@ -199,36 +199,9 @@ namespace AdminDashboard.Controllers
                 var jmContent = mapJm.ToString(Newtonsoft.Json.Formatting.None);
                 files.Add(($"Shared/resources/worlds/Dungeons/{safeTitle}.jm", jmContent));
 
-                // 3. Generate custom Ground XML entries if needed
-                if (customTiles != null && customTiles.Count > 0)
-                {
-                    var customGroundIds = FindCustomGroundIds(mapJm);
-                    if (customGroundIds.Count > 0)
-                    {
-                        // Build reverse map: customId → hex
-                        var idToHex = new Dictionary<string, string>();
-                        foreach (var prop in customTiles.Properties())
-                            idToHex[prop.Value.ToString()] = prop.Name;
-
-                        // Fetch existing CustomGrounds.xml to find next available type code
-                        var (existingXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomGrounds.xml");
-                        var nextType = FindNextTypeCode(existingXml);
-
-                        var newEntries = "";
-                        foreach (var customId in customGroundIds)
-                        {
-                            if (!idToHex.TryGetValue(customId, out var hex)) continue;
-                            newEntries += $"\t<Ground type=\"0x{nextType:x4}\" id=\"{EscapeXml(customId)}\">\n";
-                            newEntries += $"\t\t<Texture>\n\t\t\t<File>lofiEnvironment2</File>\n\t\t\t<Index>0x0b</Index>\n\t\t</Texture>\n";
-                            newEntries += $"\t\t<Color>0x{hex}</Color>\n";
-                            newEntries += $"\t</Ground>\n";
-                            nextType++;
-                        }
-
-                        var updatedXml = existingXml.Replace("</GroundTypes>", newEntries + "</GroundTypes>");
-                        files.Add(("Shared/resources/xml/custom/CustomGrounds.xml", updatedXml));
-                    }
-                }
+                // 3. Custom ground tiles: no XML generation needed.
+                // The JM dict already contains groundPixels data for custom tiles.
+                // At server startup, Json2Wmap.Convert assigns local 0xF000+ type codes per-dungeon.
 
                 // 4. Generate sprite sheets + write mob/item XMLs
                 var mobs = (dungeon["mobs"] ?? dungeon["bosses"]) as JArray;

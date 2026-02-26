@@ -1,4 +1,4 @@
-﻿using TKRShared;
+using TKRShared;
 using Ionic.Zlib;
 using Newtonsoft.Json;
 using System;
@@ -12,24 +12,48 @@ namespace Shared.terrain
     {
         public static void Convert(XmlData data, string from, string to)
         {
-            var x = Convert(data, File.ReadAllText(from));
+            var x = Convert(data, File.ReadAllText(from), out _);
 
             File.WriteAllBytes(to, x);
         }
 
-        public static byte[] Convert(XmlData data, string json)
+        public static byte[] Convert(XmlData data, string json, out List<CustomGroundEntry> customGrounds)
         {
             var obj = JsonConvert.DeserializeObject<json_dat>(json);
             var dat = ZlibStream.UncompressBuffer(obj.data);
             var tileDict = new Dictionary<short, TerrainTile>();
 
+            var customGroundMap = new Dictionary<string, ushort>();
+            ushort nextCustomCode = 0xF000;
+            customGrounds = new List<CustomGroundEntry>();
+
             for (var i = 0; i < obj.dict.Length; i++)
             {
                 var o = obj.dict[i];
 
+                ushort tileId;
+                if (o.ground == null)
+                    tileId = 0xff;
+                else if (o.ground.StartsWith("custom_"))
+                {
+                    if (!customGroundMap.TryGetValue(o.ground, out tileId))
+                    {
+                        tileId = nextCustomCode++;
+                        customGroundMap[o.ground] = tileId;
+                        customGrounds.Add(new CustomGroundEntry
+                        {
+                            TypeCode = tileId,
+                            GroundId = o.ground,
+                            GroundPixels = o.groundPixels
+                        });
+                    }
+                }
+                else
+                    tileId = data.IdToTileType[o.ground];
+
                 tileDict[(short)i] = new TerrainTile()
                 {
-                    TileId = o.ground == null ? (ushort)0xff : data.IdToTileType[o.ground],
+                    TileId = tileId,
                     TileObj = o.objs?[0].id,
                     Name = o.objs == null ? "" : o.objs[0].name ?? "",
                     Terrain = TerrainType.None,
@@ -58,6 +82,7 @@ namespace Shared.terrain
         private struct loc
         {
             public string ground;
+            public string groundPixels;
             public obj[] objs;
             public obj[] regions;
         }

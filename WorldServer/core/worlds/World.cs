@@ -468,20 +468,18 @@ namespace WorldServer.core.worlds
                 return false;
             FromWorldMap(new MemoryStream(data));
 
-            // Build custom grounds XML for this dungeon (includes per-pixel data)
+            // Build custom grounds XML for this dungeon from per-JM metadata
             var gameData = GameServer.Resources.GameData;
-            if (gameData.JmCustomGroundIds.TryGetValue(jmPath, out var customIds))
+            if (gameData.JmCustomGrounds.TryGetValue(jmPath, out var customGrounds))
             {
                 var sb = new System.Text.StringBuilder("<Grounds>");
-                foreach (var groundId in customIds)
+                foreach (var entry in customGrounds)
                 {
-                    if (gameData.GroundXmlById.TryGetValue(groundId, out var elem))
-                    {
-                        var groundElem = new System.Xml.Linq.XElement(elem);
-                        if (gameData.GroundPixelsById.TryGetValue(groundId, out var pixels))
-                            groundElem.Add(new System.Xml.Linq.XElement("GroundPixels", pixels));
-                        sb.Append(groundElem.ToString());
-                    }
+                    sb.Append($"<Ground type=\"0x{entry.TypeCode:x4}\" id=\"{entry.GroundId}\">");
+                    sb.Append("<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>");
+                    if (!string.IsNullOrEmpty(entry.GroundPixels))
+                        sb.Append($"<GroundPixels>{entry.GroundPixels}</GroundPixels>");
+                    sb.Append("</Ground>");
                 }
                 sb.Append("</Grounds>");
                 CustomGroundsXml = sb.ToString();
