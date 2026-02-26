@@ -20,6 +20,14 @@ namespace Shared.resources
         public string GroundPixels;
     }
 
+    public class CustomObjectEntry
+    {
+        public ushort TypeCode;      // 0x9000+ assigned in Json2Wmap
+        public string ObjectId;      // "custom_xxx" from JM
+        public string ObjectPixels;  // base64 RGB (192 bytes = 8x8x3)
+        public string ObjectClass;   // "Wall", "DestructibleWall", "Decoration"
+    }
+
     public class XmlData
     {
         public Dictionary<ushort, PlayerDesc> Classes = new Dictionary<ushort, PlayerDesc>();
@@ -36,6 +44,7 @@ namespace Shared.resources
         public Dictionary<ushort, string> TileTypeToId = new Dictionary<ushort, string>();
         public Dictionary<string, XElement> GroundXmlById = new Dictionary<string, XElement>();
         public Dictionary<string, List<CustomGroundEntry>> JmCustomGrounds = new Dictionary<string, List<CustomGroundEntry>>();
+        public Dictionary<string, List<CustomObjectEntry>> JmCustomObjects = new Dictionary<string, List<CustomObjectEntry>>();
         public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
 
         private readonly Dictionary<string, WorldResource> Worlds = new Dictionary<string, WorldResource>();
@@ -205,11 +214,13 @@ namespace Shared.resources
 
                         try
                         {
-                            var data = Json2Wmap.Convert(this, mapJson, out var customGrounds);
+                            var data = Json2Wmap.Convert(this, mapJson, out var customGrounds, out var customObjects);
                             WorldDataCache.Add(id, data);
 
                             if (customGrounds != null && customGrounds.Count > 0)
                                 JmCustomGrounds[id] = customGrounds;
+                            if (customObjects != null && customObjects.Count > 0)
+                                JmCustomObjects[id] = customObjects;
                         }
                         catch (Exception e)
                         {

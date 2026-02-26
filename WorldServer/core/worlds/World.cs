@@ -1,6 +1,7 @@
 ﻿using Pipelines.Sockets.Unofficial.Arenas;
 using Shared.database;
 using Shared.resources;
+using System.Xml.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,6 +49,7 @@ namespace WorldServer.core.worlds
 
         public bool isWeekend { get; set; } = false;
         public List<Shared.resources.CustomGroundEntry> CustomGroundEntries { get; set; }
+        public List<Shared.resources.CustomObjectEntry> CustomObjectEntries { get; set; }
         public string CustomDungeonAssetsXml { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
         public string[] StartingEquipment { get; set; }
@@ -466,10 +468,26 @@ namespace WorldServer.core.worlds
             var data = GameServer.Resources.GameData.GetWorldData(jmPath);
             if (data == null)
                 return false;
+
+            var gameData = GameServer.Resources.GameData;
+
+            // Register custom object ObjectDescs BEFORE loading map, so Wmap.Load() can resolve names
+            if (gameData.JmCustomObjects.TryGetValue(jmPath, out var customObjects))
+            {
+                CustomObjectEntries = customObjects;
+                foreach (var co in customObjects)
+                {
+                    var xml = BuildCustomObjectXml(co);
+                    var desc = new ObjectDesc(co.TypeCode, xml);
+                    gameData.ObjectDescs[co.TypeCode] = desc;
+                    gameData.IdToObjectType[co.ObjectId] = co.TypeCode;
+                    gameData.ObjectTypeToId[co.TypeCode] = co.ObjectId;
+                }
+            }
+
             FromWorldMap(new MemoryStream(data));
 
             // Store custom ground entries for this dungeon (sent as binary to client)
-            var gameData = GameServer.Resources.GameData;
             if (gameData.JmCustomGrounds.TryGetValue(jmPath, out var customGrounds))
                 CustomGroundEntries = customGrounds;
 
@@ -478,6 +496,39 @@ namespace WorldServer.core.worlds
                 CustomDungeonAssetsXml = assetsXml;
 
             return true;
+        }
+
+        private static XElement BuildCustomObjectXml(CustomObjectEntry co)
+        {
+            var xml = new XElement("Object",
+                new XAttribute("type", $"0x{co.TypeCode:x4}"),
+                new XAttribute("id", co.ObjectId),
+                new XElement("Class", "Wall"),
+                new XElement("Static")
+            );
+
+            switch (co.ObjectClass)
+            {
+                case "DestructibleWall":
+                    xml.Add(new XElement("FullOccupy"));
+                    xml.Add(new XElement("BlocksSight"));
+                    xml.Add(new XElement("OccupySquare"));
+                    xml.Add(new XElement("EnemyOccupySquare"));
+                    xml.Add(new XElement("Enemy"));
+                    xml.Add(new XElement("MaxHitPoints", 100));
+                    break;
+                case "Decoration":
+                    // No occupy/block flags — walkable decoration
+                    break;
+                default: // "Wall"
+                    xml.Add(new XElement("FullOccupy"));
+                    xml.Add(new XElement("BlocksSight"));
+                    xml.Add(new XElement("OccupySquare"));
+                    xml.Add(new XElement("EnemyOccupySquare"));
+                    break;
+            }
+
+            return xml;
         }
 
         public virtual void Init()

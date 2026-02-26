@@ -229,6 +229,18 @@ namespace WorldServer.core
                 }
             }
 
+            // Send custom object sprites for community dungeons (binary format, chunked)
+            if (world.CustomObjectEntries != null && world.CustomObjectEntries.Count > 0)
+            {
+                const int chunkSize = 500;
+                var entries = world.CustomObjectEntries;
+                for (int i = 0; i < entries.Count; i += chunkSize)
+                {
+                    var chunk = entries.GetRange(i, Math.Min(chunkSize, entries.Count - i));
+                    packets.Add(new CustomObjectsMessage { Entries = chunk });
+                }
+            }
+
             // Send per-dungeon sprites + object definitions
             if (world.CustomDungeonAssetsXml != null)
                 packets.Add(new CustomDungeonAssetsMessage { AssetsXml = world.CustomDungeonAssetsXml });

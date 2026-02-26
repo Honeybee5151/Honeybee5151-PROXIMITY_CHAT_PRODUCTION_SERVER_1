@@ -12,12 +12,12 @@ namespace Shared.terrain
     {
         public static void Convert(XmlData data, string from, string to)
         {
-            var x = Convert(data, File.ReadAllText(from), out _);
+            var x = Convert(data, File.ReadAllText(from), out _, out _);
 
             File.WriteAllBytes(to, x);
         }
 
-        public static byte[] Convert(XmlData data, string json, out List<CustomGroundEntry> customGrounds)
+        public static byte[] Convert(XmlData data, string json, out List<CustomGroundEntry> customGrounds, out List<CustomObjectEntry> customObjects)
         {
             var obj = JsonConvert.DeserializeObject<json_dat>(json);
             var dat = ZlibStream.UncompressBuffer(obj.data);
@@ -26,6 +26,12 @@ namespace Shared.terrain
             var customGroundMap = new Dictionary<string, ushort>();
             ushort nextCustomCode = 0x8000;
             customGrounds = new List<CustomGroundEntry>();
+
+            // Custom objects: dedup by pixel content, assign 0x9000+ type codes
+            var customObjPixelsMap = new Dictionary<string, string>(); // objectPixels base64 → objectId
+            var customObjMap = new Dictionary<string, ushort>(); // objectPixels base64 → typeCode
+            ushort nextCustomObjCode = 0x9000;
+            customObjects = new List<CustomObjectEntry>();
 
             for (var i = 0; i < obj.dict.Length; i++)
             {
@@ -51,10 +57,36 @@ namespace Shared.terrain
                 else
                     tileId = data.IdToTileType[o.ground];
 
+                // Handle custom object pixels
+                string tileObjId = null;
+                if (o.objs != null && o.objs.Length > 0 && !string.IsNullOrEmpty(o.objs[0].objectPixels))
+                {
+                    var pixelsKey = o.objs[0].objectPixels;
+                    if (!customObjMap.TryGetValue(pixelsKey, out _))
+                    {
+                        var objId = $"cobj_{nextCustomObjCode:x4}";
+                        customObjMap[pixelsKey] = nextCustomObjCode;
+                        customObjPixelsMap[pixelsKey] = objId;
+                        customObjects.Add(new CustomObjectEntry
+                        {
+                            TypeCode = nextCustomObjCode,
+                            ObjectId = objId,
+                            ObjectPixels = pixelsKey,
+                            ObjectClass = o.objs[0].objectClass ?? "Wall"
+                        });
+                        nextCustomObjCode++;
+                    }
+                    tileObjId = customObjPixelsMap[pixelsKey];
+                }
+                else
+                {
+                    tileObjId = o.objs?[0].id;
+                }
+
                 tileDict[(short)i] = new TerrainTile()
                 {
                     TileId = tileId,
-                    TileObj = o.objs?[0].id,
+                    TileObj = tileObjId,
                     Name = o.objs == null ? "" : o.objs[0].name ?? "",
                     Terrain = TerrainType.None,
                     Region = o.regions == null ? TileRegion.None : (TileRegion)Enum.Parse(typeof(TileRegion), o.regions[0].id.Replace(' ', '_'))
@@ -91,6 +123,8 @@ namespace Shared.terrain
         {
             public string id;
             public string name;
+            public string objectPixels;
+            public string objectClass;
         }
     }
 }

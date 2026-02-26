@@ -94,5 +94,6 @@ public enum MessageId : byte
     //777592
     PROXIMITY_VOICE = 88,
     CUSTOM_GROUNDS = 89,
-    CUSTOM_DUNGEON_ASSETS = 90
+    CUSTOM_DUNGEON_ASSETS = 90,
+    CUSTOM_OBJECTS = 91
 }
