@@ -83,6 +83,37 @@ namespace AdminDashboard.Controllers
                     {
                         var xml = mob["xml"]?.ToString() ?? "";
                         var name = Regex.Match(xml, @"id=""([^""]+)""").Groups[1].Value;
+
+                        // Parse mob stats from XML
+                        int? hp = null, def = null, xpMult = null, size = null;
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(xml))
+                            {
+                                var xDoc = System.Xml.Linq.XElement.Parse(xml);
+                                hp = (int?)xDoc.Element("MaxHitPoints");
+                                def = (int?)xDoc.Element("Defense");
+                                xpMult = (int?)xDoc.Element("XpMult");
+                                size = (int?)xDoc.Element("Size");
+                            }
+                        }
+                        catch { /* ignore parse errors */ }
+
+                        // Parse loot from mob data
+                        var lootEntries = new List<object>();
+                        var lootArr = mob["loot"] as JArray;
+                        if (lootArr != null)
+                        {
+                            foreach (var loot in lootArr)
+                            {
+                                lootEntries.Add(new
+                                {
+                                    item = loot["item"]?.ToString() ?? loot["name"]?.ToString() ?? "?",
+                                    chance = loot["chance"]?.Value<double>() ?? loot["rate"]?.Value<double>() ?? 0,
+                                });
+                            }
+                        }
+
                         mobList.Add(new
                         {
                             name = string.IsNullOrEmpty(name) ? "Unknown Mob" : name,
@@ -91,6 +122,11 @@ namespace AdminDashboard.Controllers
                             spriteAttack = mob["spriteAttack"]?.ToString(),
                             spriteSize = mob["spriteSize"]?.Value<int>() ?? 8,
                             projectileSprites = mob["projectileSprites"] as JObject,
+                            hp,
+                            def,
+                            xpMult,
+                            size,
+                            loot = lootEntries,
                         });
                     }
                 }
@@ -103,12 +139,67 @@ namespace AdminDashboard.Controllers
                     {
                         var xml = item["xml"]?.ToString() ?? "";
                         var name = Regex.Match(xml, @"id=""([^""]+)""").Groups[1].Value;
+
+                        // Parse item stats from XML
+                        string slotType = null, tier = null, bagType = null, description = null;
+                        string damage = null;
+                        double? rateOfFire = null, range = null;
+                        int? numProjectile = null;
+                        var statBonuses = new List<string>();
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(xml))
+                            {
+                                var xDoc = System.Xml.Linq.XElement.Parse(xml);
+                                slotType = (string)xDoc.Element("SlotType");
+                                tier = (string)xDoc.Element("Tier");
+                                bagType = (string)xDoc.Element("BagType");
+                                description = (string)xDoc.Element("Description");
+                                rateOfFire = (double?)xDoc.Element("RateOfFire");
+                                numProjectile = (int?)xDoc.Element("NumProjectile");
+
+                                var proj = xDoc.Element("Projectile");
+                                if (proj != null)
+                                {
+                                    var minDmg = (string)proj.Element("MinDamage");
+                                    var maxDmg = (string)proj.Element("MaxDamage");
+                                    range = (double?)proj.Element("Range");
+                                    if (minDmg != null && maxDmg != null)
+                                        damage = $"{minDmg}-{maxDmg}";
+                                    else if (maxDmg != null)
+                                        damage = maxDmg;
+                                }
+
+                                foreach (var act in xDoc.Elements("ActivateOnEquip"))
+                                {
+                                    var stat = (string)act.Attribute("stat");
+                                    var amt = (string)act.Attribute("amount");
+                                    if (stat != null && amt != null)
+                                        statBonuses.Add($"+{amt} {StatName(stat)}");
+                                }
+                            }
+                        }
+                        catch { /* ignore parse errors */ }
+
+                        // Parse loot info (which mobs drop this item)
+                        var dropFrom = item["dropFromMobs"] ?? item["dropFrom"];
+
                         itemList.Add(new
                         {
                             name = string.IsNullOrEmpty(name) ? "Unknown Item" : name,
                             xml,
                             sprite = item["sprite"]?.ToString(),
                             projectileSprites = item["projectileSprites"] as JObject,
+                            slotType,
+                            tier,
+                            bagType,
+                            description,
+                            damage,
+                            rateOfFire,
+                            range,
+                            numProjectile,
+                            statBonuses,
+                            dropFrom,
                         });
                     }
                 }
@@ -146,11 +237,14 @@ namespace AdminDashboard.Controllers
                     id,
                     title = dungeon["title"]?.ToString(),
                     description = dungeon["description"]?.ToString(),
+                    creatorName = dungeon["creator_name"]?.ToString(),
                     mobs = mobList,
                     items = itemList,
                     map = mapInfo,
                     mapThumbnail,
                     customTiles = tileList,
+                    startingEquipment = dungeon["starting_equipment"] as JArray,
+                    characterPreset = dungeon["character_preset"],
                 });
             }
             catch (Exception ex)
@@ -1278,6 +1372,22 @@ namespace AdminDashboard.Controllers
                 zlibOut.Write(rawBytes, 0, rawBytes.Length);
             }
             mapJm["data"] = Convert.ToBase64String(compressOut.ToArray());
+        }
+
+        private static string StatName(string stat)
+        {
+            return stat switch
+            {
+                "0" => "HP",
+                "1" => "MP",
+                "2" => "ATT",
+                "3" => "DEF",
+                "4" => "SPD",
+                "5" => "DEX",
+                "6" => "VIT",
+                "7" => "WIS",
+                _ => stat
+            };
         }
     }
 

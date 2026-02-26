@@ -1319,9 +1319,12 @@ function hidePreview() {
 function renderPreview(data) {
     let html = '';
 
-    // Description
-    if (data.description) {
-        html += `<div class="preview-section"><p style="color:#aaa;margin:0;">${esc(data.description)}</p></div>`;
+    // Description + creator
+    if (data.description || data.creatorName) {
+        html += `<div class="preview-section">`;
+        if (data.creatorName) html += `<div style="color:#8b5cf6;font-size:12px;margin-bottom:4px;">by ${esc(data.creatorName)}</div>`;
+        if (data.description) html += `<p style="color:#aaa;margin:0;">${esc(data.description)}</p>`;
+        html += `</div>`;
     }
 
     // Map info + thumbnail
@@ -1356,11 +1359,11 @@ function renderPreview(data) {
         html += `<div class="preview-section"><h4>Mobs (${data.mobs.length})</h4>`;
         for (let i = 0; i < data.mobs.length; i++) {
             const mob = data.mobs[i];
-            const spriteScale = mob.spriteSize === 16 ? 64 : 64; // display at 64px
+            const spriteScale = 64;
             html += `<div class="preview-entity">`;
 
-            // Sprites
-            html += '<div style="display:flex;gap:6px;">';
+            // Sprites (idle + attack + projectiles)
+            html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
             if (mob.spriteBase) {
                 html += `<div style="text-align:center;"><img src="${mob.spriteBase}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Base/Idle"><div style="font-size:10px;color:#666;">idle</div></div>`;
             }
@@ -1370,13 +1373,36 @@ function renderPreview(data) {
             if (!mob.spriteBase && !mob.spriteAttack) {
                 html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
             }
+            // Projectile sprites
+            if (mob.projectileSprites) {
+                for (const [projId, src] of Object.entries(mob.projectileSprites)) {
+                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" title="Projectile: ${esc(projId)}"><div style="font-size:10px;color:#666;">proj</div></div>`;
+                }
+            }
             html += '</div>';
 
             // Info
             html += `<div class="preview-entity-info">
                 <div class="preview-entity-name">${esc(mob.name)}</div>
-                <div style="color:#666;font-size:11px;">${mob.spriteSize}x${mob.spriteSize} sprite</div>
-                <span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
+                <div class="preview-stats">`;
+            if (mob.hp != null) html += `<span class="stat-tag stat-hp">HP ${mob.hp}</span>`;
+            if (mob.def != null) html += `<span class="stat-tag stat-def">DEF ${mob.def}</span>`;
+            if (mob.xpMult != null) html += `<span class="stat-tag stat-xp">XP x${mob.xpMult}</span>`;
+            if (mob.size != null) html += `<span class="stat-tag">Size ${mob.size}</span>`;
+            html += `<span class="stat-tag" style="opacity:0.5;">${mob.spriteSize}x${mob.spriteSize}</span>`;
+            html += `</div>`;
+
+            // Loot drops
+            if (mob.loot && mob.loot.length > 0) {
+                html += `<div class="preview-loot">`;
+                for (const l of mob.loot) {
+                    const pct = (l.chance * 100).toFixed(l.chance < 0.01 ? 2 : 1);
+                    html += `<span class="loot-tag">${esc(l.item)} <span style="color:#666;">${pct}%</span></span>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `<span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
                 <div class="preview-xml" style="display:none;">${esc(mob.xml)}</div>
             </div>`;
 
@@ -1392,23 +1418,90 @@ function renderPreview(data) {
             const item = data.items[i];
             html += `<div class="preview-entity">`;
 
-            // Sprite
+            // Sprite + projectile sprites
+            html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
             if (item.sprite) {
                 html += `<img src="${item.sprite}" class="preview-sprite" width="64" height="64" title="Item sprite">`;
             } else {
                 html += `<div class="preview-sprite" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
             }
+            if (item.projectileSprites) {
+                for (const [projId, src] of Object.entries(item.projectileSprites)) {
+                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" title="Projectile: ${esc(projId)}"><div style="font-size:10px;color:#666;">proj</div></div>`;
+                }
+            }
+            html += '</div>';
 
             // Info
             html += `<div class="preview-entity-info">
-                <div class="preview-entity-name">${esc(item.name)}</div>
-                <span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
+                <div class="preview-entity-name">${esc(item.name)}`;
+            if (item.tier != null) html += ` <span style="color:#8b5cf6;font-size:12px;">T${esc(item.tier)}</span>`;
+            html += `</div>`;
+
+            // Stats row
+            html += `<div class="preview-stats">`;
+            if (item.damage) html += `<span class="stat-tag stat-dmg">DMG ${esc(item.damage)}</span>`;
+            if (item.rateOfFire != null) html += `<span class="stat-tag">ROF ${item.rateOfFire}</span>`;
+            if (item.range != null) html += `<span class="stat-tag">Range ${item.range}</span>`;
+            if (item.numProjectile != null && item.numProjectile > 1) html += `<span class="stat-tag">x${item.numProjectile} shots</span>`;
+            if (item.slotType != null) html += `<span class="stat-tag" style="opacity:0.5;">Slot ${esc(item.slotType)}</span>`;
+            if (item.bagType != null) html += `<span class="stat-tag" style="opacity:0.5;">Bag ${esc(item.bagType)}</span>`;
+            html += `</div>`;
+
+            // Stat bonuses
+            if (item.statBonuses && item.statBonuses.length > 0) {
+                html += `<div class="preview-stats">`;
+                for (const b of item.statBonuses) html += `<span class="stat-tag stat-bonus">${esc(b)}</span>`;
+                html += `</div>`;
+            }
+
+            // Description
+            if (item.description) {
+                html += `<div style="color:#888;font-size:11px;font-style:italic;margin-top:2px;">${esc(item.description)}</div>`;
+            }
+
+            // Drop info
+            if (item.dropFrom) {
+                const drops = Array.isArray(item.dropFrom) ? item.dropFrom : [item.dropFrom];
+                if (drops.length > 0) {
+                    html += `<div style="font-size:11px;color:#666;margin-top:2px;">Drops from: ${drops.map(d => esc(typeof d === 'string' ? d : d.name || d.mob || '?')).join(', ')}</div>`;
+                }
+            }
+
+            html += `<span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
                 <div class="preview-xml" style="display:none;">${esc(item.xml)}</div>
             </div>`;
 
             html += '</div>';
         }
         html += '</div>';
+    }
+
+    // Starting Equipment
+    if (data.startingEquipment && data.startingEquipment.length > 0) {
+        html += `<div class="preview-section"><h4>Starting Equipment</h4>`;
+        html += `<div style="display:flex;gap:8px;flex-wrap:wrap;">`;
+        for (const eq of data.startingEquipment) {
+            html += `<span class="stat-tag">${esc(typeof eq === 'string' ? eq : eq.name || JSON.stringify(eq))}</span>`;
+        }
+        html += `</div></div>`;
+    }
+
+    // Character Preset
+    if (data.characterPreset) {
+        html += `<div class="preview-section"><h4>Character Preset</h4>`;
+        const p = data.characterPreset;
+        html += `<div class="preview-stats">`;
+        if (p.className) html += `<span class="stat-tag">${esc(p.className)}</span>`;
+        if (p.hp) html += `<span class="stat-tag stat-hp">HP ${p.hp}</span>`;
+        if (p.mp) html += `<span class="stat-tag" style="background:#1a1a3e;color:#818cf8;">MP ${p.mp}</span>`;
+        if (p.att) html += `<span class="stat-tag">ATT ${p.att}</span>`;
+        if (p.def) html += `<span class="stat-tag stat-def">DEF ${p.def}</span>`;
+        if (p.spd) html += `<span class="stat-tag">SPD ${p.spd}</span>`;
+        if (p.dex) html += `<span class="stat-tag">DEX ${p.dex}</span>`;
+        if (p.vit) html += `<span class="stat-tag">VIT ${p.vit}</span>`;
+        if (p.wis) html += `<span class="stat-tag">WIS ${p.wis}</span>`;
+        html += `</div></div>`;
     }
 
     if (!html) {
