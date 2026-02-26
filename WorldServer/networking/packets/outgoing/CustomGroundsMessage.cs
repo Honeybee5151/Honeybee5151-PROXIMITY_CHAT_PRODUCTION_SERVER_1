@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Ionic.Zlib;
+using NLog;
 using Shared;
 using Shared.resources;
 
@@ -9,6 +10,8 @@ namespace WorldServer.networking.packets.outgoing
 {
     public class CustomGroundsMessage : OutgoingMessage
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         public List<CustomGroundEntry> Entries { get; set; }
 
         public override MessageId MessageId => MessageId.CUSTOM_GROUNDS;
@@ -16,6 +19,7 @@ namespace WorldServer.networking.packets.outgoing
         public override void Write(NetworkWriter wtr)
         {
             var entries = Entries ?? new List<CustomGroundEntry>();
+            Log.Info($"CustomGroundsMessage.Write: {entries.Count} entries");
 
             // Binary format: int32 count + (uint16 typeCode + byte[192] pixels) per entry
             // Use NetworkWriter for consistent big-endian encoding
@@ -52,6 +56,7 @@ namespace WorldServer.networking.packets.outgoing
             bw.Flush();
             var raw = ms.ToArray();
             var compressed = ZlibStream.CompressBuffer(raw);
+            Log.Info($"CustomGroundsMessage.Write: raw={raw.Length} bytes, compressed={compressed.Length} bytes");
             wtr.Write(compressed.Length);
             wtr.Write(compressed);
         }

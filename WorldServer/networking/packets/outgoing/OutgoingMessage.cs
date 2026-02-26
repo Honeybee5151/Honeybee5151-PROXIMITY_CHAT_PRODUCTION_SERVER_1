@@ -25,7 +25,10 @@ namespace WorldServer.networking.packets.outgoing
                 var packetLength = bodyLength + 5;
 
                 if (packetLength > buff.Length - offset)
+                {
+                    Log.Warn($"Packet {MessageId} too large: {packetLength} bytes > buffer remaining {buff.Length - offset}");
                     return 0;
+                }
 
                 try
                 {
