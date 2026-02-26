@@ -21,7 +21,7 @@ namespace WorldServer.core.connection
         public SendToken(int offset)
         {
             BufferOffset = offset;
-            Data = new byte[0x100000];
+            Data = new byte[0x800000]; // 8MB - needed for large compressed CustomGrounds packets
         }
 
         public void Reset()
