@@ -218,8 +218,9 @@ namespace WorldServer.core
             };
 
             // Send custom ground tiles for community dungeons (binary format)
-            if (world.CustomGroundEntries != null && world.CustomGroundEntries.Count > 0)
-                packets.Add(new CustomGroundsMessage { Entries = world.CustomGroundEntries });
+            // TEMPORARILY DISABLED for debugging - testing if large packet causes black screen
+            //if (world.CustomGroundEntries != null && world.CustomGroundEntries.Count > 0)
+            //    packets.Add(new CustomGroundsMessage { Entries = world.CustomGroundEntries });
 
             // Send per-dungeon sprites + object definitions
             if (world.CustomDungeonAssetsXml != null)
