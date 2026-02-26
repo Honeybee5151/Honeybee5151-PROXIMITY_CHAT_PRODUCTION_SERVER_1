@@ -1,3 +1,5 @@
+using System.Text;
+using Ionic.Zlib;
 using Shared;
 
 namespace WorldServer.networking.packets.outgoing
@@ -10,7 +12,11 @@ namespace WorldServer.networking.packets.outgoing
 
         public override void Write(NetworkWriter wtr)
         {
-            wtr.WriteUTF32(GroundsXml ?? "");
+            var xml = GroundsXml ?? "";
+            var raw = Encoding.UTF8.GetBytes(xml);
+            var compressed = ZlibStream.CompressBuffer(raw);
+            wtr.Write(compressed.Length);
+            wtr.Write(compressed);
         }
     }
 }
