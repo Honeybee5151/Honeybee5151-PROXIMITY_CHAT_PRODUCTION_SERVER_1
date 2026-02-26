@@ -217,10 +217,17 @@ namespace WorldServer.core
                 }
             };
 
-            // Send custom ground tiles for community dungeons (binary format)
-            // TEMPORARILY DISABLED for debugging - testing if large packet causes black screen
-            //if (world.CustomGroundEntries != null && world.CustomGroundEntries.Count > 0)
-            //    packets.Add(new CustomGroundsMessage { Entries = world.CustomGroundEntries });
+            // Send custom ground tiles for community dungeons (binary format, chunked)
+            if (world.CustomGroundEntries != null && world.CustomGroundEntries.Count > 0)
+            {
+                const int chunkSize = 500;
+                var entries = world.CustomGroundEntries;
+                for (int i = 0; i < entries.Count; i += chunkSize)
+                {
+                    var chunk = entries.GetRange(i, Math.Min(chunkSize, entries.Count - i));
+                    packets.Add(new CustomGroundsMessage { Entries = chunk });
+                }
+            }
 
             // Send per-dungeon sprites + object definitions
             if (world.CustomDungeonAssetsXml != null)
