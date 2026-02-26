@@ -47,7 +47,7 @@ namespace WorldServer.core.worlds
         private long Lifetime { get; set; }
 
         public bool isWeekend { get; set; } = false;
-        public string CustomGroundsXml { get; set; }
+        public List<Shared.resources.CustomGroundEntry> CustomGroundEntries { get; set; }
         public string CustomDungeonAssetsXml { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
         public string[] StartingEquipment { get; set; }
@@ -468,22 +468,10 @@ namespace WorldServer.core.worlds
                 return false;
             FromWorldMap(new MemoryStream(data));
 
-            // Build custom grounds XML for this dungeon from per-JM metadata
+            // Store custom ground entries for this dungeon (sent as binary to client)
             var gameData = GameServer.Resources.GameData;
             if (gameData.JmCustomGrounds.TryGetValue(jmPath, out var customGrounds))
-            {
-                var sb = new System.Text.StringBuilder("<Grounds>");
-                foreach (var entry in customGrounds)
-                {
-                    sb.Append($"<Ground type=\"0x{entry.TypeCode:x4}\" id=\"{entry.GroundId}\">");
-                    sb.Append("<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>");
-                    if (!string.IsNullOrEmpty(entry.GroundPixels))
-                        sb.Append($"<GroundPixels>{entry.GroundPixels}</GroundPixels>");
-                    sb.Append("</Ground>");
-                }
-                sb.Append("</Grounds>");
-                CustomGroundsXml = sb.ToString();
-            }
+                CustomGroundEntries = customGrounds;
 
             // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
             if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))
