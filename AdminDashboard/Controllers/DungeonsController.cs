@@ -219,14 +219,21 @@ namespace AdminDashboard.Controllers
                     };
 
                     // Generate visual thumbnails
-                    var colorsPath = Path.Combine(
-                        AppContext.BaseDirectory, "wwwroot", "data", "sprite-colors.json");
-                    _mapThumb.LoadColors(colorsPath);
-                    var thumbs = _mapThumb.GenerateThumbnails(mapJm, customTiles);
-                    if (thumbs != null)
+                    try
                     {
-                        mapGroundThumbnail = thumbs.GroundPng;
-                        mapObjectsThumbnail = thumbs.ObjectsPng;
+                        var colorsPath = Path.Combine(
+                            AppContext.BaseDirectory, "wwwroot", "data", "sprite-colors.json");
+                        _mapThumb.LoadColors(colorsPath);
+                        var thumbs = _mapThumb.GenerateThumbnails(mapJm, customTiles);
+                        if (thumbs != null)
+                        {
+                            mapGroundThumbnail = thumbs.GroundPng;
+                            mapObjectsThumbnail = thumbs.ObjectsPng;
+                        }
+                    }
+                    catch (Exception thumbEx)
+                    {
+                        Console.WriteLine($"[Preview] Thumbnail generation failed: {thumbEx.Message}\n{thumbEx.StackTrace}");
                     }
                 }
 
