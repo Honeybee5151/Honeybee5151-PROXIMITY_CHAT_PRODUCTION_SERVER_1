@@ -12,38 +12,43 @@ namespace WorldServer.networking.packets.outgoing
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+        /// <summary>Pre-compressed blob (built once at world load). Preferred over Entries.</summary>
+        public byte[] PreCompressed { get; set; }
+
+        /// <summary>Fallback: raw entries to compress on-the-fly (only if PreCompressed is null).</summary>
         public List<CustomGroundEntry> Entries { get; set; }
 
         public override MessageId MessageId => MessageId.CUSTOM_GROUNDS;
 
         public override void Write(NetworkWriter wtr)
         {
-            var entries = Entries ?? new List<CustomGroundEntry>();
-            Log.Info($"CustomGroundsMessage.Write: {entries.Count} entries");
-
-            // Binary format: int32 count + (uint16 typeCode + byte[192] pixels) per entry
-            // Use NetworkWriter for consistent big-endian encoding
             byte[] compressed;
-            using (var ms = new MemoryStream())
-            using (var bw = new NetworkWriter(ms))
+
+            if (PreCompressed != null)
             {
-                bw.Write(entries.Count); // big-endian int32
-
-                foreach (var entry in entries)
-                {
-                    bw.Write(entry.TypeCode); // big-endian uint16
-
-                    // Use pre-decoded pixels (cached at load time in Json2Wmap)
-                    var pixels = entry.DecodedPixels ?? new byte[192];
-                    bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
-                    if (pixels.Length < 192)
-                        bw.Write(new byte[192 - pixels.Length]);
-                }
-
-                bw.Flush();
-                compressed = ZlibStream.CompressBuffer(ms.ToArray());
+                compressed = PreCompressed;
             }
-            Log.Info($"CustomGroundsMessage.Write: compressed={compressed.Length} bytes");
+            else
+            {
+                var entries = Entries ?? new List<CustomGroundEntry>();
+                Log.Info($"CustomGroundsMessage.Write: {entries.Count} entries (compressing on-the-fly)");
+                using (var ms = new MemoryStream())
+                using (var bw = new NetworkWriter(ms))
+                {
+                    bw.Write(entries.Count);
+                    foreach (var entry in entries)
+                    {
+                        bw.Write(entry.TypeCode);
+                        var pixels = entry.DecodedPixels ?? new byte[192];
+                        bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
+                        if (pixels.Length < 192)
+                            bw.Write(new byte[192 - pixels.Length]);
+                    }
+                    bw.Flush();
+                    compressed = ZlibStream.CompressBuffer(ms.ToArray());
+                }
+            }
+
             wtr.Write(compressed.Length);
             wtr.Write(compressed);
         }

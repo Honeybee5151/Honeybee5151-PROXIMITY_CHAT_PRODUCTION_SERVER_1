@@ -50,6 +50,10 @@ namespace WorldServer.core.worlds
         public bool isWeekend { get; set; } = false;
         public List<Shared.resources.CustomGroundEntry> CustomGroundEntries { get; set; }
         public List<Shared.resources.CustomObjectEntry> CustomObjectEntries { get; set; }
+        /// <summary>Pre-compressed message blobs for custom grounds (one per chunk). Built once at load.</summary>
+        public List<byte[]> PreCompressedGroundChunks { get; set; }
+        /// <summary>Pre-compressed message blobs for custom objects (one per chunk). Built once at load.</summary>
+        public List<byte[]> PreCompressedObjectChunks { get; set; }
         public string CustomDungeonAssetsXml { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
         public string[] StartingEquipment { get; set; }
@@ -484,11 +488,75 @@ namespace WorldServer.core.worlds
             if (gameData.JmCustomGrounds.TryGetValue(jmPath, out var customGrounds))
                 CustomGroundEntries = customGrounds;
 
+            // Pre-compress custom message chunks once at load (reused per client connect)
+            PreCompressCustomChunks();
+
             // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
             if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))
                 CustomDungeonAssetsXml = assetsXml;
 
             return true;
+        }
+
+        private void PreCompressCustomChunks()
+        {
+            const int chunkSize = 500;
+
+            if (CustomGroundEntries != null && CustomGroundEntries.Count > 0)
+            {
+                PreCompressedGroundChunks = new List<byte[]>();
+                for (int i = 0; i < CustomGroundEntries.Count; i += chunkSize)
+                {
+                    var chunk = CustomGroundEntries.GetRange(i, Math.Min(chunkSize, CustomGroundEntries.Count - i));
+                    PreCompressedGroundChunks.Add(CompressGroundChunk(chunk));
+                }
+            }
+
+            if (CustomObjectEntries != null && CustomObjectEntries.Count > 0)
+            {
+                PreCompressedObjectChunks = new List<byte[]>();
+                for (int i = 0; i < CustomObjectEntries.Count; i += chunkSize)
+                {
+                    var chunk = CustomObjectEntries.GetRange(i, Math.Min(chunkSize, CustomObjectEntries.Count - i));
+                    PreCompressedObjectChunks.Add(CompressObjectChunk(chunk));
+                }
+            }
+        }
+
+        private static byte[] CompressGroundChunk(List<Shared.resources.CustomGroundEntry> entries)
+        {
+            using var ms = new MemoryStream();
+            using var bw = new Shared.NetworkWriter(ms);
+            bw.Write(entries.Count);
+            foreach (var entry in entries)
+            {
+                bw.Write(entry.TypeCode);
+                var pixels = entry.DecodedPixels ?? new byte[192];
+                bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
+                if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
+            }
+            bw.Flush();
+            return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());
+        }
+
+        private static byte[] CompressObjectChunk(List<Shared.resources.CustomObjectEntry> entries)
+        {
+            using var ms = new MemoryStream();
+            using var bw = new Shared.NetworkWriter(ms);
+            bw.Write(entries.Count);
+            foreach (var entry in entries)
+            {
+                bw.Write(entry.TypeCode);
+                var pixels = entry.DecodedPixels ?? new byte[192];
+                bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
+                if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
+                byte classFlag = 0;
+                if (entry.ObjectClass == "DestructibleWall") classFlag = 1;
+                else if (entry.ObjectClass == "Decoration") classFlag = 2;
+                bw.Write(classFlag);
+            }
+            bw.Flush();
+            return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());
         }
 
         // BuildCustomObjectXml moved to XmlData.cs (centralized with Register/Unregister)
@@ -693,6 +761,8 @@ namespace WorldServer.core.worlds
             Map.Clear();
             CustomGroundEntries = null;
             CustomDungeonAssetsXml = null;
+            PreCompressedGroundChunks = null;
+            PreCompressedObjectChunks = null;
         }
     }
 }

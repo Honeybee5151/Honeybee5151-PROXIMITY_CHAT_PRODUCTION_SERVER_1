@@ -217,28 +217,18 @@ namespace WorldServer.core
                 }
             };
 
-            // Send custom ground tiles for community dungeons (binary format, chunked)
-            if (world.CustomGroundEntries != null && world.CustomGroundEntries.Count > 0)
+            // Send pre-compressed custom ground chunks (compressed once at world load, reused per client)
+            if (world.PreCompressedGroundChunks != null)
             {
-                const int chunkSize = 500;
-                var entries = world.CustomGroundEntries;
-                for (int i = 0; i < entries.Count; i += chunkSize)
-                {
-                    var chunk = entries.GetRange(i, Math.Min(chunkSize, entries.Count - i));
-                    packets.Add(new CustomGroundsMessage { Entries = chunk });
-                }
+                foreach (var blob in world.PreCompressedGroundChunks)
+                    packets.Add(new CustomGroundsMessage { PreCompressed = blob });
             }
 
-            // Send custom object sprites for community dungeons (binary format, chunked)
-            if (world.CustomObjectEntries != null && world.CustomObjectEntries.Count > 0)
+            // Send pre-compressed custom object chunks (compressed once at world load, reused per client)
+            if (world.PreCompressedObjectChunks != null)
             {
-                const int chunkSize = 500;
-                var entries = world.CustomObjectEntries;
-                for (int i = 0; i < entries.Count; i += chunkSize)
-                {
-                    var chunk = entries.GetRange(i, Math.Min(chunkSize, entries.Count - i));
-                    packets.Add(new CustomObjectsMessage { Entries = chunk });
-                }
+                foreach (var blob in world.PreCompressedObjectChunks)
+                    packets.Add(new CustomObjectsMessage { PreCompressed = blob });
             }
 
             // Send per-dungeon sprites + object definitions
