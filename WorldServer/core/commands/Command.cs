@@ -29,7 +29,7 @@ namespace WorldServer.core.commands
             }
             catch (Exception e)
             {
-                Log.Warn($"An error was thrown when {player.Name} tried using: '/{CommandName}'.", e);
+                Log.Warn($"An error was thrown when {player.Name} tried using: '/{CommandName}'. {e}");
                 return false;
             }
         }
