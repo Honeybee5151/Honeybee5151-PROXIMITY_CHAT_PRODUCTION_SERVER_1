@@ -61,10 +61,10 @@ namespace Shared.resources
         public void RegisterCustomGroundRange()
         {
             var placeholderXml = XElement.Parse(
-                "<Ground type=\"0xF000\" id=\"CustomGround\">" +
+                "<Ground type=\"0x8000\" id=\"CustomGround\">" +
                 "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
                 "</Ground>");
-            for (ushort t = 0xF000; t <= 0xF7FF; t++)
+            for (ushort t = 0x8000; t <= 0xEFFF; t++)
             {
                 if (!Tiles.ContainsKey(t))
                     Tiles[t] = new TileDesc(t, placeholderXml);

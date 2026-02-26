@@ -24,7 +24,7 @@ namespace Shared.terrain
             var tileDict = new Dictionary<short, TerrainTile>();
 
             var customGroundMap = new Dictionary<string, ushort>();
-            ushort nextCustomCode = 0xF000;
+            ushort nextCustomCode = 0x8000;
             customGrounds = new List<CustomGroundEntry>();
 
             for (var i = 0; i < obj.dict.Length; i++)
