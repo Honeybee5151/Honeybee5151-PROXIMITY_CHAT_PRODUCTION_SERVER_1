@@ -671,6 +671,8 @@ namespace WorldServer.core.worlds
         public void OnRemovedFromWorldManager()
         {
             Map.Clear();
+            CustomGroundEntries = null;
+            CustomDungeonAssetsXml = null;
         }
     }
 }

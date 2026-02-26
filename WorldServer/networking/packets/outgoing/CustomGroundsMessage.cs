@@ -23,40 +23,41 @@ namespace WorldServer.networking.packets.outgoing
 
             // Binary format: int32 count + (uint16 typeCode + byte[192] pixels) per entry
             // Use NetworkWriter for consistent big-endian encoding
-            var ms = new MemoryStream();
-            var bw = new NetworkWriter(ms);
-
-            bw.Write(entries.Count); // big-endian int32
-
-            foreach (var entry in entries)
+            byte[] compressed;
+            using (var ms = new MemoryStream())
+            using (var bw = new NetworkWriter(ms))
             {
-                bw.Write(entry.TypeCode); // big-endian uint16
+                bw.Write(entries.Count); // big-endian int32
 
-                // Decode base64 groundPixels to raw RGB bytes (192 bytes for 8x8x3)
-                byte[] pixels;
-                try
+                foreach (var entry in entries)
                 {
-                    pixels = Convert.FromBase64String(entry.GroundPixels ?? "");
-                }
-                catch
-                {
-                    pixels = new byte[192];
+                    bw.Write(entry.TypeCode); // big-endian uint16
+
+                    // Decode base64 groundPixels to raw RGB bytes (192 bytes for 8x8x3)
+                    byte[] pixels;
+                    try
+                    {
+                        pixels = Convert.FromBase64String(entry.GroundPixels ?? "");
+                    }
+                    catch
+                    {
+                        pixels = new byte[192];
+                    }
+
+                    // Ensure exactly 192 bytes
+                    if (pixels.Length >= 192)
+                        bw.Write(pixels, 0, 192);
+                    else
+                    {
+                        bw.Write(pixels);
+                        bw.Write(new byte[192 - pixels.Length]);
+                    }
                 }
 
-                // Ensure exactly 192 bytes
-                if (pixels.Length >= 192)
-                    bw.Write(pixels, 0, 192);
-                else
-                {
-                    bw.Write(pixels);
-                    bw.Write(new byte[192 - pixels.Length]);
-                }
+                bw.Flush();
+                compressed = ZlibStream.CompressBuffer(ms.ToArray());
             }
-
-            bw.Flush();
-            var raw = ms.ToArray();
-            var compressed = ZlibStream.CompressBuffer(raw);
-            Log.Info($"CustomGroundsMessage.Write: raw={raw.Length} bytes, compressed={compressed.Length} bytes");
+            Log.Info($"CustomGroundsMessage.Write: compressed={compressed.Length} bytes");
             wtr.Write(compressed.Length);
             wtr.Write(compressed);
         }
