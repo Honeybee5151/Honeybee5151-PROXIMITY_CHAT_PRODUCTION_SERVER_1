@@ -1347,9 +1347,9 @@ function renderPreview(data) {
 
         // Stacked maps
         if (data.mapGroundThumbnail) {
-            html += `<div style="margin-top:10px;">
+            html += `<div style="margin-top:10px;text-align:center;">
                 <div style="color:#888;font-size:12px;margin-bottom:4px;">Ground</div>
-                <div class="map-viewport" style="overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
+                <div class="map-viewport" style="display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
                     <img src="data:image/png;base64,${data.mapGroundThumbnail}"
                          class="map-thumb-img"
                          style="image-rendering:pixelated;display:block;"
@@ -1360,9 +1360,9 @@ function renderPreview(data) {
         }
 
         if (data.mapObjectsThumbnail) {
-            html += `<div style="margin-top:10px;">
+            html += `<div style="margin-top:10px;text-align:center;">
                 <div style="color:#888;font-size:12px;margin-bottom:4px;">Objects</div>
-                <div class="map-viewport" style="overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
+                <div class="map-viewport" style="display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
                     <img src="data:image/png;base64,${data.mapObjectsThumbnail}"
                          class="map-thumb-img"
                          style="image-rendering:pixelated;display:block;"
