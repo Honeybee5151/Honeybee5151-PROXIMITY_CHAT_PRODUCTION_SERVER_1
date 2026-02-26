@@ -1345,34 +1345,32 @@ function renderPreview(data) {
             <button class="map-zoom-btn" onclick="setMapZoom(8)" data-zoom="8">8x</button>
         </div>`;
 
-        // Side-by-side maps
-        html += `<div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">`;
-
+        // Stacked maps
         if (data.mapGroundThumbnail) {
-            html += `<div style="flex:1;min-width:200px;">
-                <div style="color:#888;font-size:12px;margin-bottom:4px;text-align:center;">Ground</div>
-                <div class="map-viewport" style="overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
+            html += `<div style="margin-top:10px;">
+                <div style="color:#888;font-size:12px;margin-bottom:4px;">Ground</div>
+                <div class="map-viewport" style="overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
                     <img src="data:image/png;base64,${data.mapGroundThumbnail}"
                          class="map-thumb-img"
-                         style="image-rendering:pixelated;display:block;transform-origin:top left;"
+                         style="image-rendering:pixelated;display:block;"
+                         onload="this.style.width=(this.naturalWidth*2)+'px';this.style.height=(this.naturalHeight*2)+'px';"
                          title="Ground layer">
                 </div>
             </div>`;
         }
 
         if (data.mapObjectsThumbnail) {
-            html += `<div style="flex:1;min-width:200px;">
-                <div style="color:#888;font-size:12px;margin-bottom:4px;text-align:center;">Objects</div>
-                <div class="map-viewport" style="overflow:auto;max-height:500px;border:1px solid #333;border-radius:4px;background:#111;">
+            html += `<div style="margin-top:10px;">
+                <div style="color:#888;font-size:12px;margin-bottom:4px;">Objects</div>
+                <div class="map-viewport" style="overflow-x:auto;overflow-y:hidden;border:1px solid #333;border-radius:4px;background:#111;">
                     <img src="data:image/png;base64,${data.mapObjectsThumbnail}"
                          class="map-thumb-img"
-                         style="image-rendering:pixelated;display:block;transform-origin:top left;"
+                         style="image-rendering:pixelated;display:block;"
+                         onload="this.style.width=(this.naturalWidth*2)+'px';this.style.height=(this.naturalHeight*2)+'px';"
                          title="Objects layer">
                 </div>
             </div>`;
         }
-
-        html += `</div>`;
         html += `</div>`;
     }
 
@@ -1544,8 +1542,11 @@ function renderPreview(data) {
 
 function setMapZoom(level) {
     document.querySelectorAll('.map-thumb-img').forEach(img => {
-        img.style.transform = `scale(${level})`;
-        img.style.transformOrigin = 'top left';
+        // Use width/height instead of transform so container scrolls properly
+        const natW = img.naturalWidth;
+        const natH = img.naturalHeight;
+        img.style.width = (natW * level) + 'px';
+        img.style.height = (natH * level) + 'px';
     });
     document.querySelectorAll('.map-zoom-btn').forEach(btn => {
         btn.classList.toggle('active', parseInt(btn.dataset.zoom) === level);
