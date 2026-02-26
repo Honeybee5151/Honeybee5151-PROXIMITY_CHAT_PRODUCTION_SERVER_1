@@ -27,9 +27,9 @@ namespace Shared.terrain
             ushort nextCustomCode = 0x8000;
             customGrounds = new List<CustomGroundEntry>();
 
-            // Custom objects: dedup by pixel content, assign 0x9000+ type codes
-            var customObjPixelsMap = new Dictionary<string, string>(); // objectPixels base64 → objectId
-            var customObjMap = new Dictionary<string, ushort>(); // objectPixels base64 → typeCode
+            // Custom objects: dedup by (pixels + class), assign 0x9000+ type codes
+            var customObjPixelsMap = new Dictionary<string, string>(); // (pixels|class) → objectId
+            var customObjMap = new Dictionary<string, ushort>(); // (pixels|class) → typeCode
             ushort nextCustomObjCode = 0x9000;
             customObjects = new List<CustomObjectEntry>();
 
@@ -61,22 +61,23 @@ namespace Shared.terrain
                 string tileObjId = null;
                 if (o.objs != null && o.objs.Length > 0 && !string.IsNullOrEmpty(o.objs[0].objectPixels))
                 {
-                    var pixelsKey = o.objs[0].objectPixels;
-                    if (!customObjMap.TryGetValue(pixelsKey, out _))
+                    var objClass = o.objs[0].objectClass ?? "Wall";
+                    var dedupKey = o.objs[0].objectPixels + "|" + objClass;
+                    if (!customObjMap.TryGetValue(dedupKey, out _))
                     {
                         var objId = $"cobj_{nextCustomObjCode:x4}";
-                        customObjMap[pixelsKey] = nextCustomObjCode;
-                        customObjPixelsMap[pixelsKey] = objId;
+                        customObjMap[dedupKey] = nextCustomObjCode;
+                        customObjPixelsMap[dedupKey] = objId;
                         customObjects.Add(new CustomObjectEntry
                         {
                             TypeCode = nextCustomObjCode,
                             ObjectId = objId,
-                            ObjectPixels = pixelsKey,
-                            ObjectClass = o.objs[0].objectClass ?? "Wall"
+                            ObjectPixels = o.objs[0].objectPixels,
+                            ObjectClass = objClass
                         });
                         nextCustomObjCode++;
                     }
-                    tileObjId = customObjPixelsMap[pixelsKey];
+                    tileObjId = customObjPixelsMap[dedupKey];
                 }
                 else
                 {
