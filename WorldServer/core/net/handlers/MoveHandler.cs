@@ -46,8 +46,9 @@ namespace WorldServer.core.net.handlers
 
                 if (!player.World.IsPassable(newX, newY))
                 {
-                    StaticLogger.Instance.Info($"{player.Name} is walking on an occupied tile. {newX}, {newY}");
-                    player.Client.Disconnect("NoClipping");
+                    // Don't disconnect — just reject the move and keep player at current position
+                    // Custom dungeon NoWalk tiles should block, not kick
+                    player.UpdateTiles();
                     return;
                 }
 
