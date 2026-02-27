@@ -709,4 +709,17 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 	</World>
+	<World id="awdawdadadad">
+		<Width>8</Width>
+		<Height>8</Height>
+		<MapJM>Dungeons/awdawdadadad.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<PresetLevel>1</PresetLevel>
+		<PresetStats>100,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>
