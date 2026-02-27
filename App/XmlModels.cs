@@ -284,6 +284,7 @@ namespace App
         public int Rank { get; private set; }
         public bool Admin { get; private set; }
         public bool FirstDeath { get; private set; }
+        public bool TutorialDone { get; private set; }
 
         public int Credits { get; private set; }
         public int AmountDonated { get; private set; }
@@ -310,6 +311,7 @@ namespace App
                 Rank = acc.Rank,
                 Admin = acc.Admin,
                 FirstDeath = acc.FirstDeath,
+                TutorialDone = acc.TutorialDone,
 
                 Credits = acc.Credits,
                 NextCharSlotPrice = core.Resources.Settings.NewAccounts.SlotCost,
@@ -337,6 +339,7 @@ namespace App
 
                     NameChosen ? new XElement("NameChosen", "") : null,
                     FirstDeath ? new XElement("isFirstDeath", "") : null,
+                    TutorialDone ? new XElement("TutorialDone", "") : null,
 
                     new XElement("Credits", Credits),
                     new XElement("AmountDonated", AmountDonated),

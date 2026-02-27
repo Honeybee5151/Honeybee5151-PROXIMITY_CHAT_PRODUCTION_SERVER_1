@@ -33,6 +33,17 @@ namespace WorldServer.core.net.handlers
 
             var manager = player.GameServer;
 
+            // Silent tutorial completion marker (no command response)
+            if (text == "/tutorialdone")
+            {
+                if (!client.Account.TutorialDone)
+                {
+                    client.Account.TutorialDone = true;
+                    client.Account.FlushAsync();
+                }
+                return;
+            }
+
             // check for commands before other checks
             if (text[0] == '/')
             {
