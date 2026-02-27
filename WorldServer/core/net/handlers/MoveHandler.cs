@@ -40,7 +40,8 @@ namespace WorldServer.core.net.handlers
             {
                 if (!player.World.Map.Contains(newX, newY))
                 {
-                    player.Client.Disconnect("Out of map bounds");
+                    // Don't disconnect — reject the move (MapInfo sends square size, actual map may not be square)
+                    player.UpdateTiles();
                     return;
                 }
 
