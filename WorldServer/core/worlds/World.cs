@@ -534,8 +534,8 @@ namespace WorldServer.core.worlds
                 var pixels = entry.DecodedPixels ?? new byte[192];
                 bw.Write(pixels, 0, Math.Min(pixels.Length, 192));
                 if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
-                // Flags byte: bit 0 = NoWalk, bit 1 = Hole
-                bw.Write((byte)((entry.NoWalk ? 1 : 0) | (entry.Hole ? 2 : 0)));
+                // Flags byte: bit 0 = NoWalk
+                bw.Write((byte)(entry.NoWalk ? 1 : 0));
             }
             bw.Flush();
             return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());
