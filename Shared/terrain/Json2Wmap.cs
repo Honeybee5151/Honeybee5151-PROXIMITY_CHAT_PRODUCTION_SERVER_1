@@ -41,8 +41,10 @@ namespace Shared.terrain
                     tileId = 0xff;
                 else if (o.ground.StartsWith("custom_"))
                 {
-                    // Include blocked state in dedup key so blocked/unblocked variants get separate type codes
-                    var groundKey = o.blocked == true ? o.ground + "|blocked" : o.ground;
+                    // Include blocked/hole state in dedup key so variants get separate type codes
+                    var groundKey = o.ground;
+                    if (o.blocked == true) groundKey += "|blocked";
+                    if (o.hole == true) groundKey += "|hole";
                     if (!customGroundMap.TryGetValue(groundKey, out tileId))
                     {
                         tileId = nextCustomCode++;
@@ -63,7 +65,8 @@ namespace Shared.terrain
                             GroundId = o.ground,
                             GroundPixels = o.groundPixels,
                             DecodedPixels = decodedGndPixels,
-                            NoWalk = o.blocked == true
+                            NoWalk = o.blocked == true,
+                            Hole = o.hole == true
                         });
                     }
                 }
@@ -178,6 +181,7 @@ namespace Shared.terrain
             public string ground;
             public string groundPixels;
             public bool? blocked;
+            public bool? hole;
             public obj[] objs;
             public obj[] regions;
         }
