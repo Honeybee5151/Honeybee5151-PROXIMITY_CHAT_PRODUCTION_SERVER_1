@@ -41,10 +41,12 @@ namespace Shared.terrain
                     tileId = 0xff;
                 else if (o.ground.StartsWith("custom_"))
                 {
-                    if (!customGroundMap.TryGetValue(o.ground, out tileId))
+                    // Include blocked state in dedup key so blocked/unblocked variants get separate type codes
+                    var groundKey = o.blocked == true ? o.ground + "|blocked" : o.ground;
+                    if (!customGroundMap.TryGetValue(groundKey, out tileId))
                     {
                         tileId = nextCustomCode++;
-                        customGroundMap[o.ground] = tileId;
+                        customGroundMap[groundKey] = tileId;
                         // Decode base64 pixels once at load time
                         byte[] decodedGndPixels;
                         try { decodedGndPixels = System.Convert.FromBase64String(o.groundPixels ?? ""); }
@@ -60,7 +62,8 @@ namespace Shared.terrain
                             TypeCode = tileId,
                             GroundId = o.ground,
                             GroundPixels = o.groundPixels,
-                            DecodedPixels = decodedGndPixels
+                            DecodedPixels = decodedGndPixels,
+                            NoWalk = o.blocked == true
                         });
                     }
                 }
@@ -138,6 +141,20 @@ namespace Shared.terrain
                 };
             }
 
+            // Override TileDesc for blocked custom ground tiles (NoWalk)
+            foreach (var cg in customGrounds)
+            {
+                if (cg.NoWalk)
+                {
+                    var noWalkXml = System.Xml.Linq.XElement.Parse(
+                        $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
+                        "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
+                        "<NoWalk/>" +
+                        "</Ground>");
+                    data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, noWalkXml);
+                }
+            }
+
             var tiles = new TerrainTile[obj.width, obj.height];
 
             using (var rdr = new NetworkReader(new MemoryStream(dat)))
@@ -160,6 +177,7 @@ namespace Shared.terrain
         {
             public string ground;
             public string groundPixels;
+            public bool? blocked;
             public obj[] objs;
             public obj[] regions;
         }

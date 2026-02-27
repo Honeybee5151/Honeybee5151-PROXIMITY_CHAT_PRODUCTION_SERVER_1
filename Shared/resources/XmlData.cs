@@ -19,6 +19,7 @@ namespace Shared.resources
         public string GroundId;
         public string GroundPixels;
         public byte[] DecodedPixels; // cached decoded RGB bytes (192), set once at load
+        public bool NoWalk; // true if ground tile blocks movement
     }
 
     public class CustomObjectEntry
