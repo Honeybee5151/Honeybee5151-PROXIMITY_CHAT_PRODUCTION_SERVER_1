@@ -50,19 +50,22 @@ namespace WorldServer.core.objects
         {
             if (!_move.TryDequeue(out var tickId))
             {
-                Client.Disconnect("One too many MovePackets");
+                // Queue desync — flush and let client resync (lag instead of kick)
+                while (_move.TryDequeue(out _)) { }
                 return;
             }
 
             if (tickId != moveTickId)
             {
-                Client.Disconnect("[NewTick -> Move] TickIds don't match");
+                // TickId mismatch — flush and let client resync (lag instead of kick)
+                while (_move.TryDequeue(out _)) { }
                 return;
             }
 
             if (moveTickId > TickId)
             {
-                Client.Disconnect("[NewTick -> Move] Invalid tickId");
+                // Invalid tickId — flush and let client resync (lag instead of kick)
+                while (_move.TryDequeue(out _)) { }
                 return;
             }
 
