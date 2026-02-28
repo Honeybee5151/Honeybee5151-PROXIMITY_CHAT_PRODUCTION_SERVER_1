@@ -33,7 +33,7 @@ namespace WorldServer.core.commands
 
         internal class Size : Command
         {
-            public override RankingType RankRequirement => RankingType.Regular;
+            public override RankingType RankRequirement => RankingType.Donator;
             public override string CommandName => "size";
 
             protected override bool Process(Player player, TickTime time, string args)
@@ -45,13 +45,30 @@ namespace WorldServer.core.commands
                 }
 
                 var size = Utils.FromString(args);
-                var min = 20;
-                var max = 250;
                 var acc = player.Client.Account;
+                var rank = acc.Admin ? (int)RankingType.Admin : acc.Rank;
+
+                int min, max;
+                if (rank >= (int)RankingType.Admin)
+                {
+                    min = 20; max = 250;
+                }
+                else if (rank >= (int)RankingType.Sponsor) // Skeleking
+                {
+                    min = 25; max = 225;
+                }
+                else if (rank >= (int)RankingType.Supporter) // Skeleguard
+                {
+                    min = 50; max = 175;
+                }
+                else // Skelenoid (Donator)
+                {
+                    min = 75; max = 125;
+                }
 
                 if (size < min && size != 0 || size > max)
                 {
-                    player.SendError($"Invalid size. Size needs to be within the range: {min}-{max}. Use 0 to reset size to default.");
+                    player.SendError($"Invalid size. Your rank allows: {min}-{max}. Use 0 to reset size to default.");
                     return false;
                 }
 
