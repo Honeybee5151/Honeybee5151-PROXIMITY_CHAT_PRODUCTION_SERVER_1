@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Shared;
+using Shared.database.party;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
 
@@ -51,8 +52,46 @@ namespace WorldServer.core.commands.player
             }
 
             player.SendInfo($"Entering {match}...");
+            var previousWorld = player.World;
             player.Reconnect(world);
+            ReconnectPartyMembers(player, world, previousWorld);
             return true;
+        }
+
+        private void ReconnectPartyMembers(Player leader, World targetWorld, World previousWorld)
+        {
+            if (!targetWorld.IsCommunityDungeon)
+                return;
+
+            var partyId = leader.Client.Account.PartyId;
+            if (partyId == 0)
+                return;
+
+            var party = DbPartySystem.Get(leader.Client.Account.Database, partyId);
+            if (party == null)
+                return;
+
+            if (party.PartyLeader.Item1 != leader.Client.Account.Name || party.PartyLeader.Item2 != leader.Client.Account.AccountId)
+                return;
+
+            foreach (var member in party.PartyMembers)
+            {
+                if (member.accid == leader.AccountId)
+                    continue;
+
+                var memberClient = leader.GameServer.ConnectionManager.FindClient(member.accid);
+                if (memberClient?.Player == null)
+                    continue;
+
+                if (memberClient.Player.World != previousWorld)
+                    continue;
+
+                if (targetWorld.IsPlayersMax())
+                    break;
+
+                memberClient.Player.SendInfo("Your party leader entered a dungeon!");
+                memberClient.Player.Reconnect(targetWorld);
+            }
         }
 
         private List<string> GetCommunityDungeonNames(GameServer server)
