@@ -191,7 +191,13 @@ namespace WorldServer.core.miscfile
                 BubbleTime = 5,
                 Recipient = "",
                 Txt = text,
-                NameColor = player.ColorNameChat != 0 ? player.ColorNameChat : 0x123456,
+                NameColor = player.ColorNameChat != 0 ? player.ColorNameChat : player.Rank switch
+                {
+                    1 => 0xFFFFFF,  // Skelenoid: white
+                    2 => 0x9CA3AF,  // Skeleguard: gray
+                    3 => 0x8B1A1A,  // Skeleking: dark red
+                    _ => 0x123456   // default
+                },
                 TextColor = player.ColorChat != 0 ? player.ColorChat : 0xFFFFFF
             };
 
