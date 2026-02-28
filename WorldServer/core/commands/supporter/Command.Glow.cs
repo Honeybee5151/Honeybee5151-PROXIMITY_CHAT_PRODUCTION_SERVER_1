@@ -10,7 +10,7 @@ namespace WorldServer.core.commands
     {
         internal class Glow : Command
         {
-            public override RankingType RankRequirement => RankingType.Donator;
+            public override RankingType RankRequirement => RankingType.Supporter;
             public override string CommandName => "glow";
 
             protected override bool Process(Player player, TickTime time, string color)

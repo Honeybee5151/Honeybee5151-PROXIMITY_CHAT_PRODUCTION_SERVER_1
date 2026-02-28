@@ -177,9 +177,9 @@ namespace WorldServer.core.miscfile
             else
                 tag = player.Rank switch
                 {
-                    1 => "[Mute] ",
-                    2 => "[Whisperer] ",
-                    3 => "[Chatter] ",
+                    1 => "[Skelenoid] ",
+                    2 => "[Skeleguard] ",
+                    3 => "[Skeleking] ",
                     _ => ""
                 };
 

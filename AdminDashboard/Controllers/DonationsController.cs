@@ -24,9 +24,9 @@ namespace AdminDashboard.Controllers
 
         private static readonly Dictionary<string, string> RankNames = new()
         {
-            { "mute", "Mute" },
-            { "whisperer", "Whisperer" },
-            { "chatter", "Chatter" },
+            { "mute", "Skelenoid" },
+            { "whisperer", "Skeleguard" },
+            { "chatter", "Skeleking" },
         };
 
         public DonationsController(RedisService redis, SupabaseService supabase)

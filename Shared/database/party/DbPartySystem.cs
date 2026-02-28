@@ -71,7 +71,7 @@ namespace Shared.database.party
             {
                 // todo
                 case RankingType.Donator:
-                    return (int)PartySizes.S1;
+                    return (int)PartySizes.NPlayer; // Skelenoid: no party bonus
                 case RankingType.Supporter:
                     return (int)PartySizes.S2;
                 case RankingType.Sponsor:

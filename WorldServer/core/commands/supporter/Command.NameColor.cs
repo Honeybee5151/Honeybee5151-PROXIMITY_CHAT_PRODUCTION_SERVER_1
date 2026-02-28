@@ -9,7 +9,7 @@ namespace WorldServer.core.commands
     {
         internal class NameColor : Command
         {
-            public override RankingType RankRequirement => RankingType.Donator;
+            public override RankingType RankRequirement => RankingType.Supporter;
             public override string CommandName => "namecolor";
 
             protected override bool Process(Player player, TickTime time, string color)
