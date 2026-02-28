@@ -536,6 +536,8 @@ namespace WorldServer.core.worlds
                 if (pixels.Length < 192) bw.Write(new byte[192 - pixels.Length]);
                 // Flags byte: bit 0 = NoWalk
                 bw.Write((byte)(entry.NoWalk ? 1 : 0));
+                // Blend priority: sbyte (-1 = default/lowest, higher wins at edges)
+                bw.Write((sbyte)entry.BlendPriority);
             }
             bw.Flush();
             return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());

@@ -41,8 +41,9 @@ namespace Shared.terrain
                     tileId = 0xff;
                 else if (o.ground.StartsWith("custom_"))
                 {
-                    // Include blocked state in dedup key so blocked/unblocked variants get separate type codes
-                    var groundKey = o.blocked == true ? o.ground + "|blocked" : o.ground;
+                    // Include blocked state + blend priority in dedup key so variants get separate type codes
+                    var bp = o.blendPriority ?? -1;
+                    var groundKey = o.ground + (o.blocked == true ? "|blocked" : "") + (bp != -1 ? $"|bp{bp}" : "");
                     if (!customGroundMap.TryGetValue(groundKey, out tileId))
                     {
                         tileId = nextCustomCode++;
@@ -63,7 +64,8 @@ namespace Shared.terrain
                             GroundId = o.ground,
                             GroundPixels = o.groundPixels,
                             DecodedPixels = decodedGndPixels,
-                            NoWalk = o.blocked == true
+                            NoWalk = o.blocked == true,
+                            BlendPriority = bp
                         });
                     }
                 }
@@ -141,17 +143,17 @@ namespace Shared.terrain
                 };
             }
 
-            // Override TileDesc for blocked custom ground tiles (NoWalk)
+            // Override TileDesc for custom ground tiles with special properties (NoWalk, BlendPriority)
             foreach (var cg in customGrounds)
             {
-                if (cg.NoWalk)
+                if (cg.NoWalk || cg.BlendPriority != -1)
                 {
-                    var noWalkXml = System.Xml.Linq.XElement.Parse(
-                        $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
+                    var xml = $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
                         "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
-                        "<NoWalk/>" +
-                        "</Ground>");
-                    data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, noWalkXml);
+                        (cg.NoWalk ? "<NoWalk/>" : "") +
+                        (cg.BlendPriority != -1 ? $"<BlendPriority>{cg.BlendPriority}</BlendPriority>" : "") +
+                        "</Ground>";
+                    data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, System.Xml.Linq.XElement.Parse(xml));
                 }
             }
 
@@ -178,6 +180,7 @@ namespace Shared.terrain
             public string ground;
             public string groundPixels;
             public bool? blocked;
+            public int? blendPriority;
             public obj[] objs;
             public obj[] regions;
         }

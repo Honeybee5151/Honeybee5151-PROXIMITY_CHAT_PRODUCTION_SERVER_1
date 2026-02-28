@@ -20,6 +20,7 @@ namespace Shared.resources
         public string GroundPixels;
         public byte[] DecodedPixels; // cached decoded RGB bytes (192), set once at load
         public bool NoWalk; // true if ground tile blocks movement
+        public int BlendPriority = -1; // tile blend priority (-1 = default/lowest, higher wins at edges)
     }
 
     public class CustomObjectEntry
