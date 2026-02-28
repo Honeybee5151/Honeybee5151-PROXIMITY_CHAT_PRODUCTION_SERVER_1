@@ -22,14 +22,11 @@ namespace WorldServer.core.objects
         public int TickTime { get; private set; }
 
         private UpdatedHashSet _newObjects;
-        
-        private const int MAX_TILES_PER_UPDATE = 100;
 
         private readonly HashSet<IntPoint> _activeTiles = new HashSet<IntPoint>();
         private readonly HashSet<WmapTile> _newStaticObjects = new HashSet<WmapTile>();
         private readonly Dictionary<int, byte> _seenTiles = new Dictionary<int, byte>();
         private readonly Dictionary<Entity, Dictionary<StatDataType, object>> _statsUpdates = new Dictionary<Entity, Dictionary<StatDataType, object>>();
-        private readonly Queue<TileData> _pendingTiles = new Queue<TileData>();
 
         private bool _needsUpdateTiles = true;
         
@@ -121,18 +118,6 @@ namespace WorldServer.core.objects
                 _needsUpdateTiles = false;
             }
 
-            // Drain pending tiles (capped per update to avoid buffer overflow)
-            var tilesAdded = 0;
-            while (_pendingTiles.Count > 0 && tilesAdded < MAX_TILES_PER_UPDATE)
-            {
-                update.Tiles.Add(_pendingTiles.Dequeue());
-                tilesAdded++;
-            }
-
-            // If there are still pending tiles, force another update next tick
-            if (_pendingTiles.Count > 0)
-                _needsUpdateTiles = true;
-
             GetNewObjects(update);
             GetDrops(update);
 
@@ -164,7 +149,7 @@ namespace WorldServer.core.objects
                 _seenTiles[hash] = tile.UpdateCount;
 
                 var tileData = new TileData(playerX, playerY, tile.TileId);
-                _pendingTiles.Enqueue(tileData);
+                update.Tiles.Add(tileData);
                 newTileCount++;
             }
             FameCounter.TileSent(newTileCount);
@@ -346,7 +331,6 @@ namespace WorldServer.core.objects
             _activeTiles.Clear();
             _newStaticObjects.Clear();
             _statsUpdates.Clear();
-            _pendingTiles.Clear();
             _newObjects.Dispose();
         }
 
