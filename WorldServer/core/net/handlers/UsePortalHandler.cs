@@ -149,15 +149,16 @@ namespace WorldServer.core.net.handlers
                 (world as VaultWorld).SetOwner(player.AccountId);
             else if (!world.CreateInstance)
                 portal.WorldInstance = world;
+            var previousWorld = player.World;
             player.Reconnect(world);
 
             if (player.Pet != null)
                 player.World.LeaveWorld(player.Pet);
 
-            ReconnectPartyMembers(player, world);
+            ReconnectPartyMembers(player, world, previousWorld);
         }
 
-        private void ReconnectPartyMembers(Player leader, World targetWorld)
+        private void ReconnectPartyMembers(Player leader, World targetWorld, World previousWorld)
         {
             // Only pull party into community/custom dungeons
             if (!targetWorld.IsCommunityDungeon)
@@ -175,8 +176,6 @@ namespace WorldServer.core.net.handlers
             if (party.PartyLeader.Item1 != leader.Client.Account.Name || party.PartyLeader.Item2 != leader.Client.Account.AccountId)
                 return;
 
-            var leaderWorld = leader.World;
-
             foreach (var member in party.PartyMembers)
             {
                 // Skip the leader themselves
@@ -188,7 +187,7 @@ namespace WorldServer.core.net.handlers
                     continue;
 
                 // Only pull members who are in the same world as the leader was
-                if (memberClient.Player.World != leaderWorld)
+                if (memberClient.Player.World != previousWorld)
                     continue;
 
                 if (targetWorld.IsPlayersMax())
