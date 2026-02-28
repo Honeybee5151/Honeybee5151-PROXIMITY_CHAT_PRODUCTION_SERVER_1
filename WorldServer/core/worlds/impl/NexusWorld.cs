@@ -47,6 +47,21 @@ namespace WorldServer.core.worlds.impl
 
             base.Init();
 
+            // Spawn Sandstorm Effect in center of nexus
+            try
+            {
+                if (GameServer.Resources.GameData.IdToObjectType.TryGetValue("Sandstorm Effect", out var sandstormType))
+                {
+                    var sandstorm = Entity.Resolve(GameServer, sandstormType);
+                    sandstorm.Move(Map.Width / 2f + 0.5f, Map.Height / 2f + 0.5f);
+                    EnterWorld(sandstorm);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NexusWorld] ERROR spawning Sandstorm: {ex}");
+            }
+
             // Spawn Dungeon Browser NPC near spawn center
             try
             {

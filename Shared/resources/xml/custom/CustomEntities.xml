@@ -142,4 +142,13 @@
 		<NoMiniMap/>
 		<ShadowSize>0</ShadowSize>
 	</Object>
+	<Object type="0x49b0" id="Sandstorm Effect">
+		<Class>GameObject</Class>
+		<Effect>Sandstorm</Effect>
+		<Texture>
+			<File>invisible</File>
+			<Index>0</Index>
+		</Texture>
+		<NoMiniMap/>
+	</Object>
 </Objects>
