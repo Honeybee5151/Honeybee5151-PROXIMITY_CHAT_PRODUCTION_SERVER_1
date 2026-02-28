@@ -462,7 +462,10 @@ namespace WorldServer.core.objects
 
             var party = DbPartySystem.Get(Client.Account.Database, Client.Account.PartyId);
             if (party != null && party.PartyLeader.Item1 == Client.Account.Name && party.PartyLeader.Item2 == Client.Account.AccountId)
+            {
                 party.WorldId = -1;
+                GameServer.Database.FlushParty(party.PartyId, party);
+            }
         }
 
         public void SaveToCharacter()

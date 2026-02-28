@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Shared.database;
 using Shared.database.account;
 using Shared.database.character;
+using Shared.database.party;
 using WorldServer.core;
 using WorldServer.core.connection;
 using WorldServer.core.miscfile;
@@ -121,6 +123,9 @@ namespace WorldServer.networking
                 return;
             }
 
+            // Clean up party on disconnect
+            CleanupParty(acc);
+
             // Restore real character before saving if in community dungeon
             // Skip SaveToCharacter — the backup IS the real state, don't let Player overwrite it
             if (DungeonBackup != null)
@@ -138,6 +143,59 @@ namespace WorldServer.networking
             if (GameServer != null && GameServer.Database != null && Player.FameCounter != null && Player.FameCounter.ClassStats != null)
                 if (GameServer.Database.SaveCharacter(acc, Character, Player.FameCounter.ClassStats, true))
                     GameServer.Database.ReleaseLock(acc);
+        }
+
+        private void CleanupParty(DbAccount acc)
+        {
+            try
+            {
+                acc.Reload("partyId");
+                if (acc.PartyId == 0)
+                    return;
+
+                var party = DbPartySystem.Get(acc.Database, acc.PartyId);
+                if (party == null)
+                {
+                    // Stale reference — clear it
+                    acc.PartyId = 0;
+                    acc.FlushAsync();
+                    return;
+                }
+
+                if (party.PartyLeader.Item1 == acc.Name && party.PartyLeader.Item2 == acc.AccountId)
+                {
+                    // Leader disconnected — transfer leadership to first member, or disband
+                    if (party.PartyMembers != null && party.PartyMembers.Count > 0)
+                    {
+                        var newLeader = party.PartyMembers[0];
+                        party.PartyMembers.RemoveAt(0);
+                        party.PartyLeader = (newLeader.name, newLeader.accid);
+                        party.WorldId = -1;
+                        GameServer.Database.FlushParty(party.PartyId, party);
+
+                        // Update new leader's partyId (stays the same, already set)
+                        // Notify new leader if online
+                        var newLeaderClient = GameServer.ConnectionManager.FindClient(newLeader.accid);
+                        if (newLeaderClient?.Player != null)
+                            newLeaderClient.Player.SendInfo($"You are now the party leader (previous leader disconnected).");
+                    }
+                    else
+                    {
+                        // No members — disband
+                        var members = new HashSet<DbAccount>();
+                        GameServer.Database.RemoveParty(acc, members, acc.PartyId);
+                    }
+                }
+                else
+                {
+                    // Member disconnected — remove from party
+                    GameServer.Database.LeaveFromParty(acc.Database, acc.Name, acc.PartyId, GameServer.Database);
+                }
+            }
+            catch
+            {
+                // Don't let party cleanup failure prevent save
+            }
         }
 
         public void RestoreFromBackup()

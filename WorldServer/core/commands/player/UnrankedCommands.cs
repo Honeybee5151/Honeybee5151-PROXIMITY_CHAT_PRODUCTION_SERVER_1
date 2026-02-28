@@ -140,8 +140,13 @@ namespace WorldServer.core.commands.player
 
                 if (party == null)
                 {
-                    player.SendError("You're not in a Party!");
-                    return false;
+                    // Stale reference — clear it
+                    player.Client.Account.PartyId = 0;
+                    player.Client.Account.FlushAsync();
+                    player.Client.Account.Reload("partyId");
+                    player.InvokeStatChange(StatDataType.PartyId, 0, true);
+                    player.SendInfo("Party no longer exists. Your party reference has been cleared.");
+                    return true;
                 }
 
                 if (player.Client.Account.Name != party.PartyLeader.Item1)
@@ -152,6 +157,17 @@ namespace WorldServer.core.commands.player
 
                 Database DB = player.GameServer.Database;
 
+                // Notify members before removing
+                foreach (var member in party.PartyMembers)
+                {
+                    var memberClient = player.GameServer.ConnectionManager.FindClient(member.accid);
+                    if (memberClient?.Player != null)
+                    {
+                        memberClient.Player.SendInfo("Your party has been closed by the leader.");
+                        memberClient.Player.InvokeStatChange(StatDataType.PartyId, 0, true);
+                    }
+                }
+
                 HashSet<DbAccount> members = new HashSet<DbAccount>();
                 foreach (var member in party.PartyMembers)
                 {
@@ -159,6 +175,7 @@ namespace WorldServer.core.commands.player
                 }
 
                 DB.RemoveParty(player.Client.Account, members, player.Client.Account.PartyId);
+                player.InvokeStatChange(StatDataType.PartyId, 0, true);
             }
             catch (Exception e)
             {
@@ -183,6 +200,12 @@ namespace WorldServer.core.commands.player
 
             player.Client.Account.Reload("partyId");
 
+            if (player.Client.Account.PartyId == 0)
+            {
+                player.SendError("You're not in a party!");
+                return false;
+            }
+
             try
             {
                 var party = DbPartySystem.Get(db, player.Client.Account.PartyId);
@@ -196,14 +219,20 @@ namespace WorldServer.core.commands.player
                     }
                     else
                     {
-                        player.GameServer.Database.LeaveFromParty(db, player.Name, player.Client.Account.PartyId, player.GameServer.Database);
+                        // Send chat BEFORE leaving so PartyId is still set
                         player.GameServer.ChatManager.Party(player, player.Name + " has left the Party!");
+                        player.GameServer.Database.LeaveFromParty(db, player.Name, player.Client.Account.PartyId, player.GameServer.Database);
                     }
                 }
                 else
                 {
-                    player.SendError("You're not in a party!");
-                    return false;
+                    // Stale reference — clear it
+                    player.Client.Account.PartyId = 0;
+                    player.Client.Account.FlushAsync();
+                    player.Client.Account.Reload("partyId");
+                    player.InvokeStatChange(StatDataType.PartyId, 0, true);
+                    player.SendInfo("Party no longer exists. Your party reference has been cleared.");
+                    return true;
                 }
             }
             catch (Exception e)
@@ -213,7 +242,7 @@ namespace WorldServer.core.commands.player
             }
 
             player.SendInfo("You have left the party.");
-            player.InvokeStatChange(StatDataType.PartyId, player.Client.Account.PartyId, true);
+            player.InvokeStatChange(StatDataType.PartyId, 0, true);
             return true;
         }
     }
@@ -350,22 +379,16 @@ namespace WorldServer.core.commands.player
                     party.PartyMembers.Remove(member);
                     db.FlushParty(party.PartyId, party);
 
-                    var playerDemoted = player.GameServer.ConnectionManager.Clients.Keys.Where(c => c.Player != null && c.Player.Name == member.name && c.Player.AccountId == member.accid).Select(c => c.Player).ToArray();
-
-                    if (playerDemoted != null)
+                    var removedClient = player.GameServer.ConnectionManager.FindClient(member.accid);
+                    if (removedClient?.Player != null)
                     {
-                        playerDemoted[0].SendError($"You have been removed from {party.PartyLeader.Item1}'s party!");
-                        playerDemoted[0].InvokeStatChange(StatDataType.PartyId, playerDemoted[0].Client.Account.PartyId, true);
+                        removedClient.Player.SendError($"You have been removed from {party.PartyLeader.Item1}'s party!");
+                        removedClient.Player.InvokeStatChange(StatDataType.PartyId, 0, true);
                     }
 
-                    player.GameServer.ChatManager.Party(player, player.Name + " has been removed from the party.");
+                    player.GameServer.ChatManager.Party(player, member.name + " has been removed from the party.");
                     player.SendInfo($"{acc.Name} removed from the Party.");
                     return true;
-                }
-                else
-                {
-                    player.SendError("Player not found.");
-                    return false;
                 }
             }
 
@@ -470,7 +493,7 @@ namespace WorldServer.core.commands.player
                     return false;
                 }
 
-                if (party.PartyLeader.Item1 != player.Client.Account.Name && party.PartyLeader.Item2 != player.Client.Account.PartyId)
+                if (party.PartyLeader.Item1 != player.Client.Account.Name || party.PartyLeader.Item2 != player.Client.Account.AccountId)
                 {
                     player.SendError("You're not the party leader!");
                     return false;
@@ -512,10 +535,12 @@ namespace WorldServer.core.commands.player
 
                 foreach (var member in party.PartyMembers)
                 {
-                    var clientMember = player.GameServer.ConnectionManager.Clients.Keys.Where(c => c.Player != null && c.Account.Name == member.name && c.Account.AccountId == member.accid).Select(c => c.Player).ToArray();
-                    clientMember[0].SendInfo($"You have been invited to a '{world.IdName ?? world.DisplayName}'! use /pjoin to connect!");
-                    return true;
+                    var memberClient = player.GameServer.ConnectionManager.FindClient(member.accid);
+                    if (memberClient?.Player != null)
+                        memberClient.Player.SendInfo($"You have been invited to a '{world.IdName ?? world.DisplayName}'! Use /pjoin to connect!");
                 }
+
+                player.SendInfo("Party members have been invited to your world!");
             }
             catch (Exception e)
             {

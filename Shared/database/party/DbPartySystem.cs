@@ -57,12 +57,7 @@ namespace Shared.database.party
 
         public static int NextId(IDatabase db)
         {
-            int id = 0;
-
-            do id++;
-            while ((string)db.HashGet("party", id) != null);
-
-            return id;
+            return (int)db.StringIncrement("party:nextId");
         }
 
         public static int ReturnSize(RankingType rank)
