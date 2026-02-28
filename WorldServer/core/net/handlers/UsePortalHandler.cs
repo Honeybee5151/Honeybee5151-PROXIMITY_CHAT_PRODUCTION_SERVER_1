@@ -1,4 +1,6 @@
-﻿using Shared;
+﻿using System.Linq;
+using Shared;
+using Shared.database.party;
 using Shared.resources;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
@@ -151,6 +153,50 @@ namespace WorldServer.core.net.handlers
 
             if (player.Pet != null)
                 player.World.LeaveWorld(player.Pet);
+
+            ReconnectPartyMembers(player, world);
+        }
+
+        private void ReconnectPartyMembers(Player leader, World targetWorld)
+        {
+            // Only pull party into community/custom dungeons
+            if (!targetWorld.IsCommunityDungeon)
+                return;
+
+            var partyId = leader.Client.Account.PartyId;
+            if (partyId == 0)
+                return;
+
+            var party = DbPartySystem.Get(leader.Client.Account.Database, partyId);
+            if (party == null)
+                return;
+
+            // Only the party leader pulls members along
+            if (party.PartyLeader.Item1 != leader.Client.Account.Name || party.PartyLeader.Item2 != leader.Client.Account.AccountId)
+                return;
+
+            var leaderWorld = leader.World;
+
+            foreach (var member in party.PartyMembers)
+            {
+                // Skip the leader themselves
+                if (member.accid == leader.AccountId)
+                    continue;
+
+                var memberClient = leader.GameServer.ConnectionManager.FindClient(member.accid);
+                if (memberClient?.Player == null)
+                    continue;
+
+                // Only pull members who are in the same world as the leader was
+                if (memberClient.Player.World != leaderWorld)
+                    continue;
+
+                if (targetWorld.IsPlayersMax())
+                    break;
+
+                memberClient.Player.SendInfo("Your party leader entered a dungeon!");
+                memberClient.Player.Reconnect(targetWorld);
+            }
         }
     }
 }
