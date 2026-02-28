@@ -538,6 +538,8 @@ namespace WorldServer.core.worlds
                 bw.Write((byte)(entry.NoWalk ? 1 : 0));
                 // Blend priority: sbyte (-1 = default/lowest, higher wins at edges)
                 bw.Write((sbyte)entry.BlendPriority);
+                // Speed multiplier: float (1.0 = normal)
+                bw.Write(entry.Speed);
             }
             bw.Flush();
             return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());
