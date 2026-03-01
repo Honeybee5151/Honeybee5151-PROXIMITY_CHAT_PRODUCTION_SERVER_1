@@ -541,10 +541,13 @@ namespace AdminDashboard.Controllers
                     var projTypeCodes = new Dictionary<string, int>(); // projName -> type code
 
                     // Scan all existing dungeon_assets for type code collision prevention
+                    // Exclude the current dungeon's own file (prevents re-approval from reading stale self-data)
+                    var ownDaFileName = $"Shared/resources/xml/dungeon_assets/{safeTitle}.xml";
                     var allDungeonAssetsXmlBuilder = new StringBuilder();
                     var daFiles = await _github.ListDirectory("Shared/resources/xml/dungeon_assets");
                     foreach (var daFile in daFiles)
                     {
+                        if (daFile.Equals(ownDaFileName, StringComparison.OrdinalIgnoreCase)) continue;
                         try { allDungeonAssetsXmlBuilder.Append((await _github.FetchFile(daFile)).Content); }
                         catch { /* skip unreadable files */ }
                     }
@@ -646,7 +649,10 @@ namespace AdminDashboard.Controllers
                     }
 
                     // 4c. Process mob/item XMLs (DungeonAssets only — no global XML writes)
+                    // allCustomXml: used for type code collision checks (includes everything)
                     var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml + allProdXml;
+                    // globalOnlyXml: used for name collision checks (excludes dungeon_assets — each dungeon is independent)
+                    var globalOnlyXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allProdXml;
 
                     // Pre-compute all used type codes into a HashSet for O(1) collision checks
                     var usedTypeCodes = new HashSet<int>();
@@ -674,10 +680,10 @@ namespace AdminDashboard.Controllers
 
                     if (hasMobs)
                     {
-                        // Collect existing mob names from ALL custom XMLs + dungeon_assets to avoid duplicates
-                        var existingMobNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(allCustomXml, @"id=""([^""]+)"""))
-                            existingMobNames.Add(m.Groups[1].Value);
+                        // Collect existing mob names from GLOBAL XMLs only (not dungeon_assets — each dungeon is independent)
+                        var existingGlobalMobNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
+                            existingGlobalMobNames.Add(m.Groups[1].Value);
 
                         for (int i = 0; i < mobs!.Count; i++)
                         {
@@ -694,19 +700,20 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
-                                // Check for duplicate names (already exist in CustomObjects.xml)
+                                // Check for duplicate names in GLOBAL XMLs only (CustomObjects, CustomEntities, prod)
+                                // Other dungeon_assets are excluded — each dungeon has independent mob definitions
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                                var isDuplicate = nameMatch.Success && existingMobNames.Contains(nameMatch.Groups[1].Value);
+                                var isDuplicate = nameMatch.Success && existingGlobalMobNames.Contains(nameMatch.Groups[1].Value);
 
                                 if (isDuplicate)
                                 {
-                                    // Mob already exists — still need it in DungeonAssets for sprite override.
+                                    // Mob already exists in global XMLs — use the existing global definition for sprite override
                                     var existingName = nameMatch.Groups[1].Value;
-                                    var existingTypeMatch = Regex.Match(allCustomXml,
+                                    var existingTypeMatch = Regex.Match(globalOnlyXml,
                                         $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(existingName)}""");
                                     if (existingTypeMatch.Success)
                                     {
-                                        var existingBlock = Regex.Match(allCustomXml,
+                                        var existingBlock = Regex.Match(globalOnlyXml,
                                             $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
                                             RegexOptions.Singleline);
                                         if (existingBlock.Success)
@@ -723,7 +730,7 @@ namespace AdminDashboard.Controllers
                                     nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 }
                                 if (nameMatch.Success)
-                                    existingMobNames.Add(nameMatch.Groups[1].Value);
+                                    existingGlobalMobNames.Add(nameMatch.Groups[1].Value);
 
                                 // Skip type codes already in use
                                 while (usedTypeCodes.Contains(nextType))
@@ -752,10 +759,10 @@ namespace AdminDashboard.Controllers
                     // 4c. Process item XMLs (DungeonAssets only — no global CustomItems.xml writes)
                     if (hasItems)
                     {
-                        // Collect existing item names from ALL custom XMLs + dungeon_assets
-                        var existingItemNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(allCustomXml, @"id=""([^""]+)"""))
-                            existingItemNames.Add(m.Groups[1].Value);
+                        // Collect existing item names from GLOBAL XMLs only (not dungeon_assets)
+                        var existingGlobalItemNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
+                            existingGlobalItemNames.Add(m.Groups[1].Value);
 
                         for (int i = 0; i < items!.Count; i++)
                         {
@@ -772,11 +779,11 @@ namespace AdminDashboard.Controllers
                                 var xml = block;
 
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                                if (nameMatch.Success && existingItemNames.Contains(nameMatch.Groups[1].Value))
+                                if (nameMatch.Success && existingGlobalItemNames.Contains(nameMatch.Groups[1].Value))
                                 {
-                                    // Item already exists — still need it in DungeonAssets for sprite override
+                                    // Item already exists in global XMLs — use existing definition for sprite override
                                     var existingName = nameMatch.Groups[1].Value;
-                                    var existingBlock = Regex.Match(allCustomXml,
+                                    var existingBlock = Regex.Match(globalOnlyXml,
                                         $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
                                         RegexOptions.Singleline);
                                     if (existingBlock.Success)
@@ -793,7 +800,7 @@ namespace AdminDashboard.Controllers
                                     nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 }
                                 if (nameMatch.Success)
-                                    existingItemNames.Add(nameMatch.Groups[1].Value);
+                                    existingGlobalItemNames.Add(nameMatch.Groups[1].Value);
 
                                 // Skip type codes already in use
                                 while (usedTypeCodes.Contains(nextType))
