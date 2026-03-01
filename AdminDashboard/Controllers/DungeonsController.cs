@@ -568,10 +568,60 @@ namespace AdminDashboard.Controllers
                     catch { /* prod directory missing — skip */ }
                     var allProdXml = allProdXmlBuilder.ToString();
 
+                    // Fetch projXml early — needed for globalOnlyXml which pre-rename depends on
+                    (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
+
+                    // globalOnlyXml: used for name collision checks (excludes dungeon_assets — each dungeon is independent)
+                    var globalOnlyXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allProdXml;
+
+                    // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
+                    var reservedNames = new HashSet<string>();
+                    try
+                    {
+                        var (reservedContent, _) = await _github.FetchFile("Shared/resources/reserved_names.txt");
+                        foreach (var line in reservedContent.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                            reservedNames.Add(line.Trim());
+                    }
+                    catch { /* reserved_names.txt missing — skip check */ }
+
+                    // 4b-pre. Pre-rename mob/item names that collide with global names
+                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
+                    {
+                        var globalNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
+                            globalNames.Add(m.Groups[1].Value);
+
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                mobs[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                        for (int i = 0; i < items!.Count; i++)
+                        {
+                            var rawXml = items[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                items[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                    }
+
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     // Always process ALL projectiles (not just ones with custom sprites)
                     {
-                        (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
                         // Check ALL XMLs (custom + prod + dungeon_assets) to prevent type code collisions
                         var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml + allDungeonAssetsXml + allProdXml;
                         var projUsedCodes = new HashSet<int>();
@@ -651,8 +701,6 @@ namespace AdminDashboard.Controllers
                     // 4c. Process mob/item XMLs (DungeonAssets only — no global XML writes)
                     // allCustomXml: used for type code collision checks (includes everything)
                     var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml + allProdXml;
-                    // globalOnlyXml: used for name collision checks (excludes dungeon_assets — each dungeon is independent)
-                    var globalOnlyXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allProdXml;
 
                     // Pre-compute all used type codes into a HashSet for O(1) collision checks
                     var usedTypeCodes = new HashSet<int>();
@@ -663,51 +711,6 @@ namespace AdminDashboard.Controllers
                     }
 
                     var nextType = FindNextTypeCode(usedTypeCodes, 0x5000);
-
-                    // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
-                    var reservedNames = new HashSet<string>();
-                    try
-                    {
-                        var (reservedContent, _) = await _github.FetchFile("Shared/resources/reserved_names.txt");
-                        foreach (var line in reservedContent.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-                            reservedNames.Add(line.Trim());
-                    }
-                    catch { /* reserved_names.txt missing — skip check */ }
-
-                    // 4b-pre. Pre-rename mob/item names that collide with global names
-                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
-                    {
-                        var globalNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
-                            globalNames.Add(m.Groups[1].Value);
-
-                        for (int i = 0; i < mobs!.Count; i++)
-                        {
-                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
-                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
-                            {
-                                var oldName = nameMatch.Groups[1].Value;
-                                var newName = $"{safeTitle} {oldName}";
-                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
-                                mobs[i]["xml"] = rawXml;
-                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
-                            }
-                        }
-                        for (int i = 0; i < items!.Count; i++)
-                        {
-                            var rawXml = items[i]["xml"]?.ToString() ?? "";
-                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
-                            {
-                                var oldName = nameMatch.Groups[1].Value;
-                                var newName = $"{safeTitle} {oldName}";
-                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
-                                items[i]["xml"] = rawXml;
-                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
-                            }
-                        }
-                    }
 
                     // Collect processed XML blocks for DungeonAssets (step 4d needs type codes)
                     var processedMobBlocks = new List<(int mobIdx, string xml)>();
