@@ -517,12 +517,13 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Fetch ALL custom XML files + dungeon_assets upfront for collision-safe type code allocation
+                    // Fetch ALL XML files (custom + prod + dungeon_assets) for collision-safe type code allocation
                     var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
                     var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
                     var entitiesXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomEntities.xml")).Content;
                     string projXml = null;
                     var projTypeCodes = new Dictionary<string, int>(); // projName -> type code
+
                     // Scan all existing dungeon_assets for type code collision prevention
                     var allDungeonAssetsXmlBuilder = new StringBuilder();
                     var daFiles = await _github.ListDirectory("Shared/resources/xml/dungeon_assets");
@@ -533,12 +534,27 @@ namespace AdminDashboard.Controllers
                     }
                     var allDungeonAssetsXml = allDungeonAssetsXmlBuilder.ToString();
 
+                    // Scan all prod XML files for type codes (prevents collision with game entities)
+                    var allProdXmlBuilder = new StringBuilder();
+                    try
+                    {
+                        var prodFiles = await _github.ListDirectory("Shared/resources/xml/prod");
+                        foreach (var prodFile in prodFiles)
+                        {
+                            if (!prodFile.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) continue;
+                            try { allProdXmlBuilder.Append((await _github.FetchFile(prodFile)).Content); }
+                            catch { /* skip unreadable files */ }
+                        }
+                    }
+                    catch { /* prod directory missing — skip */ }
+                    var allProdXml = allProdXmlBuilder.ToString();
+
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
                     {
                         (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
-                        // Check ALL custom XMLs + dungeon_assets to prevent type code collisions
-                        var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml + allDungeonAssetsXml;
+                        // Check ALL XMLs (custom + prod + dungeon_assets) to prevent type code collisions
+                        var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml + allDungeonAssetsXml + allProdXml;
                         var projUsedCodes = new HashSet<int>();
                         foreach (Match m in Regex.Matches(allProjCheckXml, @"type=""0x([0-9a-fA-F]+)"""))
                         {
@@ -609,7 +625,7 @@ namespace AdminDashboard.Controllers
                     }
 
                     // 4c. Process mob/item XMLs (DungeonAssets only — no global XML writes)
-                    var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml;
+                    var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml + allProdXml;
 
                     // Pre-compute all used type codes into a HashSet for O(1) collision checks
                     var usedTypeCodes = new HashSet<int>();
