@@ -1,0 +1,255 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAArtJREFUWIXdl09IVFEUxn9vFQgVSSO6EGwiTMGMMdB04R/clUiLUEEEwWYRjZvBQBlssCEwazPt3ASTMA4F/RkiELFcZAklTcaEBKMpqDSuEly0uS1e9/rmzZv3DAscv80M93C+d+/9vvPOeRoO6K2JCoBTR0sBqPPHiAbrefixS3PKtcoHWN5eU/lO8XyCEEJompZX+7bd7JOr6wIgmU6ptTp/jKrGNQDiYQ+b0y0AVLrcGbkvU7Nccjdizpd4vDXJrYoh27ivswhvYFgb694Rya/PVUyaY6x7RwxMFOz5wvcpkDD8t+Q4VAaQ4ksk0ynq/DEAVhIuChN9NJWXAPBmacPxQUaRi1tnKEz02cYBHkz+AKDn/F0AIp9u0l5VCUAoel0zGSBjv1ZnE0IIgFwiud/2CIBUQ8QcN3NnPUNy2/EfRFhudCugH0YKm0ynVEWWVadZSbjYnG7JqnoJszHM+Z75sG0cwD+o3+eFIw0AVFa0c/zsPQD1VjBVv6MBIHeVSvElTCYQf3J14t30w2WAqbhP/IwM0lRewsnQ7iHGQyMC4N3TMzmJLl75Rll1Gpm/UNuvRPR1FgFkxAdeTWbk2vF3BecASMRGGZgosBIf/oEBUg0RTf5acVsZIF+Fl8gygOzvJceeqVhvTVSYh7Q7r/V2MNTcoda7gnNqPjCugz7kGecHI4aaO7KGQMkP+qwhqx4gR9/fVwvYiwEscHgMMBX3CdD7uzcwrCZ0ozAA117or+HF2VJWEi5VtbJKZXtY3taFNn49yHhb/wKLs6VEg/XY8X8Xl9X66uo6t2/0Ol2wFOOvhzRjC7AwgJHbCM2J96Aja9PjoRHhDQxr46ERIfuxsWrjYQ/auVoAxOd51bPf39crvrh1hrb+BeJhD3b5xtxc/AAnHlVxevQXH74s7dUEOZHv1fo/8Bv0eIkYJAg/eAAAAABJRU5ErkJggg==</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x506d" id="Gazing Oculus">
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	<AltTexture id="1">
+		<Texture>
+			<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+			<Index>1</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="2">
+		<Texture>
+			<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+			<Index>2</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="3">
+		<Texture>
+			<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+			<Index>3</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="4">
+		<Texture>
+			<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+			<Index>4</Index>
+		</Texture>
+	</AltTexture>
+	
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ghost_hit</HitSound>
+    <DeathSound>monster/ghost_death</DeathSound>
+    <MaxHitPoints>2800</MaxHitPoints>
+    <Size>100</Size>
+    <Defense>18</Defense>
+    <XpMult>0.15</XpMult>
+    <Flying/>
+    <ShowName/>
+    <Projectile id="0">
+        <ObjectId>Gazing Oculus Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <MinDamage>55</MinDamage>
+        <MaxDamage>85</MaxDamage>
+        <Size>55</Size>
+        <LifetimeMS>1000</LifetimeMS>
+        <ConditionEffect duration="3">Dazed</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Gazing Oculus Proj 1</ObjectId>
+        <Speed>55</Speed>
+        <Damage>70</Damage>
+        <Size>70</Size>
+        <LifetimeMS>1400</LifetimeMS>
+        <Wavy/>
+        <Amplitude>0.6</Amplitude>
+        <Frequency>2</Frequency>
+        <ConditionEffect duration="2">Darkness</ConditionEffect>
+    </Projectile>
+    <Projectile id="2">
+        <ObjectId>Gazing Oculus Proj 2</ObjectId>
+        <Speed>90</Speed>
+        <Damage>50</Damage>
+        <Size>40</Size>
+        <LifetimeMS>700</LifetimeMS>
+        <MultiHit/>
+        <ConditionEffect duration="2">Blind</ConditionEffect>
+    </Projectile>
+    <Projectile id="3">
+        <ObjectId>Gazing Oculus Proj 3</ObjectId>
+        <Speed>45</Speed>
+        <MinDamage>60</MinDamage>
+        <MaxDamage>100</MaxDamage>
+        <Size>65</Size>
+        <LifetimeMS>1600</LifetimeMS>
+        <Parametric/>
+        <Amplitude>0.8</Amplitude>
+        <Frequency>1.5</Frequency>
+        <ConditionEffect duration="3">Sick</ConditionEffect>
+    </Projectile>
+</Object>
+<Object type="0x49aa" id="Gazing Oculus Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>5</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x49ab" id="Gazing Oculus Proj 1">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>6</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x49ac" id="Gazing Oculus Proj 2">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>7</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x49ad" id="Gazing Oculus Proj 3">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>8</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x49ae" id="Oculus of the Watcher Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>10</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x506e" id="Oculus of the Watcher">
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>9</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>A disembodied eye that never blinks, plucked from an eldritch sentinel. It sees through walls, flesh, and lies. Those who wear it feel a gaze upon them always.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>0</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x506f" id="Gazebeam Staff">
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>9</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>24</SlotType>
+        <Tier>-1</Tier>
+        <Description>A gnarled wand crowned with a perpetually staring eyeball. Its beam follows targets as if guided by sight itself.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>75</MinDamage>
+            <MaxDamage>135</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+            <Size>75</Size>
+            <ConditionEffect duration="2">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="2"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x5070" id="Iris of the Abyss">
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>9</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>8</SlotType>
+        <Tier>-1</Tier>
+        <Description>A spell orb swirling with dilated pupils. When invoked, a thousand phantom eyes erupt outward, searing all they perceive.</Description>
+        <MpCost>100</MpCost>
+        <Cooldown>0.5</Cooldown>
+        <Activate numShots="16">BulletNova</Activate>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>55</Speed>
+            <MinDamage>160</MinDamage>
+            <MaxDamage>230</MaxDamage>
+            <LifetimeMS>650</LifetimeMS>
+            <Size>85</Size>
+            <MultiHit/>
+            <Wavy/>
+            <Amplitude>0.5</Amplitude>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="30"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x5071" id="Retinal Shroud">
+	<Texture>
+		<File>dungeon_0b714d07-c954-471b-9f91-65a5b1d8b14d_8x8</File>
+		<Index>9</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>14</SlotType>
+        <Tier>-1</Tier>
+        <Description>A robe woven from thousands of blinking eyelids. The fabric shifts and watches, granting its wearer awareness at the cost of one's own composure.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="15"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+        <FameBonus>5</FameBonus>
+    </Object>
+</Objects>
+</DungeonAssets>
