@@ -494,20 +494,28 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Fetch ALL custom XML files upfront for collision-safe type code allocation
+                    // Fetch ALL custom XML files + dungeon_assets upfront for collision-safe type code allocation
                     var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
                     var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
                     var entitiesXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomEntities.xml")).Content;
                     string projXml = null;
+                    var projTypeCodes = new Dictionary<string, int>(); // projName -> type code
+                    // Scan all existing dungeon_assets for type code collision prevention
+                    var allDungeonAssetsXml = "";
+                    var daFiles = await _github.ListDirectory("Shared/resources/xml/dungeon_assets");
+                    foreach (var daFile in daFiles)
+                    {
+                        try { allDungeonAssetsXml += (await _github.FetchFile(daFile)).Content; }
+                        catch { /* skip unreadable files */ }
+                    }
 
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
                     {
                         (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
-                        // Check ALL custom XMLs to prevent type code collisions
-                        var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml;
+                        // Check ALL custom XMLs + dungeon_assets to prevent type code collisions
+                        var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml + allDungeonAssetsXml;
                         var projNextType = FindNextTypeCode(allProjCheckXml, 0x4970);
-                        var newProjEntries = "";
 
                         // Mob projectile sprites
                         for (int i = 0; i < mobs!.Count; i++)
@@ -522,15 +530,8 @@ namespace AdminDashboard.Controllers
                                 var projId = kvp.Key;
                                 var projName = $"{mobName} Proj {projId}";
 
-                                // Placeholder texture in CustomProj.xml — per-dungeon sheet overrides at runtime
-                                newProjEntries += $"\t<Object type=\"0x{projNextType:x4}\" id=\"{EscapeXml(projName)}\">\n";
-                                newProjEntries += $"\t\t<Class>Projectile</Class>\n";
-                                newProjEntries += $"\t\t<Texture>\n";
-                                newProjEntries += $"\t\t\t<File>lofiObj5</File>\n";
-                                newProjEntries += $"\t\t\t<Index>0</Index>\n";
-                                newProjEntries += $"\t\t</Texture>\n";
-                                newProjEntries += $"\t\t<AngleCorrection>1</AngleCorrection>\n";
-                                newProjEntries += $"\t</Object>\n";
+                                // Allocate type code for this projectile (written to DungeonAssets only)
+                                projTypeCodes[projName] = projNextType;
                                 projNextType++;
 
                                 // Rewrite the mob XML's ObjectId for this projectile slot
@@ -558,14 +559,8 @@ namespace AdminDashboard.Controllers
                                 var projId = kvp.Key;
                                 var projName = $"{itemName} Proj {projId}";
 
-                                newProjEntries += $"\t<Object type=\"0x{projNextType:x4}\" id=\"{EscapeXml(projName)}\">\n";
-                                newProjEntries += $"\t\t<Class>Projectile</Class>\n";
-                                newProjEntries += $"\t\t<Texture>\n";
-                                newProjEntries += $"\t\t\t<File>lofiObj5</File>\n";
-                                newProjEntries += $"\t\t\t<Index>0</Index>\n";
-                                newProjEntries += $"\t\t</Texture>\n";
-                                newProjEntries += $"\t\t<AngleCorrection>1</AngleCorrection>\n";
-                                newProjEntries += $"\t</Object>\n";
+                                // Allocate type code for this projectile (written to DungeonAssets only)
+                                projTypeCodes[projName] = projNextType;
                                 projNextType++;
 
                                 // Rewrite the item XML's ObjectId for this projectile slot
@@ -580,16 +575,11 @@ namespace AdminDashboard.Controllers
                             items[i]["xml"] = rawXml;
                         }
 
-                        if (!string.IsNullOrEmpty(newProjEntries))
-                        {
-                            var updatedProjXml = projXml.Replace("</Objects>", newProjEntries + "</Objects>");
-                            files.Add(("Shared/resources/xml/custom/CustomProj.xml", updatedProjXml));
-                        }
+                        // Projectile definitions are written to DungeonAssets only (no global CustomProj.xml)
                     }
 
-                    // 4c. Write mob XMLs to CustomObjects.xml (with sprite texture refs)
-                    // Combined XML of ALL custom files — used for type code collision checks
-                    var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "");
+                    // 4c. Process mob/item XMLs (DungeonAssets only — no global XML writes)
+                    var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml;
                     var nextType = FindNextTypeCode(allCustomXml, 0x5000);
 
                     // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
@@ -608,12 +598,11 @@ namespace AdminDashboard.Controllers
 
                     if (hasMobs)
                     {
-                        // Collect existing mob names to avoid duplicates
+                        // Collect existing mob names from ALL custom XMLs + dungeon_assets to avoid duplicates
                         var existingMobNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(objectsXml, @"id=""([^""]+)"""))
+                        foreach (Match m in Regex.Matches(allCustomXml, @"id=""([^""]+)"""))
                             existingMobNames.Add(m.Groups[1].Value);
 
-                        var newMobEntries = "";
                         for (int i = 0; i < mobs!.Count; i++)
                         {
                             var rawXml = mobs[i]["xml"]?.ToString();
@@ -635,15 +624,13 @@ namespace AdminDashboard.Controllers
 
                                 if (isDuplicate)
                                 {
-                                    // Mob already in CustomObjects.xml — still need it in DungeonAssets
-                                    // for per-dungeon sprite override. Find its existing type code.
+                                    // Mob already exists — still need it in DungeonAssets for sprite override.
                                     var existingName = nameMatch.Groups[1].Value;
-                                    var existingTypeMatch = Regex.Match(objectsXml,
+                                    var existingTypeMatch = Regex.Match(allCustomXml,
                                         $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(existingName)}""");
                                     if (existingTypeMatch.Success)
                                     {
-                                        // Re-emit with existing type code for DungeonAssets
-                                        var existingBlock = Regex.Match(objectsXml,
+                                        var existingBlock = Regex.Match(allCustomXml,
                                             $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
                                             RegexOptions.Singleline);
                                         if (existingBlock.Success)
@@ -662,8 +649,8 @@ namespace AdminDashboard.Controllers
                                 if (nameMatch.Success)
                                     existingMobNames.Add(nameMatch.Groups[1].Value);
 
-                                // Skip type codes already in use (check ALL custom XMLs to prevent collisions)
-                                while (Regex.IsMatch(allCustomXml + newMobEntries, $@"type=""0x{nextType:x4}"""))
+                                // Skip type codes already in use
+                                while (Regex.IsMatch(allCustomXml, $@"type=""0x{nextType:x4}"""))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
@@ -678,41 +665,26 @@ namespace AdminDashboard.Controllers
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
-                                // Inject placeholder texture in CustomObjects.xml (per-dungeon sheet overrides at runtime)
-                                if (mobSpriteIndices.TryGetValue(i, out var sprIndices))
-                                {
-                                    xml = InjectSpriteTexture(xml, "chars8x8rEncounters", new List<int> { 0 }, isMob: true);
-                                }
-
-                                // Save processed block (with type code + texture) for DungeonAssets
+                                // Save processed block (with type code) for DungeonAssets
                                 processedMobBlocks.Add((i, xml.Trim()));
-
-                                newMobEntries += "\t" + xml.Trim() + "\n";
                             }
                         }
-
-                        if (!string.IsNullOrEmpty(newMobEntries))
-                        {
-                            var updatedObjectsXml = objectsXml.Replace("</Objects>", newMobEntries + "</Objects>");
-                            files.Add(("Shared/resources/xml/custom/CustomObjects.xml", updatedObjectsXml));
-                        }
+                        // Mob definitions written to DungeonAssets only (no global CustomObjects.xml)
                     }
 
-                    // 4c. Write item XMLs to CustomItems.xml (with sprite texture refs)
+                    // 4c. Process item XMLs (DungeonAssets only — no global CustomItems.xml writes)
                     if (hasItems)
                     {
-                        // Collect existing item names to avoid duplicates
+                        // Collect existing item names from ALL custom XMLs + dungeon_assets
                         var existingItemNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(itemsXml, @"id=""([^""]+)"""))
+                        foreach (Match m in Regex.Matches(allCustomXml, @"id=""([^""]+)"""))
                             existingItemNames.Add(m.Groups[1].Value);
 
-                        var newItemEntries = "";
                         for (int i = 0; i < items!.Count; i++)
                         {
                             var rawXml = items[i]["xml"]?.ToString();
                             if (string.IsNullOrEmpty(rawXml)) continue;
 
-                            // Extract individual <Object> blocks (strip <Objects> wrapper if present)
                             var objectBlocks = Regex.Matches(rawXml, @"<Object\b[^>]*>.*?</Object>", RegexOptions.Singleline);
                             var blocks = objectBlocks.Count > 0
                                 ? objectBlocks.Cast<Match>().Select(m => m.Value).ToList()
@@ -722,14 +694,12 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
-                                // Check for duplicate names (already exist in CustomItems.xml)
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 if (nameMatch.Success && existingItemNames.Contains(nameMatch.Groups[1].Value))
                                 {
-                                    // Item already in CustomItems.xml — still need it in DungeonAssets
-                                    // for per-dungeon sprite override
+                                    // Item already exists — still need it in DungeonAssets for sprite override
                                     var existingName = nameMatch.Groups[1].Value;
-                                    var existingBlock = Regex.Match(itemsXml,
+                                    var existingBlock = Regex.Match(allCustomXml,
                                         $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
                                         RegexOptions.Singleline);
                                     if (existingBlock.Success)
@@ -748,29 +718,18 @@ namespace AdminDashboard.Controllers
                                 if (nameMatch.Success)
                                     existingItemNames.Add(nameMatch.Groups[1].Value);
 
-                                // Check ALL custom XMLs to find next available type code
-                                while (Regex.IsMatch(allCustomXml + newMobEntries + newItemEntries, $@"type=""0x{nextType:x4}"""))
+                                // Skip type codes already in use
+                                while (Regex.IsMatch(allCustomXml, $@"type=""0x{nextType:x4}"""))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
                                 nextType++;
 
-                                // Inject placeholder texture in CustomItems.xml (per-dungeon sheet overrides at runtime)
-                                if (pdItemSpriteIndices.TryGetValue(i, out var pdSprIdx2))
-                                    xml = InjectSpriteTexture(xml, "lofiObj5", 0, isMob: false);
-
-                                // Save processed block (with type code + texture) for DungeonAssets
+                                // Save processed block (with type code) for DungeonAssets
                                 processedItemBlocks.Add((i, xml.Trim()));
-
-                                newItemEntries += "\t" + xml.Trim() + "\n";
                             }
                         }
-
-                        if (!string.IsNullOrEmpty(newItemEntries))
-                        {
-                            var updatedItemsXml = itemsXml.Replace("</Objects>", newItemEntries + "</Objects>");
-                            files.Add(("Shared/resources/xml/custom/CustomItems.xml", updatedItemsXml));
-                        }
+                        // Item definitions written to DungeonAssets only (no global CustomItems.xml)
                     }
 
                     // 4d. Build per-dungeon DungeonAssets XML (sent via CUSTOM_DUNGEON_ASSETS packet)
@@ -830,13 +789,9 @@ namespace AdminDashboard.Controllers
                         }
 
                         // Emit projectile entries with per-dungeon sheet refs
-                        // Use type codes from CustomProj.xml entries written in step 4b
+                        // Use type codes from projTypeCodes dictionary (allocated in step 4b)
                         if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
                         {
-                            // Fetch the proj XML we just built to get the real type codes
-                            var projFileEntry = files.FirstOrDefault(f => f.Path.Contains("CustomProj.xml"));
-                            var projXmlContent = projFileEntry.Content ?? "";
-
                             var pdProjSheetName = $"dungeon_{request.DungeonId}_8x8"; // projectiles always 8x8
 
                             // Mob projectile entries
@@ -849,10 +804,7 @@ namespace AdminDashboard.Controllers
                                 foreach (var kvp in pdProjMap)
                                 {
                                     var projName = $"{mobName} Proj {kvp.Key}";
-                                    // Find the real type code from CustomProj.xml
-                                    var typeMatch = Regex.Match(projXmlContent,
-                                        $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(EscapeXml(projName))}""");
-                                    var typeCode = typeMatch.Success ? typeMatch.Groups[1].Value : "0x0000";
+                                    var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
 
                                     assetsXml += $"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n";
                                     assetsXml += $"\t<Class>Projectile</Class>\n";
@@ -872,9 +824,7 @@ namespace AdminDashboard.Controllers
                                 foreach (var kvp in pdItemProjMap)
                                 {
                                     var projName = $"{itemName} Proj {kvp.Key}";
-                                    var typeMatch = Regex.Match(projXmlContent,
-                                        $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(EscapeXml(projName))}""");
-                                    var typeCode = typeMatch.Success ? typeMatch.Groups[1].Value : "0x0000";
+                                    var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
 
                                     assetsXml += $"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n";
                                     assetsXml += $"\t<Class>Projectile</Class>\n";

@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -53,6 +54,19 @@ namespace AdminDashboard.Services
             var content = Encoding.UTF8.GetString(Convert.FromBase64String(base64)).TrimStart('\uFEFF');
             var sha = data["sha"]?.ToString() ?? "";
             return (content, sha);
+        }
+
+        /// <summary>List files in a directory from the repo</summary>
+        public async Task<List<string>> ListDirectory(string path)
+        {
+            var res = await _http.GetAsync($"repos/{_repo}/contents/{path}?ref={_branch}");
+            if (!res.IsSuccessStatusCode)
+                return new List<string>();
+            var items = JArray.Parse(await res.Content.ReadAsStringAsync());
+            return items.Where(i => i["type"]?.ToString() == "file")
+                        .Select(i => i["path"]?.ToString())
+                        .Where(p => p != null)
+                        .ToList();
         }
 
         /// <summary>Fetch a binary file's raw bytes from the repo</summary>

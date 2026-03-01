@@ -52,6 +52,7 @@ namespace Shared.resources
         public Dictionary<string, List<CustomGroundEntry>> JmCustomGrounds = new Dictionary<string, List<CustomGroundEntry>>();
         public Dictionary<string, List<CustomObjectEntry>> JmCustomObjects = new Dictionary<string, List<CustomObjectEntry>>();
         public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
+        public Dictionary<string, List<ushort>> DungeonObjectTypes = new Dictionary<string, List<ushort>>(); // jmPath -> type codes from DungeonAssets
 
         // Global type code allocator for custom objects (thread-safe, prevents collisions across dungeons)
         private ushort _nextCustomObjTypeCode = 0x9000;
@@ -335,7 +336,32 @@ namespace Shared.resources
             {
                 var name = Path.GetFileNameWithoutExtension(file);
                 var jmPath = $"Dungeons/{name}.jm";
-                DungeonAssetsXml[jmPath] = File.ReadAllText(file);
+                var xmlContent = File.ReadAllText(file);
+                DungeonAssetsXml[jmPath] = xmlContent;
+
+                // Parse and register object definitions from DungeonAssets so they're
+                // available for BehaviorDb initialization (Spawn's GetObjType needs IdToObjectType)
+                try
+                {
+                    var doc = XElement.Parse(xmlContent);
+                    var objectsElem = doc.Element("Objects");
+                    if (objectsElem != null)
+                    {
+                        var types = new List<ushort>();
+                        foreach (var obj in objectsElem.Elements("Object"))
+                        {
+                            try { types.Add(obj.GetAttribute<ushort>("type")); }
+                            catch { /* skip malformed entries */ }
+                        }
+                        AddObjects(objectsElem);
+                        DungeonObjectTypes[jmPath] = types;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Failed to parse DungeonAssets objects for '{name}': {e.Message}");
+                }
+
                 Log.Info($"Loaded dungeon assets for '{name}' (key: {jmPath})");
             }
         }
