@@ -142,7 +142,7 @@
 		<NoMiniMap/>
 		<ShadowSize>0</ShadowSize>
 	</Object>
-	<Object type="0x49c0" id="Sandstorm Effect">
+	<Object type="0x9001" id="Sandstorm Effect">
 		<Class>GameObject</Class>
 		<Effect>Sandstorm</Effect>
 		<Texture>
