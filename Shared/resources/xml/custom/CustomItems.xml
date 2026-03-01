@@ -1248,4 +1248,44 @@
         <BagType>5</BagType>
         <FameBonus>5</FameBonus>
     </Object>
+	<Object type="0x5072" id="Ocular Cleaver">
+	<Texture>
+		<File>lofiObj5</File>
+		<Index>0</Index>
+	</Texture>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>1</SlotType>
+        <Tier>-1</Tier>
+        <Description>A grotesque blade forged around a living, lidless eye. It twitches and rolls in its socket, guiding each swing toward vital organs with unsettling precision. Those struck feel the unbearable sensation of being watched from within.</Description>
+        <RateOfFire>1.15</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>420</LifetimeMS>
+            <Size>90</Size>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-20"/>
+        </ActivateOnEquip>
+        <BagType>0</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
 </Objects>
