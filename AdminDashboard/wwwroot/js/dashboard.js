@@ -1206,26 +1206,35 @@ function hideConfirm() {
 }
 
 // ========== Dungeons ==========
+let _pendingDungeons = []; // cache for batch operations
+
 async function loadDungeons() {
     const container = document.getElementById('dungeons-list');
     const feedback = document.getElementById('dungeons-feedback');
     feedback.style.display = 'none';
     container.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
+    updateSelectedButtons();
 
     try {
         const data = await apiFetch('/api/dungeons/pending');
         if (!data.dungeons || data.dungeons.length === 0) {
+            _pendingDungeons = [];
             container.innerHTML = '<div style="color:#555;text-align:center;padding:40px;">No pending dungeons</div>';
+            updateSelectedButtons();
             return;
         }
 
+        _pendingDungeons = data.dungeons;
+
         let html = '<div class="table-container"><table><thead><tr>' +
+            '<th style="width:30px;"><input type="checkbox" id="select-all-dungeons" onchange="toggleAllDungeons(this.checked)"></th>' +
             '<th>Title</th><th>Map</th><th>Custom Tiles</th><th>Mobs</th><th>Items</th><th>Created</th><th>Actions</th>' +
             '</tr></thead><tbody>';
 
         for (const d of data.dungeons) {
             const date = d.created_at ? new Date(d.created_at).toLocaleDateString() : '—';
             html += `<tr>
+                <td><input type="checkbox" class="dungeon-checkbox" data-id="${d.id}" data-title="${esc(d.title || 'Untitled')}" onchange="updateSelectedButtons()"></td>
                 <td><strong>${esc(d.title || 'Untitled')}</strong>${d.description ? '<br><small style="color:#888;">' + esc(d.description) + '</small>' : ''}</td>
                 <td>${d.has_map ? '<span style="color:#22c55e;">JM</span>' : d.has_xml ? '<span style="color:#8b5cf6;">XML</span>' : '—'}</td>
                 <td>${d.has_custom_tiles ? '<span style="color:#ef4444;">Yes</span>' : 'No'}</td>
@@ -1242,10 +1251,94 @@ async function loadDungeons() {
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        updateSelectedButtons();
     } catch (e) {
         container.innerHTML = '<div style="color:#f87171;text-align:center;padding:20px;">Failed to load dungeons</div>';
         showFeedback('dungeons-feedback', e.message, false);
     }
+}
+
+function getSelectedDungeons() {
+    return Array.from(document.querySelectorAll('.dungeon-checkbox:checked')).map(cb => ({
+        id: cb.dataset.id,
+        title: cb.dataset.title
+    }));
+}
+
+function toggleAllDungeons(checked) {
+    document.querySelectorAll('.dungeon-checkbox').forEach(cb => cb.checked = checked);
+    updateSelectedButtons();
+}
+
+function updateSelectedButtons() {
+    const selected = getSelectedDungeons();
+    const count = selected.length;
+    const btnApprove = document.getElementById('btn-approve-selected');
+    const btnReject = document.getElementById('btn-reject-selected');
+    const countEl = document.getElementById('selected-count');
+    if (btnApprove) btnApprove.style.display = count > 0 ? '' : 'none';
+    if (btnReject) btnReject.style.display = count > 0 ? '' : 'none';
+    if (countEl) {
+        countEl.style.display = count > 0 ? '' : 'none';
+        countEl.textContent = `${count} selected`;
+    }
+}
+
+function approveSelected() {
+    const selected = getSelectedDungeons();
+    if (selected.length === 0) return;
+    const names = selected.map(s => s.title).join(', ');
+    showConfirm(`Approve ${selected.length} dungeon(s): ${names}? Each will be pushed to the server repo.`, async () => {
+        const feedback = document.getElementById('dungeons-feedback');
+        feedback.style.display = 'none';
+        let successes = 0, failures = [];
+        for (const d of selected) {
+            try {
+                showFeedback('dungeons-feedback', `Approving "${d.title}" (${successes + 1}/${selected.length})...`, true);
+                await apiFetch('/api/dungeons/approve', {
+                    method: 'POST',
+                    body: JSON.stringify({ dungeonId: d.id })
+                });
+                successes++;
+            } catch (e) {
+                failures.push(`${d.title}: ${e.message}`);
+            }
+        }
+        if (failures.length === 0) {
+            showFeedback('dungeons-feedback', `All ${successes} dungeon(s) approved!`, true);
+        } else {
+            showFeedback('dungeons-feedback', `${successes} approved, ${failures.length} failed: ${failures.join('; ')}`, false);
+        }
+        loadDungeons();
+    });
+}
+
+function rejectSelected() {
+    const selected = getSelectedDungeons();
+    if (selected.length === 0) return;
+    const names = selected.map(s => s.title).join(', ');
+    showConfirm(`Reject ${selected.length} dungeon(s): ${names}?`, async () => {
+        const feedback = document.getElementById('dungeons-feedback');
+        feedback.style.display = 'none';
+        let successes = 0, failures = [];
+        for (const d of selected) {
+            try {
+                await apiFetch('/api/dungeons/reject', {
+                    method: 'POST',
+                    body: JSON.stringify({ dungeonId: d.id })
+                });
+                successes++;
+            } catch (e) {
+                failures.push(`${d.title}: ${e.message}`);
+            }
+        }
+        if (failures.length === 0) {
+            showFeedback('dungeons-feedback', `All ${successes} dungeon(s) rejected`, true);
+        } else {
+            showFeedback('dungeons-feedback', `${successes} rejected, ${failures.length} failed: ${failures.join('; ')}`, false);
+        }
+        loadDungeons();
+    });
 }
 
 function approveDungeon(id, title) {

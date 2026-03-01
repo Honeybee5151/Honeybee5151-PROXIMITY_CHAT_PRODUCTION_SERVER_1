@@ -195,8 +195,11 @@
             <!-- Dungeons Page -->
             <div class="page" id="page-dungeons">
                 <h2 class="page-title">Community Dungeons</h2>
-                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
                     <button class="btn btn-primary" onclick="loadDungeons()">Refresh</button>
+                    <button class="btn btn-success" id="btn-approve-selected" style="display:none;" onclick="approveSelected()">Approve Selected</button>
+                    <button class="btn btn-danger" id="btn-reject-selected" style="display:none;" onclick="rejectSelected()">Reject Selected</button>
+                    <span id="selected-count" style="color:#888;font-size:13px;display:none;"></span>
                 </div>
                 <div id="dungeons-list">
                     <div style="color: #555; text-align: center; padding: 40px;">Click Refresh to load pending dungeons</div>
