@@ -979,4 +979,18 @@
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>true</PresetHasBackpack>
 	</World>
+	<World id="998">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/998.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Fang of the Forgotten King</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>5000,100,10,0,100,100,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>
