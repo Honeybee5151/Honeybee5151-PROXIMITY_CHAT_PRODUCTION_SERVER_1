@@ -566,7 +566,7 @@ namespace AdminDashboard.Controllers
                     var allProdXml = allProdXmlBuilder.ToString();
 
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
-                    if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
+                    // Always process ALL projectiles (not just ones with custom sprites)
                     {
                         (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
                         // Check ALL XMLs (custom + prod + dungeon_assets) to prevent type code collisions
@@ -579,20 +579,25 @@ namespace AdminDashboard.Controllers
                         }
                         var projNextType = FindNextTypeCode(projUsedCodes, 0x4970);
 
-                        // Mob projectile sprites
+                        // Mob projectiles: extract ALL projectile IDs from XML, allocate type codes, rewrite ObjectIds
                         for (int i = 0; i < mobs!.Count; i++)
                         {
-                            if (!pdProjSpriteIndices.TryGetValue(i, out var projMap)) continue;
-
                             var rawXml = mobs[i]["xml"]?.ToString() ?? "";
                             var mobName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+                            if (string.IsNullOrEmpty(mobName)) continue;
 
-                            foreach (var kvp in projMap)
+                            // Find all <Projectile id="N"> in the mob XML
+                            var projMatches = Regex.Matches(rawXml, @"<Projectile\s+id=""(\d+)""");
+                            if (projMatches.Count == 0) continue;
+
+                            pdProjSpriteIndices.TryGetValue(i, out var customProjMap);
+
+                            foreach (Match pm in projMatches)
                             {
-                                var projId = kvp.Key;
+                                var projId = pm.Groups[1].Value;
                                 var projName = $"{mobName} Proj {projId}";
 
-                                // Allocate type code for this projectile (written to DungeonAssets only)
+                                // Allocate type code for this projectile
                                 projTypeCodes[projName] = projNextType;
                                 projNextType++;
 
@@ -604,28 +609,29 @@ namespace AdminDashboard.Controllers
                                 );
                             }
 
-                            // Write updated XML back so mob XML writing picks up new ObjectIds
                             mobs[i]["xml"] = rawXml;
                         }
 
-                        // Item projectile sprites
+                        // Item projectiles: same treatment
                         for (int i = 0; i < items!.Count; i++)
                         {
-                            if (!pdItemProjSpriteIndices.TryGetValue(i, out var projMap)) continue;
-
                             var rawXml = items[i]["xml"]?.ToString() ?? "";
                             var itemName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+                            if (string.IsNullOrEmpty(itemName)) continue;
 
-                            foreach (var kvp in projMap)
+                            var projMatches = Regex.Matches(rawXml, @"<Projectile\s+id=""(\d+)""");
+                            if (projMatches.Count == 0) continue;
+
+                            pdItemProjSpriteIndices.TryGetValue(i, out var customProjMap);
+
+                            foreach (Match pm in projMatches)
                             {
-                                var projId = kvp.Key;
+                                var projId = pm.Groups[1].Value;
                                 var projName = $"{itemName} Proj {projId}";
 
-                                // Allocate type code for this projectile (written to DungeonAssets only)
                                 projTypeCodes[projName] = projNextType;
                                 projNextType++;
 
-                                // Rewrite the item XML's ObjectId for this projectile slot
                                 rawXml = Regex.Replace(
                                     rawXml,
                                     $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
@@ -633,7 +639,6 @@ namespace AdminDashboard.Controllers
                                 );
                             }
 
-                            // Write updated XML back so item XML writing picks up new ObjectIds
                             items[i]["xml"] = rawXml;
                         }
 
@@ -889,50 +894,59 @@ namespace AdminDashboard.Controllers
                             assetsXmlBuilder.Append(xml).Append('\n');
                         }
 
-                        // Emit projectile entries with per-dungeon sheet refs
-                        // Use type codes from projTypeCodes dictionary (allocated in step 4b)
-                        if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
+                        // Emit projectile entries for ALL projectiles (custom sprite or default)
+                        if (projTypeCodes.Count > 0)
                         {
                             var pdProjSheetName = $"dungeon_{request.DungeonId}_8x8"; // projectiles always 8x8
 
-                            // Mob projectile entries
-                            for (int i = 0; i < mobs!.Count; i++)
+                            foreach (var kvp in projTypeCodes)
                             {
-                                if (!pdProjSpriteIndices.TryGetValue(i, out var pdProjMap)) continue;
-                                var rawXml = mobs[i]["xml"]?.ToString() ?? "";
-                                var mobName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+                                var projName = kvp.Key;
+                                var typeCode = $"0x{kvp.Value:x4}";
 
-                                foreach (var kvp in pdProjMap)
+                                // Check if this projectile has a custom sprite
+                                int customSpriteIndex = -1;
+                                // Search mob projectile indices
+                                foreach (var mobKvp in pdProjSpriteIndices)
                                 {
-                                    var projName = $"{mobName} Proj {kvp.Key}";
-                                    var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
-
-                                    assetsXmlBuilder.Append($"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n");
-                                    assetsXmlBuilder.Append("\t<Class>Projectile</Class>\n");
-                                    assetsXmlBuilder.Append($"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n");
-                                    assetsXmlBuilder.Append("\t<AngleCorrection>1</AngleCorrection>\n");
-                                    assetsXmlBuilder.Append("</Object>\n");
+                                    foreach (var sprKvp in mobKvp.Value)
+                                    {
+                                        var rawXml = mobs![mobKvp.Key]["xml"]?.ToString() ?? "";
+                                        var mobName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+                                        if ($"{mobName} Proj {sprKvp.Key}" == projName)
+                                        { customSpriteIndex = sprKvp.Value; break; }
+                                    }
+                                    if (customSpriteIndex >= 0) break;
                                 }
-                            }
-
-                            // Item projectile entries
-                            for (int i = 0; i < items!.Count; i++)
-                            {
-                                if (!pdItemProjSpriteIndices.TryGetValue(i, out var pdItemProjMap)) continue;
-                                var rawXml = items[i]["xml"]?.ToString() ?? "";
-                                var itemName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
-
-                                foreach (var kvp in pdItemProjMap)
+                                // Search item projectile indices
+                                if (customSpriteIndex < 0)
                                 {
-                                    var projName = $"{itemName} Proj {kvp.Key}";
-                                    var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
-
-                                    assetsXmlBuilder.Append($"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n");
-                                    assetsXmlBuilder.Append("\t<Class>Projectile</Class>\n");
-                                    assetsXmlBuilder.Append($"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n");
-                                    assetsXmlBuilder.Append("\t<AngleCorrection>1</AngleCorrection>\n");
-                                    assetsXmlBuilder.Append("</Object>\n");
+                                    foreach (var itemKvp in pdItemProjSpriteIndices)
+                                    {
+                                        foreach (var sprKvp in itemKvp.Value)
+                                        {
+                                            var rawXml = items![itemKvp.Key]["xml"]?.ToString() ?? "";
+                                            var itemName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
+                                            if ($"{itemName} Proj {sprKvp.Key}" == projName)
+                                            { customSpriteIndex = sprKvp.Value; break; }
+                                        }
+                                        if (customSpriteIndex >= 0) break;
+                                    }
                                 }
+
+                                assetsXmlBuilder.Append($"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n");
+                                assetsXmlBuilder.Append("\t<Class>Projectile</Class>\n");
+                                if (customSpriteIndex >= 0)
+                                {
+                                    assetsXmlBuilder.Append($"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{customSpriteIndex}</Index>\n\t</Texture>\n");
+                                }
+                                else
+                                {
+                                    // No custom sprite — use default prod projectile texture
+                                    assetsXmlBuilder.Append("\t<Texture>\n\t\t<File>lofiProjs</File>\n\t\t<Index>0</Index>\n\t</Texture>\n");
+                                }
+                                assetsXmlBuilder.Append("\t<AngleCorrection>1</AngleCorrection>\n");
+                                assetsXmlBuilder.Append("</Object>\n");
                             }
                         }
 
