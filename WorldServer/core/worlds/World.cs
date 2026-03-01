@@ -488,8 +488,17 @@ namespace WorldServer.core.worlds
             if (gameData.JmCustomGrounds.TryGetValue(jmPath, out var customGrounds))
                 CustomGroundEntries = customGrounds;
 
+            StaticLogger.Instance.Info($"[CustomDebug] World {Id} loading '{jmPath}': " +
+                $"grounds={CustomGroundEntries?.Count ?? 0}, objects={CustomObjectEntries?.Count ?? 0}");
+
             // Pre-compress custom message chunks once at load (reused per client connect)
             PreCompressCustomChunks();
+
+            StaticLogger.Instance.Info($"[CustomDebug] World {Id} compressed: " +
+                $"groundChunks={PreCompressedGroundChunks?.Count ?? 0} " +
+                $"(sizes: {string.Join(",", PreCompressedGroundChunks?.Select(b => b.Length.ToString()) ?? Array.Empty<string>())}), " +
+                $"objectChunks={PreCompressedObjectChunks?.Count ?? 0} " +
+                $"(sizes: {string.Join(",", PreCompressedObjectChunks?.Select(b => b.Length.ToString()) ?? Array.Empty<string>())})");
 
             // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
             if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))

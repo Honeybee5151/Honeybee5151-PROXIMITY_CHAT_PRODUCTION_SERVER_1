@@ -10,6 +10,7 @@ using WorldServer.core.worlds;
 using WorldServer.core.worlds.impl;
 using WorldServer.networking;
 using WorldServer.networking.packets.outgoing;
+using WorldServer.utils;
 
 namespace WorldServer.core
 {
@@ -220,6 +221,7 @@ namespace WorldServer.core
             // Send pre-compressed custom ground chunks (compressed once at world load, reused per client)
             if (world.PreCompressedGroundChunks != null)
             {
+                StaticLogger.Instance.Info($"[CustomDebug] Sending {world.PreCompressedGroundChunks.Count} ground chunks to {client.Account?.Name ?? "?"}");
                 foreach (var blob in world.PreCompressedGroundChunks)
                     packets.Add(new CustomGroundsMessage { PreCompressed = blob });
             }
@@ -227,6 +229,7 @@ namespace WorldServer.core
             // Send pre-compressed custom object chunks (compressed once at world load, reused per client)
             if (world.PreCompressedObjectChunks != null)
             {
+                StaticLogger.Instance.Info($"[CustomDebug] Sending {world.PreCompressedObjectChunks.Count} object chunks to {client.Account?.Name ?? "?"}");
                 foreach (var blob in world.PreCompressedObjectChunks)
                     packets.Add(new CustomObjectsMessage { PreCompressed = blob });
             }
