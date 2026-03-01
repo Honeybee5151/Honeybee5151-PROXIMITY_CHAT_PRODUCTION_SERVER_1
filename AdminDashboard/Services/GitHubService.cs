@@ -178,7 +178,16 @@ namespace AdminDashboard.Services
             }
 
             var totalFiles = files.Count + (binaryFiles?.Count ?? 0);
-            Console.WriteLine($"[GitHubService] Committed {totalFiles} file(s): {message}");
+            Console.WriteLine($"[GitHubService] Committed {totalFiles} file(s): {message} (sha: {newCommitSha})");
+
+            // Verify the commit is accessible on GitHub before returning
+            // This prevents Coolify webhook from cloning before GitHub has settled
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                var verifyRes = await _http.GetAsync($"repos/{_repo}/git/commits/{newCommitSha}");
+                if (verifyRes.IsSuccessStatusCode) break;
+                await Task.Delay(1000);
+            }
         }
 
         private async Task<JObject> Post(string url, JObject payload)
