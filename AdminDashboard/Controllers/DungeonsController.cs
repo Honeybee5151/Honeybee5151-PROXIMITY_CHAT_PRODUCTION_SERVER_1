@@ -568,6 +568,41 @@ namespace AdminDashboard.Controllers
                     catch { /* prod directory missing — skip */ }
                     var allProdXml = allProdXmlBuilder.ToString();
 
+                    // 4b-pre. Pre-rename mob/item names that collide with global names
+                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
+                    {
+                        var globalNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
+                            globalNames.Add(m.Groups[1].Value);
+
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                mobs[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                        for (int i = 0; i < items!.Count; i++)
+                        {
+                            var rawXml = items[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                items[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                    }
+
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     // Always process ALL projectiles (not just ones with custom sprites)
                     {
@@ -700,33 +735,14 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
-                                // Check for duplicate names in GLOBAL XMLs only (CustomObjects, CustomEntities, prod)
-                                // Other dungeon_assets are excluded — each dungeon has independent mob definitions
+                                // Auto-rename mobs that collide with any existing global name
+                                // Each dungeon gets independent mobs with unique names + fresh type codes
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                                var isDuplicate = nameMatch.Success && existingGlobalMobNames.Contains(nameMatch.Groups[1].Value);
-
-                                if (isDuplicate)
+                                if (nameMatch.Success && (existingGlobalMobNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
                                 {
-                                    // Mob already exists in global XMLs — use the existing global definition for sprite override
-                                    var existingName = nameMatch.Groups[1].Value;
-                                    var existingTypeMatch = Regex.Match(globalOnlyXml,
-                                        $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(existingName)}""");
-                                    if (existingTypeMatch.Success)
-                                    {
-                                        var existingBlock = Regex.Match(globalOnlyXml,
-                                            $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
-                                            RegexOptions.Singleline);
-                                        if (existingBlock.Success)
-                                            processedMobBlocks.Add((i, existingBlock.Value.Trim()));
-                                    }
-                                    continue;
-                                }
-
-                                // Auto-rename mobs that collide with prod names
-                                if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
-                                {
-                                    var newName = $"{safeTitle} {nameMatch.Groups[1].Value}";
-                                    xml = xml.Replace($"id=\"{nameMatch.Groups[1].Value}\"", $"id=\"{newName}\"");
+                                    var oldName = nameMatch.Groups[1].Value;
+                                    var newName = $"{safeTitle} {oldName}";
+                                    xml = xml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
                                     nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 }
                                 if (nameMatch.Success)
@@ -778,20 +794,9 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
+                                // Auto-rename items that collide with any existing global name
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                                if (nameMatch.Success && existingGlobalItemNames.Contains(nameMatch.Groups[1].Value))
-                                {
-                                    // Item already exists in global XMLs — use existing definition for sprite override
-                                    var existingName = nameMatch.Groups[1].Value;
-                                    var existingBlock = Regex.Match(globalOnlyXml,
-                                        $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
-                                        RegexOptions.Singleline);
-                                    if (existingBlock.Success)
-                                        processedItemBlocks.Add((i, existingBlock.Value.Trim()));
-                                    continue;
-                                }
-                                // Auto-rename items that collide with prod names
-                                if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
+                                if (nameMatch.Success && (existingGlobalItemNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
                                 {
                                     var oldName = nameMatch.Groups[1].Value;
                                     var newName = $"{safeTitle} {oldName}";
