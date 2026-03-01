@@ -970,9 +970,11 @@ namespace AdminDashboard.Controllers
                 // 5. Add World entry to Dungeons.xml
                 var (dungeonsXml, _) = await _github.FetchFile("Shared/resources/xml/Dungeons.xml");
 
-                // Check for duplicate
-                if (dungeonsXml.Contains($"id=\"{EscapeXml(safeTitle)}\""))
-                    return BadRequest(new { error = $"A dungeon named '{safeTitle}' already exists in Dungeons.xml" });
+                // If dungeon already exists, remove old entry (re-approval overwrites)
+                var existingWorldPattern = $@"[ \t]*<World\s+id=""{Regex.Escape(EscapeXml(safeTitle))}""[^>]*>[\s\S]*?</World>\s*\n?";
+                var isReApproval = Regex.IsMatch(dungeonsXml, existingWorldPattern);
+                if (isReApproval)
+                    dungeonsXml = Regex.Replace(dungeonsXml, existingWorldPattern, "");
 
                 var width = mapJm["width"]?.Value<int>() ?? 256;
                 var height = mapJm["height"]?.Value<int>() ?? 256;
@@ -1045,8 +1047,13 @@ namespace AdminDashboard.Controllers
                     var (communityList, _) = await _github.FetchFile("Shared/resources/worlds/community-dungeons.txt");
                     if (communityList == null) communityList = "";
                     var trimmed = communityList.TrimEnd();
-                    var updated = string.IsNullOrEmpty(trimmed) ? safeTitle : trimmed + "\n" + safeTitle;
-                    files.Add(("Shared/resources/worlds/community-dungeons.txt", updated));
+                    // Only add if not already listed (re-approval)
+                    var lines = trimmed.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    if (!lines.Any(l => l.Trim().Equals(safeTitle, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var updated = string.IsNullOrEmpty(trimmed) ? safeTitle : trimmed + "\n" + safeTitle;
+                        files.Add(("Shared/resources/worlds/community-dungeons.txt", updated));
+                    }
                 }
                 catch
                 {
@@ -1265,7 +1272,8 @@ namespace AdminDashboard.Controllers
                 }
 
                 // 7. Atomic commit to GitHub (text + binary files)
-                await _github.CommitFiles(files, $"Add community dungeon: {safeTitle}", binaryFiles);
+                var commitVerb = isReApproval ? "Update" : "Add";
+                await _github.CommitFiles(files, $"{commitVerb} community dungeon: {safeTitle}", binaryFiles);
 
                 // 8. Update status in Supabase
                 await _supabase.UpdateStatus(request.DungeonId, "approved");
