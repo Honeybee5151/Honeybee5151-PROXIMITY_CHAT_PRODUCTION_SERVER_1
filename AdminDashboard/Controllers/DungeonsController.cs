@@ -376,6 +376,13 @@ namespace AdminDashboard.Controllers
                                         }
                                         else
                                         {
+                                            // Use actual bitmap dimensions if larger than declared size
+                                            using (var bmpCheck = SpriteSheetService.DecodeDataUrl(dataUrl))
+                                            {
+                                                var actualSize = Math.Max(bmpCheck.Width, bmpCheck.Height);
+                                                if (actualSize > sprSize)
+                                                    sprSize = actualSize;
+                                            }
                                             spriteEntries.Add((i, $"mob_{j}", dataUrl, sprSize, true));
                                         }
                                     }

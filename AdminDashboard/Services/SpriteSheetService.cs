@@ -111,16 +111,7 @@ namespace AdminDashboard.Services
                     var x = col * spriteSize;
                     var y = row * spriteSize;
 
-                    if (sprites[i].Width == spriteSize && sprites[i].Height == spriteSize)
-                    {
-                        canvas.DrawBitmap(sprites[i], x, y);
-                    }
-                    else
-                    {
-                        // Scale sprite to fit the grid cell (handles larger/smaller sprites)
-                        var destRect = new SKRect(x, y, x + spriteSize, y + spriteSize);
-                        canvas.DrawBitmap(sprites[i], destRect);
-                    }
+                    canvas.DrawBitmap(sprites[i], x, y);
                 }
             }
 
