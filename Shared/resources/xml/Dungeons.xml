@@ -1103,4 +1103,18 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 	</World>
+	<World id="988">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/988.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Crystalline Fang of the Depths</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>5000,100,10,0,10,200,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>
