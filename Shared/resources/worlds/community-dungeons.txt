@@ -43,3 +43,4 @@ testplzwork
 testomgtest
 bleed
 speed
+speed2
