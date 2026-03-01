@@ -965,4 +965,18 @@
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>true</PresetHasBackpack>
 	</World>
+	<World id="999">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/999.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Fang of the Hollow King,,,Boots of the Windstrider</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>5000,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>6</PresetHealthPotions>
+		<PresetManaPotions>6</PresetManaPotions>
+		<PresetHasBackpack>true</PresetHasBackpack>
+	</World>
 </Worlds>
