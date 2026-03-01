@@ -362,21 +362,17 @@ namespace AdminDashboard.Controllers
                                         if (sprAnimated)
                                         {
                                             // Animated strip — store as individual sheet, skip grid packing
-                                            var bmp = SpriteSheetService.DecodeDataUrl(dataUrl);
-                                            var frameW = bmp.Width / 7; // 7-frame layout
-                                            var dirs = frameW > 0 ? bmp.Height / frameW : 1;
-                                            if (dirs < 1) dirs = 1;
-                                            if (dirs > 3) dirs = 3;
+                                            using (var bmp = SpriteSheetService.DecodeDataUrl(dataUrl))
+                                            {
+                                                using var encoded = bmp.Encode(SKEncodedImageFormat.Png, 100);
+                                                var base64 = Convert.ToBase64String(encoded.ToArray());
+                                                var animSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}_anim_{i}_{j}";
+                                                perDungeonSheets[animSheetName] = (base64, sprSize, sprSize);
 
-                                            using var encoded = bmp.Encode(SKEncodedImageFormat.Png, 100);
-                                            var base64 = Convert.ToBase64String(encoded.ToArray());
-                                            var animSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}_anim_{i}_{j}";
-                                            perDungeonSheets[animSheetName] = (base64, sprSize, sprSize);
-
-                                            if (!pdAnimatedMobSheets.ContainsKey(i))
-                                                pdAnimatedMobSheets[i] = new List<(string, int)>();
-                                            pdAnimatedMobSheets[i].Add((animSheetName, j));
-                                            bmp.Dispose();
+                                                if (!pdAnimatedMobSheets.ContainsKey(i))
+                                                    pdAnimatedMobSheets[i] = new List<(string, int)>();
+                                                pdAnimatedMobSheets[i].Add((animSheetName, j));
+                                            }
                                         }
                                         else
                                         {
