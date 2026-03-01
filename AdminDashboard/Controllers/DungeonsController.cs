@@ -332,6 +332,10 @@ namespace AdminDashboard.Controllers
                     // Collect sprites grouped by size: (mobIndex, frame, dataUrl, spriteSize)
                     // frame = "mob_0", "mob_1", ... for mob sprites; "proj_*" for projectiles; "item" for items
                     var spriteEntries = new List<(int entityIdx, string frame, string dataUrl, int size, bool isMob)>();
+                    // Per-dungeon sheet PNGs: sheetName → base64 PNG (declared early for animated strip use)
+                    var perDungeonSheets = new Dictionary<string, (string base64Png, int tileW, int tileH)>();
+                    // Animated mob strips: mobIdx → list of (sheetName, phaseIdx)
+                    var pdAnimatedMobSheets = new Dictionary<int, List<(string sheetName, int phaseIdx)>>();
 
                     if (hasMobs)
                     {
@@ -342,6 +346,7 @@ namespace AdminDashboard.Controllers
 
                             // New: read sprites array (N named sprites)
                             var spritesArr = mob["sprites"] as JArray;
+                            var mobIsAnimated = mob["animated"]?.Value<bool>() == true;
                             if (spritesArr != null && spritesArr.Count > 0)
                             {
                                 for (int j = 0; j < spritesArr.Count; j++)
@@ -352,7 +357,31 @@ namespace AdminDashboard.Controllers
                                     {
                                         // Per-sprite size takes priority, then mob-level, then default 8
                                         var sprSize = spr?["size"]?.Value<int>() ?? size;
-                                        spriteEntries.Add((i, $"mob_{j}", dataUrl, sprSize, true));
+                                        var sprAnimated = spr?["animated"]?.Value<bool>() == true || mobIsAnimated;
+
+                                        if (sprAnimated)
+                                        {
+                                            // Animated strip — store as individual sheet, skip grid packing
+                                            var bmp = SpriteSheetService.DecodeDataUrl(dataUrl);
+                                            var frameW = bmp.Width / 7; // 7-frame layout
+                                            var dirs = frameW > 0 ? bmp.Height / frameW : 1;
+                                            if (dirs < 1) dirs = 1;
+                                            if (dirs > 3) dirs = 3;
+
+                                            using var encoded = bmp.Encode(SKEncodedImageFormat.Png, 100);
+                                            var base64 = Convert.ToBase64String(encoded.ToArray());
+                                            var animSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}_anim_{i}_{j}";
+                                            perDungeonSheets[animSheetName] = (base64, sprSize, sprSize);
+
+                                            if (!pdAnimatedMobSheets.ContainsKey(i))
+                                                pdAnimatedMobSheets[i] = new List<(string, int)>();
+                                            pdAnimatedMobSheets[i].Add((animSheetName, j));
+                                            bmp.Dispose();
+                                        }
+                                        else
+                                        {
+                                            spriteEntries.Add((i, $"mob_{j}", dataUrl, sprSize, true));
+                                        }
                                     }
                                 }
                             }
@@ -409,9 +438,6 @@ namespace AdminDashboard.Controllers
                     var pdItemSpriteIndices = new Dictionary<int, int>();
                     var pdProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
                     var pdItemProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
-                    // Per-dungeon sheet PNGs: sheetName → base64 PNG
-                    var perDungeonSheets = new Dictionary<string, (string base64Png, int tileW, int tileH)>();
-
                     foreach (var sizeGroup in spriteEntries.GroupBy(e => e.size))
                     {
                         var spriteSize = sizeGroup.Key;
@@ -755,44 +781,71 @@ namespace AdminDashboard.Controllers
                     // Uses processedMobBlocks/processedItemBlocks which already have correct type codes
                     if (perDungeonSheets.Count > 0)
                     {
+                        // Collect animated sheet names for the animated attribute
+                        var animatedSheetNames = new HashSet<string>();
+                        foreach (var kvp in pdAnimatedMobSheets)
+                            foreach (var (sheetName, _) in kvp.Value)
+                                animatedSheetNames.Add(sheetName);
+
                         var assetsXmlBuilder = new StringBuilder();
                         assetsXmlBuilder.Append("<DungeonAssets>\n<SpriteSheets>\n");
                         foreach (var kvp in perDungeonSheets)
-                            assetsXmlBuilder.Append($"<Sheet name=\"{kvp.Key}\" tileW=\"{kvp.Value.tileW}\" tileH=\"{kvp.Value.tileH}\">{kvp.Value.base64Png}</Sheet>\n");
+                        {
+                            var isAnim = animatedSheetNames.Contains(kvp.Key);
+                            assetsXmlBuilder.Append($"<Sheet name=\"{kvp.Key}\" tileW=\"{kvp.Value.tileW}\" tileH=\"{kvp.Value.tileH}\"");
+                            if (isAnim)
+                                assetsXmlBuilder.Append(" animated=\"true\"");
+                            assetsXmlBuilder.Append($">{kvp.Value.base64Png}</Sheet>\n");
+                        }
                         assetsXmlBuilder.Append("</SpriteSheets>\n<Objects>\n");
 
                         // Emit mob entries: swap shared sheet texture → per-dungeon sheet texture
-                        // Use isMob: false (Texture, not AnimatedTexture) because per-dungeon sheets
-                        // are registered in AssetLibrary on the client, not AnimatedChars
                         foreach (var (mobIdx, processedXml) in processedMobBlocks)
                         {
                             var xml = processedXml;
-                            if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIndices))
+
+                            if (pdAnimatedMobSheets.TryGetValue(mobIdx, out var animSheets))
                             {
-                                // Check if all sprites share the same size (common case)
+                                // Animated mob — use AnimatedTexture referencing individual strip sheets
+                                // Strip out any existing texture tags
+                                xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
+                                xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
+                                xml = Regex.Replace(xml, @"<AltTexture[^>]*>.*?</AltTexture>", "", RegexOptions.Singleline);
+
+                                // Base animated texture (phase 0)
+                                var baseAnimXml = $"<AnimatedTexture>\n\t\t<File>{animSheets[0].sheetName}</File>\n\t\t<Index>0</Index>\n\t</AnimatedTexture>";
+
+                                // AltTexture blocks for phases 1+ (each wraps an AnimatedTexture)
+                                var altBlocks = "";
+                                for (int s = 1; s < animSheets.Count; s++)
+                                {
+                                    altBlocks += $"\n\t<AltTexture id=\"{s}\">\n\t\t<AnimatedTexture>\n\t\t\t<File>{animSheets[s].sheetName}</File>\n\t\t\t<Index>0</Index>\n\t\t</AnimatedTexture>\n\t</AltTexture>";
+                                }
+
+                                xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{baseAnimXml}{altBlocks}");
+                            }
+                            else if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIndices))
+                            {
+                                // Static mob — use Texture + AltTexture with grid sheet indices
                                 var sizes = pdMobSpriteSizes.TryGetValue(mobIdx, out var szList) ? szList : null;
                                 var allSameSize = sizes == null || sizes.Distinct().Count() <= 1;
 
                                 if (allSameSize)
                                 {
-                                    // All sprites same size — use single sheet name
                                     var sprSize = sizes != null && sizes.Count > 0 ? sizes[0] : (mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8);
                                     var pdSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}";
                                     xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
                                 }
                                 else
                                 {
-                                    // Per-sprite sizes differ — build texture XML manually with per-slot sheet names
                                     xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
                                     xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
                                     xml = Regex.Replace(xml, @"<AltTexture[^>]*>.*?</AltTexture>", "", RegexOptions.Singleline);
 
-                                    // Base texture (slot 0)
                                     var baseSize = sizes![0];
                                     var baseSheet = $"dungeon_{request.DungeonId}_{baseSize}x{baseSize}";
                                     var textureXml = $"<Texture>\n\t\t<File>{baseSheet}</File>\n\t\t<Index>{pdSprIndices[0]}</Index>\n\t</Texture>";
 
-                                    // AltTexture blocks for slots 1..N (each may reference a different sheet)
                                     var altBlocks = "";
                                     for (int s = 1; s < pdSprIndices.Count; s++)
                                     {
