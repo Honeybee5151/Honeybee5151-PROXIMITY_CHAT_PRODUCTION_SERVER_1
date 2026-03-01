@@ -658,7 +658,7 @@ namespace AdminDashboard.Controllers
                                 rawXml = Regex.Replace(
                                     rawXml,
                                     $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
-                                    $"$1{EscapeXml(projName)}$2"
+                                    $"${{1}}{EscapeXml(projName)}${{2}}"
                                 );
                             }
 
@@ -688,7 +688,7 @@ namespace AdminDashboard.Controllers
                                 rawXml = Regex.Replace(
                                     rawXml,
                                     $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
-                                    $"$1{EscapeXml(projName)}$2"
+                                    $"${{1}}{EscapeXml(projName)}${{2}}"
                                 );
                             }
 
