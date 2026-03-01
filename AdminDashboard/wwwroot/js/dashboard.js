@@ -1235,7 +1235,7 @@ async function loadDungeons() {
             const date = d.created_at ? new Date(d.created_at).toLocaleDateString() : '—';
             html += `<tr>
                 <td><input type="checkbox" class="dungeon-checkbox" data-id="${d.id}" data-title="${esc(d.title || 'Untitled')}" onchange="updateSelectedButtons()"></td>
-                <td><strong>${esc(d.title || 'Untitled')}</strong>${d.description ? '<br><small style="color:#888;">' + esc(d.description) + '</small>' : ''}</td>
+                <td><strong>${esc(d.title || 'Untitled')}</strong> <small style="color:#666;">#${d.id}</small>${d.description ? '<br><small style="color:#888;">' + esc(d.description) + '</small>' : ''}</td>
                 <td>${d.has_map ? '<span style="color:#22c55e;">JM</span>' : d.has_xml ? '<span style="color:#8b5cf6;">XML</span>' : '—'}</td>
                 <td>${d.has_custom_tiles ? '<span style="color:#ef4444;">Yes</span>' : 'No'}</td>
                 <td>${d.mob_count}</td>
