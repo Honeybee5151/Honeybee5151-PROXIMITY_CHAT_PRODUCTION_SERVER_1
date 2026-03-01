@@ -1058,11 +1058,22 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // Auto-inject SetAltTexture for mobs with multiple sprites
+                    // Auto-inject SetAltTexture for mobs with multiple STATIC sprites
                     // Only auto-inject for simple 2-sprite mobs (base+attack) with no manual SetAltTexture.
+                    // Animated mobs handle attack cycling via the strip — skip them.
                     // Mobs with 3+ sprites must define their own SetAltTexture in behavior states.
                     for (int i = 0; i < mobs!.Count; i++)
                     {
+                        // Skip animated mobs — their attack animation is built into the strip
+                        var mobIsAnim = mobs[i]["animated"]?.Value<bool>() == true;
+                        if (!mobIsAnim)
+                        {
+                            var sprArr = mobs[i]["sprites"] as JArray;
+                            if (sprArr != null)
+                                mobIsAnim = sprArr.Any(s => s["animated"]?.Value<bool>() == true);
+                        }
+                        if (mobIsAnim) continue;
+
                         if (!mobSpriteIndices.TryGetValue(i, out var sprIndices) || sprIndices.Count < 2) continue;
 
                         var rawXml = mobs[i]["xml"]?.ToString() ?? "";
