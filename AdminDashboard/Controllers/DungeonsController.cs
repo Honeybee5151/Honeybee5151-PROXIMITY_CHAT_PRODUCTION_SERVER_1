@@ -304,9 +304,7 @@ namespace AdminDashboard.Controllers
                 // 1b. Inject mob placements + spawn region into JM if missing
                 InjectMobsAndSpawn(mapJm, dungeon);
 
-                // 2. Write .jm map file
-                var jmContent = mapJm.ToString(Newtonsoft.Json.Formatting.None);
-                files.Add(($"Shared/resources/worlds/Dungeons/{safeTitle}.jm", jmContent));
+                // 2. Write .jm map file (deferred until after mob/item renames — see below)
 
                 // 3. Custom ground tiles: no XML generation needed.
                 // The JM dict already contains groundPixels data for custom tiles.
@@ -318,8 +316,9 @@ namespace AdminDashboard.Controllers
                 var hasMobs = mobs != null && mobs.Count > 0;
                 var hasItems = items != null && items.Count > 0;
 
-                // Track item renames so loot injection in behavior JSON uses the correct name
+                // Track mob/item renames so JM map + loot injection use the correct names
                 var itemRenames = new Dictionary<string, string>(); // oldName -> newName
+                var mobRenames = new Dictionary<string, string>(); // oldName -> newName
 
                 // mobSpriteIndices needs to be accessible in behavior injection below
                 var mobSpriteIndices = new Dictionary<int, List<int>>();
@@ -601,6 +600,7 @@ namespace AdminDashboard.Controllers
                                 var newName = $"{safeTitle} {oldName}";
                                 rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
                                 mobs[i]["xml"] = rawXml;
+                                mobRenames[oldName] = newName;
                                 Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
                             }
                         }
@@ -746,6 +746,7 @@ namespace AdminDashboard.Controllers
                                     var oldName = nameMatch.Groups[1].Value;
                                     var newName = $"{safeTitle} {oldName}";
                                     xml = xml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                    mobRenames[oldName] = newName;
                                     nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 }
                                 if (nameMatch.Success)
@@ -981,6 +982,36 @@ namespace AdminDashboard.Controllers
                         files.Add(($"Shared/resources/xml/dungeon_assets/{safeTitle}.xml", assetsXmlBuilder.ToString()));
                     }
                 }
+
+                // 4f. Apply mob/item renames to JM map dict entries and write .jm file
+                if (mobRenames.Count > 0 || itemRenames.Count > 0)
+                {
+                    var dict = mapJm["dict"] as JArray;
+                    if (dict != null)
+                    {
+                        foreach (var entry in dict)
+                        {
+                            var objs = entry["objs"] as JArray;
+                            if (objs == null) continue;
+                            foreach (var obj in objs)
+                            {
+                                var id = obj["id"]?.ToString();
+                                if (id == null) continue;
+                                if (mobRenames.TryGetValue(id, out var newMobName))
+                                {
+                                    obj["id"] = newMobName;
+                                    Console.WriteLine($"[DungeonsController] Updated JM map ref '{id}' -> '{newMobName}'");
+                                }
+                                else if (itemRenames.TryGetValue(id, out var newItemName))
+                                {
+                                    obj["id"] = newItemName;
+                                    Console.WriteLine($"[DungeonsController] Updated JM map ref '{id}' -> '{newItemName}'");
+                                }
+                            }
+                        }
+                    }
+                }
+                files.Add(($"Shared/resources/worlds/Dungeons/{safeTitle}.jm", mapJm.ToString(Newtonsoft.Json.Formatting.None)));
 
                 // 5. Add World entry to Dungeons.xml
                 var (dungeonsXml, _) = await _github.FetchFile("Shared/resources/xml/Dungeons.xml");
