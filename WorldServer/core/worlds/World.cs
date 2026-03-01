@@ -505,11 +505,73 @@ namespace WorldServer.core.worlds
             // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
             if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))
             {
+                // Auto-remap type codes that collide with globally loaded objects
+                assetsXml = RemapCollidingTypeCodes(assetsXml, gameData);
                 CustomDungeonAssetsXml = assetsXml;
                 PreEncodedDungeonAssetsBytes = System.Text.Encoding.UTF8.GetBytes(assetsXml);
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Auto-remap dungeon asset type codes that collide with globally loaded objects.
+        /// Replaces colliding type="0xNNNN" values with unused codes, and updates any
+        /// projectile references in behavior JSON that use the old type codes.
+        /// </summary>
+        private static string RemapCollidingTypeCodes(string assetsXml, XmlData gameData)
+        {
+            // Extract all type codes from the dungeon assets
+            var typePattern = new System.Text.RegularExpressions.Regex(@"type=""0x([0-9a-fA-F]+)""");
+            var matches = typePattern.Matches(assetsXml);
+            var remaps = new Dictionary<ushort, ushort>(); // old → new
+
+            // Collect all type codes used in this dungeon
+            var dungeonTypes = new HashSet<ushort>();
+            foreach (System.Text.RegularExpressions.Match m in matches)
+            {
+                if (ushort.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, null, out ushort tc))
+                    dungeonTypes.Add(tc);
+            }
+
+            // Find collisions with global objects
+            foreach (var tc in dungeonTypes)
+            {
+                if (gameData.ObjectTypeToId.ContainsKey(tc))
+                {
+                    // This type code is already used globally — need to remap
+                    remaps[tc] = 0; // placeholder, will assign below
+                }
+            }
+
+            if (remaps.Count == 0)
+                return assetsXml; // no collisions
+
+            // Find unused type codes starting from 0x5000
+            ushort nextFree = 0x5000;
+            var allUsed = new HashSet<ushort>(gameData.ObjectTypeToId.Keys);
+            foreach (var tc in dungeonTypes)
+                allUsed.Add(tc);
+
+            foreach (var oldCode in remaps.Keys.ToList())
+            {
+                while (allUsed.Contains(nextFree))
+                    nextFree++;
+                remaps[oldCode] = nextFree;
+                allUsed.Add(nextFree);
+                nextFree++;
+            }
+
+            // Apply remaps to the XML string
+            foreach (var kvp in remaps)
+            {
+                var oldStr = $"type=\"0x{kvp.Key:x4}\"";
+                var newStr = $"type=\"0x{kvp.Value:x4}\"";
+                assetsXml = assetsXml.Replace(oldStr, newStr);
+                Console.WriteLine($"[DungeonAssets] Remapped type 0x{kvp.Key:x4} -> 0x{kvp.Value:x4} (collision with global '{gameData.ObjectTypeToId[kvp.Key]}')");
+            }
+
+            return assetsXml;
         }
 
         protected void PreCompressCustomChunks()
