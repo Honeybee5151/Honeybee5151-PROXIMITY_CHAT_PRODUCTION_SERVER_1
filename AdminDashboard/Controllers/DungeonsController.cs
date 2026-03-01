@@ -376,30 +376,13 @@ namespace AdminDashboard.Controllers
                                         }
                                         else
                                         {
-                                            // If sprite is bigger than base size, left-pad it so
-                                            // attack extends rightward (body stays centered)
-                                            var baseSize = size; // mob's declared spriteSize
+                                            // Use actual bitmap dimensions if larger than declared size
+                                            // (bigger sprites go into correctly-sized sheet, render centered)
                                             using (var bmpCheck = SpriteSheetService.DecodeDataUrl(dataUrl))
                                             {
-                                                var actualW = bmpCheck.Width;
-                                                var actualH = bmpCheck.Height;
-                                                if (actualW > baseSize || actualH > baseSize)
-                                                {
-                                                    // Left-pad by baseSize, bottom-align the art
-                                                    var paddedW = baseSize + actualW;
-                                                    var paddedH = Math.Max(actualH, baseSize);
-                                                    var padded = new SKBitmap(paddedW, paddedH, SKColorType.Rgba8888, SKAlphaType.Premul);
-                                                    padded.Erase(SKColors.Transparent);
-                                                    using (var canvas = new SKCanvas(padded))
-                                                    {
-                                                        canvas.DrawBitmap(bmpCheck, baseSize, paddedH - actualH);
-                                                    }
-                                                    // Re-encode padded sprite as new dataUrl
-                                                    using var encoded = padded.Encode(SKEncodedImageFormat.Png, 100);
-                                                    dataUrl = "data:image/png;base64," + Convert.ToBase64String(encoded.ToArray());
-                                                    sprSize = Math.Max(paddedW, paddedH);
-                                                    padded.Dispose();
-                                                }
+                                                var actualSize = Math.Max(bmpCheck.Width, bmpCheck.Height);
+                                                if (actualSize > sprSize)
+                                                    sprSize = actualSize;
                                             }
                                             spriteEntries.Add((i, $"mob_{j}", dataUrl, sprSize, true));
                                         }
