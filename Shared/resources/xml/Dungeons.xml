@@ -1033,4 +1033,18 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 	</World>
+	<World id="993">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/993.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Ravenblade of the Hollow King</StartingEquipment>
+		<PresetLevel>1</PresetLevel>
+		<PresetStats>1000,100,10,0,100,100,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>
