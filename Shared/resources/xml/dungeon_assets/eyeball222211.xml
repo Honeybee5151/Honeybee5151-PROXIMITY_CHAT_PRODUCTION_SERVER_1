@@ -1,0 +1,306 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_32x32" tileW="32" tileH="32">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</Sheet>
+<Sheet name="dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_48x48" tileW="48" tileH="48">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</Sheet>
+<Sheet name="dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAPJJREFUWIXtlkEKgzAQRX+kK4/hNbyKeAF3gvvgVnDXCxSv4jV6DLfTRRtJ42RM1UKLeSCGmSSi/zsZ4I8gIpLyVa3FfGRJAgBdMbEfzhf3sSbQ2nLrOpy8nShvP3ufM5CYQYDYhACRJBNkY0nZWHJ5N7Z4htmX25/78+2YLXw0wjsJADRDqtxEV0zExSWUUt75tvAeE4CIsLWIVLWma69VVWsy400bnYy5AjRDqkwV2CJ+CPf8pux7CPQCeBqMM5krdhQ/nIsb2CP+zh4AQgEJIjaB32f3+e8r/1j2GPO8UGNJBohnP8+hpdIWSuoHIr/DA4icnDhNo/B1AAAAAElFTkSuQmCC</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x506d" id="Gazing Oculus">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_32x32</File>
+		<Index>0</Index>
+	</Texture>
+	<AltTexture id="1">
+		<Texture>
+			<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_32x32</File>
+			<Index>1</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="2">
+		<Texture>
+			<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_32x32</File>
+			<Index>2</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="3">
+		<Texture>
+			<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_32x32</File>
+			<Index>3</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="4">
+		<Texture>
+			<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_48x48</File>
+			<Index>0</Index>
+		</Texture>
+	</AltTexture>
+	
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/ghost_hit</HitSound>
+    <DeathSound>monster/ghost_death</DeathSound>
+    <MaxHitPoints>2800</MaxHitPoints>
+    <Size>100</Size>
+    <Defense>18</Defense>
+    <XpMult>0.15</XpMult>
+    <Flying/>
+    <ShowName/>
+    <Projectile id="0">
+        <ObjectId>Gazing Oculus Proj 0</ObjectId>
+        <Speed>70</Speed>
+        <MinDamage>55</MinDamage>
+        <MaxDamage>85</MaxDamage>
+        <Size>55</Size>
+        <LifetimeMS>1000</LifetimeMS>
+        <ConditionEffect duration="3">Dazed</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>Gazing Oculus Proj 1</ObjectId>
+        <Speed>55</Speed>
+        <Damage>70</Damage>
+        <Size>70</Size>
+        <LifetimeMS>1400</LifetimeMS>
+        <Wavy/>
+        <Amplitude>0.6</Amplitude>
+        <Frequency>2</Frequency>
+        <ConditionEffect duration="2">Darkness</ConditionEffect>
+    </Projectile>
+    <Projectile id="2">
+        <ObjectId>Gazing Oculus Proj 2</ObjectId>
+        <Speed>90</Speed>
+        <Damage>50</Damage>
+        <Size>40</Size>
+        <LifetimeMS>700</LifetimeMS>
+        <MultiHit/>
+        <ConditionEffect duration="2">Blind</ConditionEffect>
+    </Projectile>
+    <Projectile id="3">
+        <ObjectId>Gazing Oculus Proj 3</ObjectId>
+        <Speed>45</Speed>
+        <MinDamage>60</MinDamage>
+        <MaxDamage>100</MaxDamage>
+        <Size>65</Size>
+        <LifetimeMS>1600</LifetimeMS>
+        <Parametric/>
+        <Amplitude>0.8</Amplitude>
+        <Frequency>1.5</Frequency>
+        <ConditionEffect duration="3">Sick</ConditionEffect>
+    </Projectile>
+</Object>
+<Object type="0x498c" id="Gazing Oculus Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x498d" id="Gazing Oculus Proj 1">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>1</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x498e" id="Gazing Oculus Proj 2">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>2</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x498f" id="Gazing Oculus Proj 3">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>3</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x4990" id="Oculus of the Watcher Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>5</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x4991" id="Ocular Cleaver Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>7</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x506e" id="Oculus of the Watcher">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>4</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>9</SlotType>
+        <Tier>-1</Tier>
+        <Description>A disembodied eye that never blinks, plucked from an eldritch sentinel. It sees through walls, flesh, and lies. Those who wear it feel a gaze upon them always.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="7"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="22" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>0</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x506f" id="Gazebeam Staff">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>4</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>24</SlotType>
+        <Tier>-1</Tier>
+        <Description>A gnarled wand crowned with a perpetually staring eyeball. Its beam follows targets as if guided by sight itself.</Description>
+        <RateOfFire>0.85</RateOfFire>
+        <Sound>weapon/wand</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Purple Magic</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>75</MinDamage>
+            <MaxDamage>135</MaxDamage>
+            <LifetimeMS>550</LifetimeMS>
+            <Size>75</Size>
+            <ConditionEffect duration="2">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="2"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x5070" id="Iris of the Abyss">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>4</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>8</SlotType>
+        <Tier>-1</Tier>
+        <Description>A spell orb swirling with dilated pupils. When invoked, a thousand phantom eyes erupt outward, searing all they perceive.</Description>
+        <MpCost>100</MpCost>
+        <Cooldown>0.5</Cooldown>
+        <Activate numShots="16">BulletNova</Activate>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>55</Speed>
+            <MinDamage>160</MinDamage>
+            <MaxDamage>230</MaxDamage>
+            <LifetimeMS>650</LifetimeMS>
+            <Size>85</Size>
+            <MultiHit/>
+            <Wavy/>
+            <Amplitude>0.5</Amplitude>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="3" amount="30"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+<Object type="0x5071" id="Retinal Shroud">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>4</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>14</SlotType>
+        <Tier>-1</Tier>
+        <Description>A robe woven from thousands of blinking eyelids. The fabric shifts and watches, granting its wearer awareness at the cost of one's own composure.</Description>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="15"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="50"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="26" amount="-5"/>
+        </ActivateOnEquip>
+        <BagType>5</BagType>
+        <FameBonus>5</FameBonus>
+    </Object>
+<Object type="0x5072" id="Ocular Cleaver">
+	<Texture>
+		<File>dungeon_30d541f8-e800-49b9-be9e-74f600ed73da_8x8</File>
+		<Index>6</Index>
+	</Texture>
+	
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>1</SlotType>
+        <Tier>-1</Tier>
+        <Description>A grotesque blade forged around a living, lidless eye. It twitches and rolls in its socket, guiding each swing toward vital organs with unsettling precision. Those struck feel the unbearable sensation of being watched from within.</Description>
+        <RateOfFire>1.15</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>8</ArcGap>
+        <Projectile>
+            <ObjectId>Red Fire</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>95</MinDamage>
+            <MaxDamage>195</MaxDamage>
+            <LifetimeMS>420</LifetimeMS>
+            <Size>90</Size>
+            <ConditionEffect duration="3">Exposed</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="4"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="27" amount="-3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="0" amount="-20"/>
+        </ActivateOnEquip>
+        <BagType>0</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+</Objects>
+</DungeonAssets>
