@@ -568,41 +568,6 @@ namespace AdminDashboard.Controllers
                     catch { /* prod directory missing — skip */ }
                     var allProdXml = allProdXmlBuilder.ToString();
 
-                    // 4b-pre. Pre-rename mob/item names that collide with global names
-                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
-                    {
-                        var globalNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
-                            globalNames.Add(m.Groups[1].Value);
-
-                        for (int i = 0; i < mobs!.Count; i++)
-                        {
-                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
-                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
-                            {
-                                var oldName = nameMatch.Groups[1].Value;
-                                var newName = $"{safeTitle} {oldName}";
-                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
-                                mobs[i]["xml"] = rawXml;
-                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
-                            }
-                        }
-                        for (int i = 0; i < items!.Count; i++)
-                        {
-                            var rawXml = items[i]["xml"]?.ToString() ?? "";
-                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
-                            {
-                                var oldName = nameMatch.Groups[1].Value;
-                                var newName = $"{safeTitle} {oldName}";
-                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
-                                items[i]["xml"] = rawXml;
-                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
-                            }
-                        }
-                    }
-
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     // Always process ALL projectiles (not just ones with custom sprites)
                     {
@@ -708,6 +673,41 @@ namespace AdminDashboard.Controllers
                             reservedNames.Add(line.Trim());
                     }
                     catch { /* reserved_names.txt missing — skip check */ }
+
+                    // 4b-pre. Pre-rename mob/item names that collide with global names
+                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
+                    {
+                        var globalNames = new HashSet<string>();
+                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
+                            globalNames.Add(m.Groups[1].Value);
+
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                mobs[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                        for (int i = 0; i < items!.Count; i++)
+                        {
+                            var rawXml = items[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            {
+                                var oldName = nameMatch.Groups[1].Value;
+                                var newName = $"{safeTitle} {oldName}";
+                                rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
+                                items[i]["xml"] = rawXml;
+                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
+                            }
+                        }
+                    }
 
                     // Collect processed XML blocks for DungeonAssets (step 4d needs type codes)
                     var processedMobBlocks = new List<(int mobIdx, string xml)>();
