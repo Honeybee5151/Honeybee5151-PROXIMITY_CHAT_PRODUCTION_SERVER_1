@@ -63,8 +63,7 @@ namespace WorldServer.core.terrain
                     else if (!string.IsNullOrEmpty(obj))
                         Log.Warn($"Object: {obj} not found.");
 
-                    if (!string.IsNullOrEmpty(obj))
-                        Log.Info($"  [Dict {i}] obj='{obj}' -> type=0x{desc.ObjType:x4}");
+                    // Per-object dict logging removed (too noisy)
 
                     desc.ObjCfg = rdr.ReadString();
                     desc.Terrain = (TerrainType)rdr.ReadByte();
@@ -122,8 +121,6 @@ namespace WorldServer.core.terrain
 
                 Entities = entities.ToArray();
                 Log.Info($"[Wmap.Load] Map {Width}x{Height}, {Entities.Length} entities, {Regions.Count} regions");
-                foreach (var ent in entities)
-                    Log.Info($"  Entity: type=0x{ent.Item2:x4} at ({ent.Item1.X},{ent.Item1.Y})");
 
                 return enCount;
             }
@@ -167,13 +164,10 @@ namespace WorldServer.core.terrain
 
         public void CreateEntities(IntPoint offset = new IntPoint())
         {
-            Log.Info($"[CreateEntities] Creating {Entities.Length} entities for world {World.IdName}");
             foreach (var i in Entities)
             {
                 var entity = World.CreateNewEntity(i.Item2, i.Item1.X + 0.5f + offset.X, i.Item1.Y + 0.5f + offset.Y);
-                if (entity != null)
-                    Log.Info($"  Created entity: type=0x{i.Item2:x4} id={entity.Id} class={entity.GetType().Name} at ({entity.X},{entity.Y}) quest={entity.ObjectDesc?.Quest}");
-                else
+                if (entity == null)
                     Log.Warn($"  FAILED to create entity: type=0x{i.Item2:x4} at ({i.Item1.X},{i.Item1.Y})");
 
                 if (i.Item3 != null)
