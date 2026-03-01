@@ -583,6 +583,31 @@ namespace AdminDashboard.Controllers
                     }
                     catch { /* reserved_names.txt missing — skip check */ }
 
+                    // 4b-pre-0. Capture original mob/item display names BEFORE any renaming
+                    // These are the creator's intended names, used for <DisplayId> injection later
+                    var originalMobNames = new Dictionary<int, string>(); // mobIndex -> original name
+                    var originalItemNames = new Dictionary<int, string>(); // itemIndex -> original name
+                    if (hasMobs)
+                    {
+                        for (int i = 0; i < mobs!.Count; i++)
+                        {
+                            var rawXml = mobs[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success)
+                                originalMobNames[i] = nameMatch.Groups[1].Value;
+                        }
+                    }
+                    if (hasItems)
+                    {
+                        for (int i = 0; i < items!.Count; i++)
+                        {
+                            var rawXml = items[i]["xml"]?.ToString() ?? "";
+                            var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
+                            if (nameMatch.Success)
+                                originalItemNames[i] = nameMatch.Groups[1].Value;
+                        }
+                    }
+
                     // 4b-pre. Pre-rename mob/item names that collide with global names
                     // Must happen BEFORE projectile processing so projectile names use the renamed mob name
                     {
@@ -769,6 +794,10 @@ namespace AdminDashboard.Controllers
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
                                     xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
 
+                                // Inject <DisplayId> with the creator's original name (before any auto-rename)
+                                if (originalMobNames.TryGetValue(i, out var origMobName) && !xml.Contains("<DisplayId>"))
+                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origMobName)}</DisplayId>");
+
                                 // Save processed block (with type code) for DungeonAssets
                                 processedMobBlocks.Add((i, xml.Trim()));
                             }
@@ -818,6 +847,10 @@ namespace AdminDashboard.Controllers
                                 xml = InjectTypeCode(xml, nextType);
                                 usedTypeCodes.Add(nextType);
                                 nextType++;
+
+                                // Inject <DisplayId> with the creator's original name (before any auto-rename)
+                                if (originalItemNames.TryGetValue(i, out var origItemName) && !xml.Contains("<DisplayId>"))
+                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origItemName)}</DisplayId>");
 
                                 // Save processed block (with type code) for DungeonAssets
                                 processedItemBlocks.Add((i, xml.Trim()));
@@ -1074,7 +1107,13 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
+                // Add DisplayId if the safe title differs from the original title
+                var worldDisplayId = title != safeTitle
+                    ? $"\t\t<DisplayId>{EscapeXml(title)}</DisplayId>\n"
+                    : "";
+
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
+                    worldDisplayId +
                     $"\t\t<Width>{width}</Width>\n" +
                     $"\t\t<Height>{height}</Height>\n" +
                     $"\t\t<MapJM>Dungeons/{safeTitle}.jm</MapJM>\n" +
