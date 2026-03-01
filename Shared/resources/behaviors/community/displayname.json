@@ -1,0 +1,209 @@
+{
+  "Wandering Oculus": {
+    "states": {
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Wander",
+            "speed": 0.4
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 10,
+            "type": "PlayerWithinTransition",
+            "target": "approach"
+          }
+        ]
+      },
+      "enraged": {
+        "behaviors": [
+          {
+            "type": "Orbit",
+            "speed": 2.5,
+            "radius": 3
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 8,
+            "coolDown": 700,
+            "predictive": 0.8,
+            "shootAngle": 12,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 6,
+            "radius": 9,
+            "coolDown": 500,
+            "shootAngle": 20,
+            "projectileIndex": 1
+          },
+          {
+            "max": 100,
+            "rate": 10,
+            "type": "ChangeSize"
+          },
+          {
+            "text": [
+              "The eye sees all...",
+              "You cannot hide from my gaze!"
+            ],
+            "type": "Taunt"
+          }
+        ],
+        "transitions": [
+          {
+            "time": 4000,
+            "type": "TimedTransition",
+            "target": "enraged_charge"
+          }
+        ]
+      },
+      "approach": {
+        "behaviors": [
+          {
+            "type": "Chase",
+            "range": 6,
+            "speed": 3.5,
+            "sightRange": 12
+          },
+          {
+            "type": "Shoot",
+            "count": 2,
+            "radius": 8,
+            "coolDown": 1200,
+            "shootAngle": 25,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 6,
+            "type": "PlayerWithinTransition",
+            "target": "orbit_attack"
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "reposition": {
+        "behaviors": [
+          {
+            "type": "Charge",
+            "range": 8,
+            "speed": 5,
+            "coolDown": 1500
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 8,
+            "coolDown": 600,
+            "shootAngle": 72,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3000,
+            "type": "TimedTransition",
+            "target": "orbit_attack"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "enraged",
+            "threshold": 0.4
+          }
+        ]
+      },
+      "orbit_attack": {
+        "behaviors": [
+          {
+            "type": "Orbit",
+            "speed": 1.8,
+            "radius": 4.5
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 7,
+            "coolDown": 1000,
+            "predictive": 0.6,
+            "shootAngle": 20,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 4,
+            "radius": 8,
+            "coolDown": 800,
+            "shootAngle": 15,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 5000,
+            "type": "TimedTransition",
+            "target": "reposition"
+          },
+          {
+            "type": "HpLessTransition",
+            "target": "enraged",
+            "threshold": 0.4
+          },
+          {
+            "dist": 12,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      },
+      "enraged_charge": {
+        "behaviors": [
+          {
+            "type": "Charge",
+            "range": 10,
+            "speed": 6,
+            "coolDown": 1200
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 7,
+            "coolDown": 500,
+            "predictive": 0.7,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 8,
+            "radius": 9,
+            "coolDown": 900,
+            "shootAngle": 45,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "time": 3500,
+            "type": "TimedTransition",
+            "target": "enraged"
+          },
+          {
+            "dist": 14,
+            "type": "NoPlayerWithinTransition",
+            "target": "idle"
+          }
+        ]
+      }
+    },
+    "initialState": "idle"
+  }
+}
