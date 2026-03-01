@@ -55,6 +55,8 @@ namespace WorldServer.core.worlds
         /// <summary>Pre-compressed message blobs for custom objects (one per chunk). Built once at load.</summary>
         public List<byte[]> PreCompressedObjectChunks { get; set; }
         public string CustomDungeonAssetsXml { get; set; }
+        /// <summary>Pre-encoded UTF-8 bytes of CustomDungeonAssetsXml (built once, reused per client)</summary>
+        public byte[] PreEncodedDungeonAssetsBytes { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
         public string[] StartingEquipment { get; set; }
         public string[] InventoryItems { get; set; }
@@ -502,7 +504,10 @@ namespace WorldServer.core.worlds
 
             // Load pre-built dungeon assets (per-dungeon sprites + objects) if available
             if (gameData.DungeonAssetsXml.TryGetValue(jmPath, out var assetsXml))
+            {
                 CustomDungeonAssetsXml = assetsXml;
+                PreEncodedDungeonAssetsBytes = System.Text.Encoding.UTF8.GetBytes(assetsXml);
+            }
 
             return true;
         }
@@ -784,6 +789,7 @@ namespace WorldServer.core.worlds
             Map.Clear();
             CustomGroundEntries = null;
             CustomDungeonAssetsXml = null;
+            PreEncodedDungeonAssetsBytes = null;
             PreCompressedGroundChunks = null;
             PreCompressedObjectChunks = null;
         }

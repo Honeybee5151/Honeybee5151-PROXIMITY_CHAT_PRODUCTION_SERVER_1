@@ -6,6 +6,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Threading.Tasks;
@@ -501,13 +502,14 @@ namespace AdminDashboard.Controllers
                     string projXml = null;
                     var projTypeCodes = new Dictionary<string, int>(); // projName -> type code
                     // Scan all existing dungeon_assets for type code collision prevention
-                    var allDungeonAssetsXml = "";
+                    var allDungeonAssetsXmlBuilder = new StringBuilder();
                     var daFiles = await _github.ListDirectory("Shared/resources/xml/dungeon_assets");
                     foreach (var daFile in daFiles)
                     {
-                        try { allDungeonAssetsXml += (await _github.FetchFile(daFile)).Content; }
+                        try { allDungeonAssetsXmlBuilder.Append((await _github.FetchFile(daFile)).Content); }
                         catch { /* skip unreadable files */ }
                     }
+                    var allDungeonAssetsXml = allDungeonAssetsXmlBuilder.ToString();
 
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
@@ -515,7 +517,13 @@ namespace AdminDashboard.Controllers
                         (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
                         // Check ALL custom XMLs + dungeon_assets to prevent type code collisions
                         var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml + allDungeonAssetsXml;
-                        var projNextType = FindNextTypeCode(allProjCheckXml, 0x4970);
+                        var projUsedCodes = new HashSet<int>();
+                        foreach (Match m in Regex.Matches(allProjCheckXml, @"type=""0x([0-9a-fA-F]+)"""))
+                        {
+                            if (int.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, null, out int val))
+                                projUsedCodes.Add(val);
+                        }
+                        var projNextType = FindNextTypeCode(projUsedCodes, 0x4970);
 
                         // Mob projectile sprites
                         for (int i = 0; i < mobs!.Count; i++)
@@ -580,7 +588,16 @@ namespace AdminDashboard.Controllers
 
                     // 4c. Process mob/item XMLs (DungeonAssets only — no global XML writes)
                     var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "") + allDungeonAssetsXml;
-                    var nextType = FindNextTypeCode(allCustomXml, 0x5000);
+
+                    // Pre-compute all used type codes into a HashSet for O(1) collision checks
+                    var usedTypeCodes = new HashSet<int>();
+                    foreach (Match m in Regex.Matches(allCustomXml, @"type=""0x([0-9a-fA-F]+)"""))
+                    {
+                        if (int.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber, null, out int val))
+                            usedTypeCodes.Add(val);
+                    }
+
+                    var nextType = FindNextTypeCode(usedTypeCodes, 0x5000);
 
                     // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
                     var reservedNames = new HashSet<string>();
@@ -650,10 +667,11 @@ namespace AdminDashboard.Controllers
                                     existingMobNames.Add(nameMatch.Groups[1].Value);
 
                                 // Skip type codes already in use
-                                while (Regex.IsMatch(allCustomXml, $@"type=""0x{nextType:x4}"""))
+                                while (usedTypeCodes.Contains(nextType))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
+                                usedTypeCodes.Add(nextType);
                                 nextType++;
 
                                 // Ensure <Enemy/> tag is present (required for server to spawn mob)
@@ -719,10 +737,11 @@ namespace AdminDashboard.Controllers
                                     existingItemNames.Add(nameMatch.Groups[1].Value);
 
                                 // Skip type codes already in use
-                                while (Regex.IsMatch(allCustomXml, $@"type=""0x{nextType:x4}"""))
+                                while (usedTypeCodes.Contains(nextType))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
+                                usedTypeCodes.Add(nextType);
                                 nextType++;
 
                                 // Save processed block (with type code) for DungeonAssets
@@ -736,10 +755,11 @@ namespace AdminDashboard.Controllers
                     // Uses processedMobBlocks/processedItemBlocks which already have correct type codes
                     if (perDungeonSheets.Count > 0)
                     {
-                        var assetsXml = "<DungeonAssets>\n<SpriteSheets>\n";
+                        var assetsXmlBuilder = new StringBuilder();
+                        assetsXmlBuilder.Append("<DungeonAssets>\n<SpriteSheets>\n");
                         foreach (var kvp in perDungeonSheets)
-                            assetsXml += $"<Sheet name=\"{kvp.Key}\" tileW=\"{kvp.Value.tileW}\" tileH=\"{kvp.Value.tileH}\">{kvp.Value.base64Png}</Sheet>\n";
-                        assetsXml += "</SpriteSheets>\n<Objects>\n";
+                            assetsXmlBuilder.Append($"<Sheet name=\"{kvp.Key}\" tileW=\"{kvp.Value.tileW}\" tileH=\"{kvp.Value.tileH}\">{kvp.Value.base64Png}</Sheet>\n");
+                        assetsXmlBuilder.Append("</SpriteSheets>\n<Objects>\n");
 
                         // Emit mob entries: swap shared sheet texture → per-dungeon sheet texture
                         // Use isMob: false (Texture, not AnimatedTexture) because per-dungeon sheets
@@ -785,7 +805,7 @@ namespace AdminDashboard.Controllers
                                     xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}{altBlocks}");
                                 }
                             }
-                            assetsXml += xml + "\n";
+                            assetsXmlBuilder.Append(xml).Append('\n');
                         }
 
                         // Emit projectile entries with per-dungeon sheet refs
@@ -806,11 +826,11 @@ namespace AdminDashboard.Controllers
                                     var projName = $"{mobName} Proj {kvp.Key}";
                                     var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
 
-                                    assetsXml += $"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n";
-                                    assetsXml += $"\t<Class>Projectile</Class>\n";
-                                    assetsXml += $"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n";
-                                    assetsXml += $"\t<AngleCorrection>1</AngleCorrection>\n";
-                                    assetsXml += $"</Object>\n";
+                                    assetsXmlBuilder.Append($"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n");
+                                    assetsXmlBuilder.Append("\t<Class>Projectile</Class>\n");
+                                    assetsXmlBuilder.Append($"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n");
+                                    assetsXmlBuilder.Append("\t<AngleCorrection>1</AngleCorrection>\n");
+                                    assetsXmlBuilder.Append("</Object>\n");
                                 }
                             }
 
@@ -826,11 +846,11 @@ namespace AdminDashboard.Controllers
                                     var projName = $"{itemName} Proj {kvp.Key}";
                                     var typeCode = projTypeCodes.TryGetValue(projName, out var tc) ? $"0x{tc:x4}" : "0x0000";
 
-                                    assetsXml += $"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n";
-                                    assetsXml += $"\t<Class>Projectile</Class>\n";
-                                    assetsXml += $"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n";
-                                    assetsXml += $"\t<AngleCorrection>1</AngleCorrection>\n";
-                                    assetsXml += $"</Object>\n";
+                                    assetsXmlBuilder.Append($"<Object type=\"{typeCode}\" id=\"{EscapeXml(projName)}\">\n");
+                                    assetsXmlBuilder.Append("\t<Class>Projectile</Class>\n");
+                                    assetsXmlBuilder.Append($"\t<Texture>\n\t\t<File>{pdProjSheetName}</File>\n\t\t<Index>{kvp.Value}</Index>\n\t</Texture>\n");
+                                    assetsXmlBuilder.Append("\t<AngleCorrection>1</AngleCorrection>\n");
+                                    assetsXmlBuilder.Append("</Object>\n");
                                 }
                             }
                         }
@@ -844,11 +864,11 @@ namespace AdminDashboard.Controllers
                                 var pdItemSheetName = $"dungeon_{request.DungeonId}_8x8"; // items always 8x8
                                 xml = InjectSpriteTexture(xml, pdItemSheetName, pdItemIdx, isMob: false);
                             }
-                            assetsXml += xml + "\n";
+                            assetsXmlBuilder.Append(xml).Append('\n');
                         }
 
-                        assetsXml += "</Objects>\n</DungeonAssets>";
-                        files.Add(($"Shared/resources/xml/dungeon_assets/{safeTitle}.xml", assetsXml));
+                        assetsXmlBuilder.Append("</Objects>\n</DungeonAssets>");
+                        files.Add(($"Shared/resources/xml/dungeon_assets/{safeTitle}.xml", assetsXmlBuilder.ToString()));
                     }
                 }
 
@@ -1186,7 +1206,16 @@ namespace AdminDashboard.Controllers
             return ids.ToList();
         }
 
-        /// <summary>Find the next available type code. Default start: 0xF000 for grounds, 0x5000 for objects</summary>
+        /// <summary>Find the next available type code from a pre-computed HashSet</summary>
+        private static int FindNextTypeCode(HashSet<int> usedCodes, int defaultStart)
+        {
+            int next = defaultStart;
+            while (usedCodes.Contains(next))
+                next++;
+            return next;
+        }
+
+        /// <summary>Find the next available type code from XML string. Default start: 0xF000 for grounds, 0x5000 for objects</summary>
         private static int FindNextTypeCode(string xml, int defaultStart = 0xF000)
         {
             var matches = Regex.Matches(xml, @"type=""0x([0-9a-fA-F]+)""");

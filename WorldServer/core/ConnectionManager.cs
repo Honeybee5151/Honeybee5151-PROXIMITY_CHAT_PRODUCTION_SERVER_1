@@ -235,8 +235,8 @@ namespace WorldServer.core
             }
 
             // Send per-dungeon sprites + object definitions
-            if (world.CustomDungeonAssetsXml != null)
-                packets.Add(new CustomDungeonAssetsMessage { AssetsXml = world.CustomDungeonAssetsXml });
+            if (world.PreEncodedDungeonAssetsBytes != null)
+                packets.Add(new CustomDungeonAssetsMessage { PreEncodedBytes = world.PreEncodedDungeonAssetsBytes });
 
             packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
             packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));

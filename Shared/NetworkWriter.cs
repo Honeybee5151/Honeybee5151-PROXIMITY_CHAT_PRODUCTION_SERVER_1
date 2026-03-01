@@ -55,6 +55,17 @@ namespace Shared
             Write(bytes.Length);
             Write(bytes);
         }
+        public void WritePreEncodedUTF32(byte[] preEncoded)
+        {
+            if (preEncoded == null || preEncoded.Length == 0)
+            {
+                Write(0);
+                return;
+            }
+
+            Write(preEncoded.Length);
+            Write(preEncoded);
+        }
         public void WriteNullTerminatedString(string str)
         {
             if (str == null)
