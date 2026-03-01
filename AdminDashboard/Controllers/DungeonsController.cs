@@ -609,10 +609,29 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
-                                // Skip mobs with duplicate names (already exist in CustomObjects.xml)
+                                // Check for duplicate names (already exist in CustomObjects.xml)
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
-                                if (nameMatch.Success && existingMobNames.Contains(nameMatch.Groups[1].Value))
+                                var isDuplicate = nameMatch.Success && existingMobNames.Contains(nameMatch.Groups[1].Value);
+
+                                if (isDuplicate)
+                                {
+                                    // Mob already in CustomObjects.xml — still need it in DungeonAssets
+                                    // for per-dungeon sprite override. Find its existing type code.
+                                    var existingName = nameMatch.Groups[1].Value;
+                                    var existingTypeMatch = Regex.Match(objectsXml,
+                                        $@"type=""(0x[0-9a-fA-F]+)""\s+id=""{Regex.Escape(existingName)}""");
+                                    if (existingTypeMatch.Success)
+                                    {
+                                        // Re-emit with existing type code for DungeonAssets
+                                        var existingBlock = Regex.Match(objectsXml,
+                                            $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
+                                            RegexOptions.Singleline);
+                                        if (existingBlock.Success)
+                                            processedMobBlocks.Add((i, existingBlock.Value.Trim()));
+                                    }
                                     continue;
+                                }
+
                                 // Auto-rename mobs that collide with prod names
                                 if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
                                 {
@@ -683,10 +702,20 @@ namespace AdminDashboard.Controllers
                             {
                                 var xml = block;
 
-                                // Skip items with duplicate names (already exist in CustomItems.xml)
+                                // Check for duplicate names (already exist in CustomItems.xml)
                                 var nameMatch = Regex.Match(xml, @"id=""([^""]+)""");
                                 if (nameMatch.Success && existingItemNames.Contains(nameMatch.Groups[1].Value))
+                                {
+                                    // Item already in CustomItems.xml — still need it in DungeonAssets
+                                    // for per-dungeon sprite override
+                                    var existingName = nameMatch.Groups[1].Value;
+                                    var existingBlock = Regex.Match(itemsXml,
+                                        $@"<Object\b[^>]*\bid=""{Regex.Escape(existingName)}""[^>]*>.*?</Object>",
+                                        RegexOptions.Singleline);
+                                    if (existingBlock.Success)
+                                        processedItemBlocks.Add((i, existingBlock.Value.Trim()));
                                     continue;
+                                }
                                 // Auto-rename items that collide with prod names
                                 if (nameMatch.Success && reservedNames.Contains(nameMatch.Groups[1].Value))
                                 {
@@ -836,18 +865,21 @@ namespace AdminDashboard.Controllers
                 var preset = dungeon["character_preset"] as JObject;
                 if (preset != null)
                 {
+                    // Helper: apply item renames (from prod collision auto-rename)
+                    string applyRename(string n) => itemRenames.TryGetValue(n, out var r) ? r : n;
+
                     // Equipped items (slots 0-3)
                     var equipped = preset["equippedItems"] as JArray;
                     if (equipped != null && equipped.Count > 0)
                     {
-                        var names = string.Join(",", equipped.Select(e => e.ToString()));
+                        var names = string.Join(",", equipped.Select(e => applyRename(e.ToString())));
                         presetStr += $"\t\t<StartingEquipment>{EscapeXml(names)}</StartingEquipment>\n";
                     }
                     // Inventory items (slots 4+)
                     var inventory = preset["inventoryItems"] as JArray;
                     if (inventory != null && inventory.Count > 0)
                     {
-                        var names = string.Join(",", inventory.Select(e => e.ToString()));
+                        var names = string.Join(",", inventory.Select(e => applyRename(e.ToString())));
                         presetStr += $"\t\t<InventoryItems>{EscapeXml(names)}</InventoryItems>\n";
                     }
                     // Level
