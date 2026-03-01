@@ -359,6 +359,14 @@ namespace AdminDashboard.Controllers
                                         var sprSize = spr?["size"]?.Value<int>() ?? size;
                                         var sprAnimated = spr?["animated"]?.Value<bool>() == true || mobIsAnimated;
 
+                                        // Auto-detect animated strips: width == 7 * height (standard 7-frame layout)
+                                        if (!sprAnimated)
+                                        {
+                                            using var probe = SpriteSheetService.DecodeDataUrl(dataUrl);
+                                            if (probe.Width > probe.Height && probe.Width == probe.Height * 7)
+                                                sprAnimated = true;
+                                        }
+
                                         if (sprAnimated)
                                         {
                                             // Animated strip — store as individual sheet, skip grid packing
