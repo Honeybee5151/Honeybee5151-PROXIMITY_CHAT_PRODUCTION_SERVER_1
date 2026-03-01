@@ -1003,7 +1003,9 @@ namespace AdminDashboard.Controllers
 
                         foreach (var item in items!)
                         {
-                            var dropRate = item["dropRate"]?.Value<double>() ?? 0.1;
+                            var dropRateToken = item["dropRate"];
+                            var dropRate = (dropRateToken != null && dropRateToken.Type != JTokenType.Null)
+                                ? dropRateToken.Value<double>() : 0.1;
                             // Extract item name from XML id attribute
                             var itemXml = item["xml"]?.ToString() ?? "";
                             var itemNameMatch = Regex.Match(itemXml, @"id=""([^""]+)""");
