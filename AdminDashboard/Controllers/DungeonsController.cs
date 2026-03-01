@@ -494,11 +494,19 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
+                    // Fetch ALL custom XML files upfront for collision-safe type code allocation
+                    var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
+                    var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
+                    var entitiesXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomEntities.xml")).Content;
+                    string projXml = null;
+
                     // 4b. Generate custom projectile definitions + rewrite mob/item ObjectIds
                     if (pdProjSpriteIndices.Count > 0 || pdItemProjSpriteIndices.Count > 0)
                     {
-                        var (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
-                        var projNextType = FindNextTypeCode(projXml, 0x4970);
+                        (projXml, _) = await _github.FetchFile("Shared/resources/xml/custom/CustomProj.xml");
+                        // Check ALL custom XMLs to prevent type code collisions
+                        var allProjCheckXml = objectsXml + itemsXml + entitiesXml + projXml;
+                        var projNextType = FindNextTypeCode(allProjCheckXml, 0x4970);
                         var newProjEntries = "";
 
                         // Mob projectile sprites
@@ -580,9 +588,9 @@ namespace AdminDashboard.Controllers
                     }
 
                     // 4c. Write mob XMLs to CustomObjects.xml (with sprite texture refs)
-                    var objectsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomObjects.xml")).Content;
-                    var itemsXml = (await _github.FetchFile("Shared/resources/xml/custom/CustomItems.xml")).Content;
-                    var nextType = Math.Max(FindNextTypeCode(objectsXml, 0x5000), FindNextTypeCode(itemsXml, 0x5000));
+                    // Combined XML of ALL custom files — used for type code collision checks
+                    var allCustomXml = objectsXml + itemsXml + entitiesXml + (projXml ?? "");
+                    var nextType = FindNextTypeCode(allCustomXml, 0x5000);
 
                     // Load prod reserved names to prevent name collisions (prod names overwrite custom in IdToObjectType)
                     var reservedNames = new HashSet<string>();
@@ -654,8 +662,8 @@ namespace AdminDashboard.Controllers
                                 if (nameMatch.Success)
                                     existingMobNames.Add(nameMatch.Groups[1].Value);
 
-                                // Skip type codes already in use
-                                while (Regex.IsMatch(objectsXml + itemsXml + newMobEntries, $@"type=""0x{nextType:x4}"""))
+                                // Skip type codes already in use (check ALL custom XMLs to prevent collisions)
+                                while (Regex.IsMatch(allCustomXml + newMobEntries, $@"type=""0x{nextType:x4}"""))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
@@ -740,8 +748,8 @@ namespace AdminDashboard.Controllers
                                 if (nameMatch.Success)
                                     existingItemNames.Add(nameMatch.Groups[1].Value);
 
-                                // Check existing type codes to find next available
-                                while (Regex.IsMatch(objectsXml + itemsXml + newItemEntries, $@"type=""0x{nextType:x4}"""))
+                                // Check ALL custom XMLs to find next available type code
+                                while (Regex.IsMatch(allCustomXml + newMobEntries + newItemEntries, $@"type=""0x{nextType:x4}"""))
                                     nextType++;
 
                                 xml = InjectTypeCode(xml, nextType);
