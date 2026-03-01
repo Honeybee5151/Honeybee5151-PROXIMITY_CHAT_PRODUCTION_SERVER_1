@@ -923,4 +923,18 @@
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>true</PresetHasBackpack>
 	</World>
+	<World id="eyeball2222">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/eyeball2222.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<InventoryItems>Oculus of the Watcher,Ocular Cleaver</InventoryItems>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>1000,100,10,0,100,100,10,10</PresetStats>
+		<PresetHealthPotions>6</PresetHealthPotions>
+		<PresetManaPotions>6</PresetManaPotions>
+		<PresetHasBackpack>true</PresetHasBackpack>
+	</World>
 </Worlds>
