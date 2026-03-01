@@ -50,11 +50,14 @@ namespace WorldServer.core.worlds.impl
             // Spawn Sandstorm Effect in center of nexus
             try
             {
-                if (GameServer.Resources.GameData.IdToObjectType.TryGetValue("Sandstorm Effect", out var sandstormType))
+                var sandstormFound = GameServer.Resources.GameData.IdToObjectType.TryGetValue("Sandstorm Effect", out var sandstormType);
+                Console.WriteLine($"[NexusWorld] Sandstorm lookup: found={sandstormFound} type=0x{sandstormType:x4}");
+                if (sandstormFound)
                 {
                     var sandstorm = Entity.Resolve(GameServer, sandstormType);
                     sandstorm.Move(Map.Width / 2f + 0.5f, Map.Height / 2f + 0.5f);
                     EnterWorld(sandstorm);
+                    Console.WriteLine($"[NexusWorld] Sandstorm Effect spawned at ({Map.Width / 2f + 0.5f}, {Map.Height / 2f + 0.5f})");
                 }
             }
             catch (Exception ex)

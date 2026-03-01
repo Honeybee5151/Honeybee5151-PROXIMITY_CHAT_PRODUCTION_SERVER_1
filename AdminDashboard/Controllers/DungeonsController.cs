@@ -348,7 +348,11 @@ namespace AdminDashboard.Controllers
                                     var spr = spritesArr[j] as JObject;
                                     var dataUrl = spr?["data"]?.ToString();
                                     if (!string.IsNullOrEmpty(dataUrl))
-                                        spriteEntries.Add((i, $"mob_{j}", dataUrl, size, true));
+                                    {
+                                        // Per-sprite size takes priority, then mob-level, then default 8
+                                        var sprSize = spr?["size"]?.Value<int>() ?? size;
+                                        spriteEntries.Add((i, $"mob_{j}", dataUrl, sprSize, true));
+                                    }
                                 }
                             }
                             else
@@ -400,6 +404,7 @@ namespace AdminDashboard.Controllers
                     // Per-dungeon indices (start at 0, memory-only on client via CUSTOM_DUNGEON_ASSETS)
                     // mobSpriteIndices[mobIdx] = [spriteIdx0, spriteIdx1, ...] (index 0=base, 1+=AltTextures)
                     var pdMobSpriteIndices = new Dictionary<int, List<int>>();
+                    var pdMobSpriteSizes = new Dictionary<int, List<int>>(); // mobIdx → per-slot sprite size
                     var pdItemSpriteIndices = new Dictionary<int, int>();
                     var pdProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
                     var pdItemProjSpriteIndices = new Dictionary<int, Dictionary<string, int>>();
@@ -456,6 +461,13 @@ namespace AdminDashboard.Controllers
                                         while (pdMobSpriteIndices[e.entityIdx].Count <= slotIdx)
                                             pdMobSpriteIndices[e.entityIdx].Add(-1);
                                         pdMobSpriteIndices[e.entityIdx][slotIdx] = pdIndices[i];
+
+                                        // Track per-slot sprite size for DungeonAssets sheet resolution
+                                        if (!pdMobSpriteSizes.ContainsKey(e.entityIdx))
+                                            pdMobSpriteSizes[e.entityIdx] = new List<int>();
+                                        while (pdMobSpriteSizes[e.entityIdx].Count <= slotIdx)
+                                            pdMobSpriteSizes[e.entityIdx].Add(spriteSize);
+                                        pdMobSpriteSizes[e.entityIdx][slotIdx] = spriteSize;
                                     }
                                 }
                                 else if (e.frame.StartsWith("itemproj_"))
@@ -770,9 +782,41 @@ namespace AdminDashboard.Controllers
                             var xml = processedXml;
                             if (pdMobSpriteIndices.TryGetValue(mobIdx, out var pdSprIndices))
                             {
-                                var size = mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8;
-                                var pdSheetName = $"dungeon_{request.DungeonId}_{size}x{size}";
-                                xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
+                                // Check if all sprites share the same size (common case)
+                                var sizes = pdMobSpriteSizes.TryGetValue(mobIdx, out var szList) ? szList : null;
+                                var allSameSize = sizes == null || sizes.Distinct().Count() <= 1;
+
+                                if (allSameSize)
+                                {
+                                    // All sprites same size — use single sheet name
+                                    var sprSize = sizes != null && sizes.Count > 0 ? sizes[0] : (mobs![mobIdx]["spriteSize"]?.Value<int>() ?? 8);
+                                    var pdSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}";
+                                    xml = InjectSpriteTexture(xml, pdSheetName, pdSprIndices, isMob: false);
+                                }
+                                else
+                                {
+                                    // Per-sprite sizes differ — build texture XML manually with per-slot sheet names
+                                    xml = Regex.Replace(xml, @"<AnimatedTexture>.*?</AnimatedTexture>", "", RegexOptions.Singleline);
+                                    xml = Regex.Replace(xml, @"<Texture>\s*<File>.*?</Texture>", "", RegexOptions.Singleline);
+                                    xml = Regex.Replace(xml, @"<AltTexture[^>]*>.*?</AltTexture>", "", RegexOptions.Singleline);
+
+                                    // Base texture (slot 0)
+                                    var baseSize = sizes![0];
+                                    var baseSheet = $"dungeon_{request.DungeonId}_{baseSize}x{baseSize}";
+                                    var textureXml = $"<Texture>\n\t\t<File>{baseSheet}</File>\n\t\t<Index>{pdSprIndices[0]}</Index>\n\t</Texture>";
+
+                                    // AltTexture blocks for slots 1..N (each may reference a different sheet)
+                                    var altBlocks = "";
+                                    for (int s = 1; s < pdSprIndices.Count; s++)
+                                    {
+                                        if (pdSprIndices[s] < 0 || s >= sizes.Count) continue;
+                                        var altSize = sizes[s];
+                                        var altSheet = $"dungeon_{request.DungeonId}_{altSize}x{altSize}";
+                                        altBlocks += $"\n\t<AltTexture id=\"{s}\">\n\t\t<Texture>\n\t\t\t<File>{altSheet}</File>\n\t\t\t<Index>{pdSprIndices[s]}</Index>\n\t\t</Texture>\n\t</AltTexture>";
+                                    }
+
+                                    xml = Regex.Replace(xml, @"(<Object(?![a-zA-Z])(?:\s[^>]*)?>)", $"$1\n\t{textureXml}{altBlocks}");
+                                }
                             }
                             assetsXml += xml + "\n";
                         }
