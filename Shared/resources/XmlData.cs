@@ -22,6 +22,14 @@ namespace Shared.resources
         public bool NoWalk; // true if ground tile blocks movement
         public int BlendPriority = -1; // tile blend priority (-1 = default/lowest, higher wins at edges)
         public float Speed = 1.0f; // movement speed multiplier (1.0 = normal)
+        public int MinDamage = 0; // min damage per tick (~500ms)
+        public int MaxDamage = 0; // max damage per tick
+        public bool Sink = false; // sinking visual effect (water/lava)
+        public int AnimateType = 0; // 0=none, 1=Wave, 2=Flow
+        public float AnimateDx = 0; // horizontal flow direction
+        public float AnimateDy = 0; // vertical flow direction
+        public bool Push = false; // push entities in animate direction
+        public float SlideAmount = 0; // sliding effect (ice)
     }
 
     public class CustomObjectEntry

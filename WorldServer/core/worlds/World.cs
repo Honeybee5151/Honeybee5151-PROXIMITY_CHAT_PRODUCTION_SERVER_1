@@ -554,6 +554,15 @@ namespace WorldServer.core.worlds
                 bw.Write((sbyte)entry.BlendPriority);
                 // Speed multiplier: float (1.0 = normal)
                 bw.Write(entry.Speed);
+                // Advanced properties
+                bw.Write((short)entry.MinDamage);
+                bw.Write((short)entry.MaxDamage);
+                bw.Write(entry.Sink);
+                bw.Write((byte)entry.AnimateType); // 0=none, 1=Wave, 2=Flow
+                bw.Write(entry.AnimateDx);
+                bw.Write(entry.AnimateDy);
+                bw.Write(entry.Push);
+                bw.Write(entry.SlideAmount);
             }
             bw.Flush();
             return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());

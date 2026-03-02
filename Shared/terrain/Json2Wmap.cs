@@ -41,10 +41,32 @@ namespace Shared.terrain
                     tileId = 0xff;
                 else if (o.ground.StartsWith("custom_"))
                 {
-                    // Include blocked state + blend priority + speed in dedup key so variants get separate type codes
+                    // Include all properties in dedup key so variants get separate type codes
                     var bp = o.blendPriority ?? -1;
                     var spd = o.speed ?? 1.0f;
-                    var groundKey = o.ground + (o.blocked == true ? "|blocked" : "") + (bp != -1 ? $"|bp{bp}" : "") + (spd != 1.0f ? $"|spd{spd}" : "");
+                    var minDmg = (o.damage != null && o.damage.Length >= 1) ? o.damage[0] : 0;
+                    var maxDmg = (o.damage != null && o.damage.Length >= 2) ? o.damage[1] : 0;
+                    var sink = o.sink == true;
+                    var animType = 0;
+                    var animDx = 0f;
+                    var animDy = 0f;
+                    if (o.animate != null)
+                    {
+                        animType = o.animate.type == "Wave" ? 1 : o.animate.type == "Flow" ? 2 : 0;
+                        animDx = o.animate.dx;
+                        animDy = o.animate.dy;
+                    }
+                    var push = o.push == true;
+                    var slideAmt = o.slide ?? 0f;
+                    var groundKey = o.ground
+                        + (o.blocked == true ? "|blocked" : "")
+                        + (bp != -1 ? $"|bp{bp}" : "")
+                        + (spd != 1.0f ? $"|spd{spd}" : "")
+                        + (minDmg > 0 || maxDmg > 0 ? $"|dmg{minDmg}-{maxDmg}" : "")
+                        + (sink ? "|sink" : "")
+                        + (animType != 0 ? $"|anim{animType}_{animDx}_{animDy}" : "")
+                        + (push ? "|push" : "")
+                        + (slideAmt != 0 ? $"|slide{slideAmt}" : "");
                     if (!customGroundMap.TryGetValue(groundKey, out tileId))
                     {
                         tileId = nextCustomCode++;
@@ -67,7 +89,15 @@ namespace Shared.terrain
                             DecodedPixels = decodedGndPixels,
                             NoWalk = o.blocked == true,
                             BlendPriority = bp,
-                            Speed = spd
+                            Speed = spd,
+                            MinDamage = minDmg,
+                            MaxDamage = maxDmg,
+                            Sink = sink,
+                            AnimateType = animType,
+                            AnimateDx = animDx,
+                            AnimateDy = animDy,
+                            Push = push,
+                            SlideAmount = slideAmt
                         });
                     }
                 }
@@ -145,16 +175,22 @@ namespace Shared.terrain
                 };
             }
 
-            // Override TileDesc for custom ground tiles with special properties (NoWalk, BlendPriority, Speed)
+            // Override TileDesc for custom ground tiles with special properties
             foreach (var cg in customGrounds)
             {
-                if (cg.NoWalk || cg.BlendPriority != -1 || cg.Speed != 1.0f)
+                if (cg.NoWalk || cg.BlendPriority != -1 || cg.Speed != 1.0f ||
+                    cg.MinDamage > 0 || cg.MaxDamage > 0 || cg.Sink || cg.Push || cg.SlideAmount != 0)
                 {
                     var xml = $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
                         "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
                         (cg.NoWalk ? "<NoWalk/>" : "") +
                         (cg.BlendPriority != -1 ? $"<BlendPriority>{cg.BlendPriority}</BlendPriority>" : "") +
                         (cg.Speed != 1.0f ? $"<Speed>{cg.Speed}</Speed>" : "") +
+                        (cg.MinDamage > 0 ? $"<MinDamage>{cg.MinDamage}</MinDamage>" : "") +
+                        (cg.MaxDamage > 0 ? $"<MaxDamage>{cg.MaxDamage}</MaxDamage>" : "") +
+                        (cg.Sink ? "<Sink/>" : "") +
+                        (cg.Push ? "<Push/>" : "") +
+                        (cg.SlideAmount != 0 ? $"<SlideAmount>{cg.SlideAmount}</SlideAmount>" : "") +
                         "</Ground>";
                     data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, System.Xml.Linq.XElement.Parse(xml));
                 }
@@ -178,6 +214,13 @@ namespace Shared.terrain
             public int width;
         }
 
+        private class json_animate
+        {
+            public string type;
+            public float dx;
+            public float dy;
+        }
+
         private struct loc
         {
             public string ground;
@@ -185,6 +228,11 @@ namespace Shared.terrain
             public bool? blocked;
             public int? blendPriority;
             public float? speed;
+            public int[] damage;
+            public bool? sink;
+            public json_animate animate;
+            public bool? push;
+            public float? slide;
             public obj[] objs;
             public obj[] regions;
         }
