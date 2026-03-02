@@ -103,6 +103,20 @@ namespace AdminDashboard.Services
             }
         }
 
+        /// <summary>Get all dungeons for a specific user (lightweight: id, data_size, status only)</summary>
+        public async Task<List<JObject>> GetUserDungeons(string userId)
+        {
+            var url = $"{_url}/rest/v1/dungeons?user_id=eq.{Uri.EscapeDataString(userId)}&select=id,data_size,status";
+            var res = await _http.GetAsync(url);
+            var json = await res.Content.ReadAsStringAsync();
+            if (!res.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[Supabase] GetUserDungeons error: {res.StatusCode} - {json}");
+                return new List<JObject>();
+            }
+            return JsonConvert.DeserializeObject<List<JObject>>(json) ?? new List<JObject>();
+        }
+
         /// <summary>Update dungeon status</summary>
         public async Task UpdateStatus(string id, string status)
         {

@@ -275,6 +275,25 @@ namespace AdminDashboard.Controllers
                         tileList.Add(new { hex = prop.Name, id = prop.Value.ToString() });
                 }
 
+                // Creator storage stats
+                var userId = dungeon["user_id"]?.ToString();
+                long creatorStorageUsed = 0;
+                int creatorDungeonCount = 0;
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var userDungeons = await _supabase.GetUserDungeons(userId);
+                    foreach (var d in userDungeons)
+                    {
+                        var st = d["status"]?.ToString();
+                        if (st == "pending" || st == "approved")
+                        {
+                            creatorStorageUsed += d["data_size"]?.Value<long>() ?? 0;
+                            creatorDungeonCount++;
+                        }
+                    }
+                }
+                var thisDungeonSize = dungeon["data_size"]?.Value<long>() ?? 0;
+
                 var response = new
                 {
                     id,
@@ -289,6 +308,9 @@ namespace AdminDashboard.Controllers
                     customTiles = tileList,
                     startingEquipment = dungeon["starting_equipment"],
                     characterPreset = dungeon["character_preset"],
+                    creatorStorageUsed,
+                    creatorStorageThisDungeon = thisDungeonSize,
+                    creatorDungeonCount,
                 };
                 // Use Newtonsoft serializer to handle JToken/JObject/JArray fields properly
                 var json = JsonConvert.SerializeObject(response, new JsonSerializerSettings

@@ -1184,6 +1184,13 @@ function esc(str) {
     return div.innerHTML;
 }
 
+function formatBytes(bytes) {
+    if (bytes == null || bytes === 0) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
 function showFeedback(id, message, type) {
     const el = document.getElementById(id);
     el.textContent = message;
@@ -1412,11 +1419,18 @@ function hidePreview() {
 function renderPreview(data) {
     let html = '';
 
-    // Description + creator
-    if (data.description || data.creatorName) {
+    // Description + creator + storage
+    if (data.description || data.creatorName || data.creatorStorageUsed != null) {
         html += `<div class="preview-section">`;
         if (data.creatorName) html += `<div style="color:#8b5cf6;font-size:12px;margin-bottom:4px;">by ${esc(data.creatorName)}</div>`;
         if (data.description) html += `<p style="color:#aaa;margin:0;">${esc(data.description)}</p>`;
+        if (data.creatorStorageUsed != null) {
+            html += `<div style="color:#888;font-size:11px;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;">`;
+            html += `<span>This dungeon: <strong style="color:#e0e0e0;">${formatBytes(data.creatorStorageThisDungeon || 0)}</strong></span>`;
+            html += `<span>Total storage: <strong style="color:#e0e0e0;">${formatBytes(data.creatorStorageUsed)}</strong></span>`;
+            if (data.creatorDungeonCount != null) html += `<span>Dungeons: <strong style="color:#e0e0e0;">${data.creatorDungeonCount}</strong></span>`;
+            html += `</div>`;
+        }
         html += `</div>`;
     }
 
