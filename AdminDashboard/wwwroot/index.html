@@ -377,6 +377,20 @@
         </div>
     </div>
 
+    <!-- Sprite Expand Overlay -->
+    <div class="sprite-expand-overlay" id="sprite-expand-overlay" onclick="closeSpriteExpand(event)">
+        <div class="expand-close">ESC or click to close</div>
+        <div class="expand-label" id="expand-label"></div>
+        <img id="expand-img" src="" alt="">
+        <div class="expand-zoom">
+            <span style="color:#888;font-size:12px;">Zoom:</span>
+            <button onclick="event.stopPropagation();setSpriteZoom(2)" data-sz="2">2x</button>
+            <button class="active" onclick="event.stopPropagation();setSpriteZoom(4)" data-sz="4">4x</button>
+            <button onclick="event.stopPropagation();setSpriteZoom(8)" data-sz="8">8x</button>
+            <button onclick="event.stopPropagation();setSpriteZoom(16)" data-sz="16">16x</button>
+        </div>
+    </div>
+
     <script src="/js/dashboard.js"></script>
 </body>
 </html>

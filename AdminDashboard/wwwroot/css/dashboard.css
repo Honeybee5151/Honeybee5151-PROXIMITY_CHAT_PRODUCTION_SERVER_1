@@ -824,6 +824,73 @@ tr:hover td {
     color: #c4b5fd;
 }
 
+/* Sprite expand overlay */
+.sprite-expand-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    cursor: pointer;
+}
+
+.sprite-expand-overlay.active {
+    display: flex;
+}
+
+.sprite-expand-overlay img {
+    image-rendering: pixelated;
+    max-width: 90vw;
+    max-height: 70vh;
+    border: 2px solid #444;
+    border-radius: 4px;
+    background: #111;
+}
+
+.sprite-expand-overlay .expand-label {
+    color: #888;
+    font-size: 13px;
+}
+
+.sprite-expand-overlay .expand-zoom {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.sprite-expand-overlay .expand-zoom button {
+    padding: 4px 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #222;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.sprite-expand-overlay .expand-zoom button.active {
+    background: #8b5cf6;
+    color: #fff;
+    border-color: #8b5cf6;
+}
+
+.sprite-expand-overlay .expand-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    color: #888;
+    font-size: 12px;
+}
+
+/* Clickable sprites in preview */
+.preview-entity img, .preview-sprite {
+    cursor: zoom-in;
+}
+
 /* Map zoom buttons */
 .map-zoom-btn {
     padding: 2px 8px;

@@ -1495,16 +1495,16 @@ function renderPreview(data) {
                     html += `<div style="text-align:left;">`;
                     html += `<div style="font-size:10px;color:#888;margin-bottom:2px;">${esc(label)}${isAnim ? ' (animated strip)' : ''}</div>`;
                     // Full strip at natural size, scaled up with pixelated rendering
-                    html += `<img src="${spr.data}" style="image-rendering:pixelated;max-width:100%;height:${spriteScale}px;" title="${esc(label)} — full sprite">`;
+                    html += `<img src="${spr.data}" style="image-rendering:pixelated;max-width:100%;height:${spriteScale}px;cursor:zoom-in;" title="${esc(label)} — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(mob.name)} — ${esc(label)}')">`;
                     html += `</div>`;
                 }
             } else {
                 // Legacy spriteBase/spriteAttack
                 if (mob.spriteBase) {
-                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">idle</div><img src="${mob.spriteBase}" style="image-rendering:pixelated;height:${spriteScale}px;" title="Base/Idle"></div>`;
+                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">idle</div><img src="${mob.spriteBase}" style="image-rendering:pixelated;height:${spriteScale}px;cursor:zoom-in;" title="Base/Idle — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(mob.name)} — idle')"></div>`;
                 }
                 if (mob.spriteAttack) {
-                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">attack</div><img src="${mob.spriteAttack}" style="image-rendering:pixelated;height:${spriteScale}px;" title="Attack"></div>`;
+                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">attack</div><img src="${mob.spriteAttack}" style="image-rendering:pixelated;height:${spriteScale}px;cursor:zoom-in;" title="Attack — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(mob.name)} — attack')"></div>`;
                 }
                 if (!mob.spriteBase && !mob.spriteAttack) {
                     html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
@@ -1514,7 +1514,7 @@ function renderPreview(data) {
             // Projectile sprites
             if (mob.projectileSprites) {
                 for (const [projId, src] of Object.entries(mob.projectileSprites)) {
-                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" title="Projectile: ${esc(projId)}"><div style="font-size:10px;color:#666;">proj</div></div>`;
+                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" style="cursor:zoom-in;" title="Projectile: ${esc(projId)} — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(mob.name)} — proj ${esc(projId)}')"><div style="font-size:10px;color:#666;">proj</div></div>`;
                 }
             }
             html += '</div>';
@@ -1559,13 +1559,13 @@ function renderPreview(data) {
             // Sprite + projectile sprites
             html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
             if (item.sprite) {
-                html += `<img src="${item.sprite}" class="preview-sprite" width="64" height="64" title="Item sprite">`;
+                html += `<img src="${item.sprite}" class="preview-sprite" width="64" height="64" style="cursor:zoom-in;" title="Item sprite — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(item.name)}')">`;
             } else {
                 html += `<div class="preview-sprite" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
             }
             if (item.projectileSprites) {
                 for (const [projId, src] of Object.entries(item.projectileSprites)) {
-                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" title="Projectile: ${esc(projId)}"><div style="font-size:10px;color:#666;">proj</div></div>`;
+                    if (src) html += `<div style="text-align:center;"><img src="${src}" class="preview-sprite" width="32" height="32" style="cursor:zoom-in;" title="Projectile: ${esc(projId)} — click to expand" onclick="event.stopPropagation();expandSprite(this.src, '${esc(item.name)} — proj ${esc(projId)}')"><div style="font-size:10px;color:#666;">proj</div></div>`;
                 }
             }
             html += '</div>';
@@ -1672,3 +1672,41 @@ function toggleXml(el) {
         el.textContent = 'Show XML';
     }
 }
+
+// Sprite expand/fullscreen
+let spriteExpandZoom = 4;
+function expandSprite(src, label) {
+    const overlay = document.getElementById('sprite-expand-overlay');
+    const img = document.getElementById('expand-img');
+    const lbl = document.getElementById('expand-label');
+    img.src = src;
+    lbl.textContent = label || '';
+    overlay.classList.add('active');
+    spriteExpandZoom = 4;
+    // Wait for image to load to set size
+    img.onload = function() {
+        setSpriteZoom(spriteExpandZoom);
+    };
+    if (img.complete) setSpriteZoom(spriteExpandZoom);
+}
+
+function closeSpriteExpand(e) {
+    if (e && (e.target.tagName === 'BUTTON' || e.target.closest('.expand-zoom'))) return;
+    document.getElementById('sprite-expand-overlay').classList.remove('active');
+}
+
+function setSpriteZoom(level) {
+    spriteExpandZoom = level;
+    const img = document.getElementById('expand-img');
+    if (img.naturalWidth) {
+        img.style.width = (img.naturalWidth * level) + 'px';
+        img.style.height = (img.naturalHeight * level) + 'px';
+    }
+    document.querySelectorAll('.expand-zoom button').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.sz) === level);
+    });
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSpriteExpand();
+});
