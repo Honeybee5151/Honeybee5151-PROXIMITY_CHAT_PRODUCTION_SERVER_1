@@ -608,38 +608,39 @@ namespace AdminDashboard.Controllers
                         }
                     }
 
-                    // 4b-pre. Pre-rename mob/item names that collide with global names
-                    // Must happen BEFORE projectile processing so projectile names use the renamed mob name
+                    // 4b-pre. Always prefix ALL mob/item names with safeTitle for cross-dungeon uniqueness
+                    // Must happen BEFORE projectile processing so projectile names use the prefixed name
                     {
-                        var globalNames = new HashSet<string>();
-                        foreach (Match m in Regex.Matches(globalOnlyXml, @"id=""([^""]+)"""))
-                            globalNames.Add(m.Groups[1].Value);
-
                         for (int i = 0; i < mobs!.Count; i++)
                         {
                             var rawXml = mobs[i]["xml"]?.ToString() ?? "";
                             var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            if (nameMatch.Success)
                             {
                                 var oldName = nameMatch.Groups[1].Value;
+                                // Skip if already prefixed (re-approval)
+                                if (oldName.StartsWith(safeTitle + " ")) continue;
                                 var newName = $"{safeTitle} {oldName}";
                                 rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
                                 mobs[i]["xml"] = rawXml;
                                 mobRenames[oldName] = newName;
-                                Console.WriteLine($"[DungeonsController] Renamed mob '{oldName}' -> '{newName}' (global name collision)");
+                                Console.WriteLine($"[DungeonsController] Prefixed mob '{oldName}' -> '{newName}'");
                             }
                         }
                         for (int i = 0; i < items!.Count; i++)
                         {
                             var rawXml = items[i]["xml"]?.ToString() ?? "";
                             var nameMatch = Regex.Match(rawXml, @"id=""([^""]+)""");
-                            if (nameMatch.Success && (globalNames.Contains(nameMatch.Groups[1].Value) || reservedNames.Contains(nameMatch.Groups[1].Value)))
+                            if (nameMatch.Success)
                             {
                                 var oldName = nameMatch.Groups[1].Value;
+                                // Skip if already prefixed (re-approval)
+                                if (oldName.StartsWith(safeTitle + " ")) continue;
                                 var newName = $"{safeTitle} {oldName}";
                                 rawXml = rawXml.Replace($"id=\"{oldName}\"", $"id=\"{newName}\"");
                                 items[i]["xml"] = rawXml;
-                                Console.WriteLine($"[DungeonsController] Renamed item '{oldName}' -> '{newName}' (global name collision)");
+                                itemRenames[oldName] = newName;
+                                Console.WriteLine($"[DungeonsController] Prefixed item '{oldName}' -> '{newName}'");
                             }
                         }
                     }
@@ -1300,6 +1301,13 @@ namespace AdminDashboard.Controllers
                                 var dropFrom = item["dropFrom"]?.ToString();
                                 if (!string.IsNullOrEmpty(dropFrom))
                                     targetMobs.Add(dropFrom);
+                            }
+
+                            // Map original mob names to renamed names (e.g. "Gazing Oculus" -> "999 Gazing Oculus")
+                            for (int m = 0; m < targetMobs.Count; m++)
+                            {
+                                if (mobRenames.TryGetValue(targetMobs[m], out var renamed))
+                                    targetMobs[m] = renamed;
                             }
 
                             if (targetMobs.Count == 0) continue;
