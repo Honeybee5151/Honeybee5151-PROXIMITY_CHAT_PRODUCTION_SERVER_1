@@ -21,8 +21,7 @@
     <Defense>5</Defense>
     <XpMult>0.05</XpMult>
     <Projectile id="0">
-        <ObjectId>
-	<DisplayId>Wandering Oculus</DisplayId>displayname1 Wandering Oculus Proj 0</ObjectId>
+        <ObjectId>displayname1 Wandering Oculus Proj 0</ObjectId>
         <Speed>90</Speed>
         <MinDamage>35</MinDamage>
         <MaxDamage>55</MaxDamage>
@@ -31,8 +30,7 @@
         <ConditionEffect duration="2">Dazed</ConditionEffect>
     </Projectile>
     <Projectile id="1">
-        <ObjectId>
-	<DisplayId>Wandering Oculus</DisplayId>displayname1 Wandering Oculus Proj 1</ObjectId>
+        <ObjectId>displayname1 Wandering Oculus Proj 1</ObjectId>
         <Speed>55</Speed>
         <Damage>40</Damage>
         <Size>55</Size>
@@ -85,8 +83,7 @@
         <NumProjectiles>3</NumProjectiles>
         <ArcGap>8</ArcGap>
         <Projectile>
-            <ObjectId>
-	<DisplayId>Fangblade of the Hollow King</DisplayId>displayname1 Fangblade of the Hollow King Proj 0</ObjectId>
+            <ObjectId>displayname1 Fangblade of the Hollow King Proj 0</ObjectId>
             <Speed>85</Speed>
             <MinDamage>120</MinDamage>
             <MaxDamage>235</MaxDamage>
