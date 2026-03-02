@@ -507,4 +507,18 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 	</World>
+	<World id="displayname1">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/displayname1.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>Fangblade of the Hollow King</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>1000,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+	</World>
 </Worlds>
