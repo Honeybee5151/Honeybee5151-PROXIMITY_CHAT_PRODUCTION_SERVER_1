@@ -189,6 +189,7 @@ namespace Shared.terrain
                         (cg.MinDamage > 0 ? $"<MinDamage>{cg.MinDamage}</MinDamage>" : "") +
                         (cg.MaxDamage > 0 ? $"<MaxDamage>{cg.MaxDamage}</MaxDamage>" : "") +
                         (cg.Sink ? "<Sink/>" : "") +
+                        (cg.AnimateType != 0 ? $"<Animate dx=\"{cg.AnimateDx}\" dy=\"{cg.AnimateDy}\">{(cg.AnimateType == 1 ? "Wave" : "Flow")}</Animate>" : "") +
                         (cg.Push ? "<Push/>" : "") +
                         (cg.SlideAmount != 0 ? $"<SlideAmount>{cg.SlideAmount}</SlideAmount>" : "") +
                         "</Ground>";

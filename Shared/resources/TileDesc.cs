@@ -45,10 +45,13 @@ namespace Shared.resources
             if (Push)
             {
                 var anim = e.Element("Animate");
-                if (anim.HasAttribute("dx"))
-                    PushX = anim.GetAttribute<float>("dx");
-                if (anim.HasAttribute("dy"))
-                    PushY = anim.GetAttribute<float>("dy");
+                if (anim != null)
+                {
+                    if (anim.HasAttribute("dx"))
+                        PushX = anim.GetAttribute<float>("dx");
+                    if (anim.HasAttribute("dy"))
+                        PushY = anim.GetAttribute<float>("dy");
+                }
             }
 
             if (e.Element("ConditionEffect") != null)
