@@ -514,7 +514,7 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 		<CommunityDungeon/>
-		<StartingEquipment>Fangblade of the Hollow King</StartingEquipment>
+		<StartingEquipment>displayname1 Fangblade of the Hollow King</StartingEquipment>
 		<PresetLevel>20</PresetLevel>
 		<PresetStats>1000,100,10,0,10,10,10,10</PresetStats>
 		<PresetHealthPotions>0</PresetHealthPotions>

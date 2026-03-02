@@ -4,7 +4,7 @@
 <Sheet name="dungeon_af42bf72-79b4-45ec-b395-23787589c698_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAINJREFUWIXtltENgCAMRMENulO38c8JHKw7MQJ+kRChSEUjMfe+7+jH0QPnMgJzdAZ69ZrOOg+8jCXQmnbddtV/9mhngI/pCUXTtC5A7kPw87BYDYE5koi/O3DUD57FdAFa4aXtr7VAqnsS8STi0QATM/Jhu3oCwHwUDaBtOGobgB9yAK3cTzMeGFDvAAAAAElFTkSuQmCC</Sheet>
 </SpriteSheets>
 <Objects>
-<Object type="0x5021" id="Wandering Oculus">
+<Object type="0x5021" id="displayname1 Wandering Oculus">
 	<AnimatedTexture>
 		<File>dungeon_af42bf72-79b4-45ec-b395-23787589c698_32x32_anim_0_0</File>
 		<Index>0</Index>
@@ -22,7 +22,7 @@
     <XpMult>0.05</XpMult>
     <Projectile id="0">
         <ObjectId>
-	<DisplayId>Wandering Oculus</DisplayId>Wandering Oculus Proj 0</ObjectId>
+	<DisplayId>Wandering Oculus</DisplayId>displayname1 Wandering Oculus Proj 0</ObjectId>
         <Speed>90</Speed>
         <MinDamage>35</MinDamage>
         <MaxDamage>55</MaxDamage>
@@ -32,7 +32,7 @@
     </Projectile>
     <Projectile id="1">
         <ObjectId>
-	<DisplayId>Wandering Oculus</DisplayId>Wandering Oculus Proj 1</ObjectId>
+	<DisplayId>Wandering Oculus</DisplayId>displayname1 Wandering Oculus Proj 1</ObjectId>
         <Speed>55</Speed>
         <Damage>40</Damage>
         <Size>55</Size>
@@ -43,7 +43,7 @@
         <PassesCover/>
     </Projectile>
 </Object>
-<Object type="0x497c" id="Wandering Oculus Proj 0">
+<Object type="0x497c" id="displayname1 Wandering Oculus Proj 0">
 	<Class>Projectile</Class>
 	<Texture>
 		<File>dungeon_af42bf72-79b4-45ec-b395-23787589c698_8x8</File>
@@ -51,7 +51,7 @@
 	</Texture>
 	<AngleCorrection>1</AngleCorrection>
 </Object>
-<Object type="0x497d" id="Wandering Oculus Proj 1">
+<Object type="0x497d" id="displayname1 Wandering Oculus Proj 1">
 	<Class>Projectile</Class>
 	<Texture>
 		<File>dungeon_af42bf72-79b4-45ec-b395-23787589c698_8x8</File>
@@ -59,7 +59,7 @@
 	</Texture>
 	<AngleCorrection>1</AngleCorrection>
 </Object>
-<Object type="0x497e" id="Fangblade of the Hollow King Proj 0">
+<Object type="0x497e" id="displayname1 Fangblade of the Hollow King Proj 0">
 	<Class>Projectile</Class>
 	<Texture>
 		<File>dungeon_af42bf72-79b4-45ec-b395-23787589c698_8x8</File>
@@ -67,7 +67,7 @@
 	</Texture>
 	<AngleCorrection>1</AngleCorrection>
 </Object>
-<Object type="0x502f" id="Fangblade of the Hollow King">
+<Object type="0x502f" id="displayname1 Fangblade of the Hollow King">
 	<Texture>
 		<File>dungeon_af42bf72-79b4-45ec-b395-23787589c698_8x8</File>
 		<Index>2</Index>
@@ -86,7 +86,7 @@
         <ArcGap>8</ArcGap>
         <Projectile>
             <ObjectId>
-	<DisplayId>Fangblade of the Hollow King</DisplayId>Fangblade of the Hollow King Proj 0</ObjectId>
+	<DisplayId>Fangblade of the Hollow King</DisplayId>displayname1 Fangblade of the Hollow King Proj 0</ObjectId>
             <Speed>85</Speed>
             <MinDamage>120</MinDamage>
             <MaxDamage>235</MaxDamage>
