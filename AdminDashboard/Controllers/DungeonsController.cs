@@ -690,32 +690,49 @@ namespace AdminDashboard.Controllers
                             mobs[i]["xml"] = rawXml;
                         }
 
-                        // Item projectiles: same treatment
+                        // Item projectiles: items use <Projectile> (no id attribute) for single projectile,
+                        // or <Projectile id="N"> for multiple. Handle both formats.
                         for (int i = 0; i < items!.Count; i++)
                         {
                             var rawXml = items[i]["xml"]?.ToString() ?? "";
                             var itemName = Regex.Match(rawXml, @"id=""([^""]+)""").Groups[1].Value;
                             if (string.IsNullOrEmpty(itemName)) continue;
 
-                            var projMatches = Regex.Matches(rawXml, @"<Projectile\s+id=""(\d+)""");
-                            if (projMatches.Count == 0) continue;
-
                             pdItemProjSpriteIndices.TryGetValue(i, out var customProjMap);
 
-                            foreach (Match pm in projMatches)
+                            // First try numbered projectiles: <Projectile id="N">
+                            var projMatches = Regex.Matches(rawXml, @"<Projectile\s+id=""(\d+)""");
+                            if (projMatches.Count > 0)
                             {
-                                var projId = pm.Groups[1].Value;
-                                var projName = $"{itemName} Proj {projId}";
+                                foreach (Match pm in projMatches)
+                                {
+                                    var projId = pm.Groups[1].Value;
+                                    var projName = $"{itemName} Proj {projId}";
 
+                                    projTypeCodes[projName] = projNextType;
+                                    projNextType++;
+
+                                    rawXml = Regex.Replace(
+                                        rawXml,
+                                        $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
+                                        $"${{1}}{EscapeXml(projName)}${{2}}"
+                                    );
+                                }
+                            }
+                            // Then handle bare <Projectile> (no id attr) — typical for items
+                            else if (Regex.IsMatch(rawXml, @"<Projectile\s*>"))
+                            {
+                                var projName = $"{itemName} Proj 0";
                                 projTypeCodes[projName] = projNextType;
                                 projNextType++;
 
                                 rawXml = Regex.Replace(
                                     rawXml,
-                                    $@"(<Projectile\s+id=""{Regex.Escape(projId)}""[^>]*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
+                                    @"(<Projectile\s*>[\s\S]*?<ObjectId>)[^<]+(</ObjectId>)",
                                     $"${{1}}{EscapeXml(projName)}${{2}}"
                                 );
                             }
+                            else continue;
 
                             items[i]["xml"] = rawXml;
                         }
