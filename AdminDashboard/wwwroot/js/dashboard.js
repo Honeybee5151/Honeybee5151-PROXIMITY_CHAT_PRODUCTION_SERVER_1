@@ -1530,6 +1530,22 @@ function renderPreview(data) {
             html += `<span class="stat-tag" style="opacity:0.5;">${mob.spriteSize}x${mob.spriteSize}</span>`;
             html += `</div>`;
 
+            // Projectile info from XML
+            if (mob.projectiles && mob.projectiles.length > 0) {
+                html += `<div class="preview-stats" style="margin-top:4px;">`;
+                for (const p of mob.projectiles) {
+                    let label = p.objectId ? esc(p.objectId) : 'proj #' + esc(p.id);
+                    let dmg = '';
+                    if (p.minDamage && p.maxDamage) dmg = ` ${p.minDamage}-${p.maxDamage}`;
+                    else if (p.maxDamage) dmg = ` ${p.maxDamage}`;
+                    const sprSrc = mob.projectileSprites && mob.projectileSprites[p.id];
+                    html += `<span class="stat-tag" style="background:#2d1a2e;color:#e879f9;">`;
+                    if (sprSrc) html += `<img src="${sprSrc}" style="width:12px;height:12px;image-rendering:pixelated;vertical-align:middle;margin-right:3px;cursor:zoom-in;" onclick="event.stopPropagation();expandSprite(this.src, '${esc(mob.name)} — proj ${esc(p.id)}')">`;
+                    html += `${label}${dmg}</span>`;
+                }
+                html += `</div>`;
+            }
+
             // Loot drops
             if (mob.loot && mob.loot.length > 0) {
                 html += `<div class="preview-loot">`;
@@ -1590,6 +1606,22 @@ function renderPreview(data) {
             if (item.statBonuses && item.statBonuses.length > 0) {
                 html += `<div class="preview-stats">`;
                 for (const b of item.statBonuses) html += `<span class="stat-tag stat-bonus">${esc(b)}</span>`;
+                html += `</div>`;
+            }
+
+            // Projectile info from XML
+            if (item.projectiles && item.projectiles.length > 0) {
+                html += `<div class="preview-stats" style="margin-top:4px;">`;
+                for (const p of item.projectiles) {
+                    let label = p.objectId ? esc(p.objectId) : 'proj #' + esc(p.id);
+                    let dmg = '';
+                    if (p.minDamage && p.maxDamage) dmg = ` ${p.minDamage}-${p.maxDamage}`;
+                    else if (p.maxDamage) dmg = ` ${p.maxDamage}`;
+                    const sprSrc = item.projectileSprites && item.projectileSprites[p.id];
+                    html += `<span class="stat-tag" style="background:#2d1a2e;color:#e879f9;">`;
+                    if (sprSrc) html += `<img src="${sprSrc}" style="width:12px;height:12px;image-rendering:pixelated;vertical-align:middle;margin-right:3px;cursor:zoom-in;" onclick="event.stopPropagation();expandSprite(this.src, '${esc(item.name)} — proj ${esc(p.id)}')">`;
+                    html += `${label}${dmg}</span>`;
+                }
                 html += `</div>`;
             }
 

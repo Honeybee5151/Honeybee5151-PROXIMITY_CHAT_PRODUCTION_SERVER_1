@@ -87,6 +87,7 @@ namespace AdminDashboard.Controllers
 
                         // Parse mob stats from XML
                         int? hp = null, def = null, xpMult = null, size = null;
+                        var mobProjectiles = new List<object>();
                         try
                         {
                             if (!string.IsNullOrEmpty(xml))
@@ -96,6 +97,18 @@ namespace AdminDashboard.Controllers
                                 def = (int?)xDoc.Element("Defense");
                                 xpMult = (int?)xDoc.Element("XpMult");
                                 size = (int?)xDoc.Element("Size");
+                                foreach (var proj in xDoc.Elements("Projectile"))
+                                {
+                                    mobProjectiles.Add(new
+                                    {
+                                        id = (string)proj.Attribute("id") ?? "0",
+                                        objectId = (string)proj.Element("ObjectId"),
+                                        minDamage = (string)proj.Element("MinDamage"),
+                                        maxDamage = (string)proj.Element("MaxDamage"),
+                                        speed = (string)proj.Element("Speed"),
+                                        lifetime = (string)proj.Element("LifetimeMS"),
+                                    });
+                                }
                             }
                         }
                         catch { /* ignore parse errors */ }
@@ -119,10 +132,12 @@ namespace AdminDashboard.Controllers
                         {
                             name = string.IsNullOrEmpty(name) ? "Unknown Mob" : name,
                             xml,
+                            sprites = mob["sprites"] as JArray,
                             spriteBase = (mob["spriteBase"] ?? mob["sprite"])?.ToString(),
                             spriteAttack = mob["spriteAttack"]?.ToString(),
                             spriteSize = mob["spriteSize"]?.Value<int>() ?? 8,
                             projectileSprites = mob["projectileSprites"] as JObject,
+                            projectiles = mobProjectiles,
                             hp,
                             def,
                             xpMult,
@@ -147,6 +162,7 @@ namespace AdminDashboard.Controllers
                         double? rateOfFire = null, range = null;
                         int? numProjectile = null;
                         var statBonuses = new List<string>();
+                        var itemProjectiles = new List<object>();
                         try
                         {
                             if (!string.IsNullOrEmpty(xml))
@@ -159,16 +175,28 @@ namespace AdminDashboard.Controllers
                                 rateOfFire = (double?)xDoc.Element("RateOfFire");
                                 numProjectile = (int?)xDoc.Element("NumProjectile");
 
-                                var proj = xDoc.Element("Projectile");
-                                if (proj != null)
+                                foreach (var proj in xDoc.Elements("Projectile"))
                                 {
                                     var minDmg = (string)proj.Element("MinDamage");
                                     var maxDmg = (string)proj.Element("MaxDamage");
-                                    range = (double?)proj.Element("Range");
-                                    if (minDmg != null && maxDmg != null)
-                                        damage = $"{minDmg}-{maxDmg}";
-                                    else if (maxDmg != null)
-                                        damage = maxDmg;
+                                    var projRange = (double?)proj.Element("Range");
+                                    if (range == null) range = projRange;
+                                    if (damage == null)
+                                    {
+                                        if (minDmg != null && maxDmg != null)
+                                            damage = $"{minDmg}-{maxDmg}";
+                                        else if (maxDmg != null)
+                                            damage = maxDmg;
+                                    }
+                                    itemProjectiles.Add(new
+                                    {
+                                        id = (string)proj.Attribute("id") ?? "0",
+                                        objectId = (string)proj.Element("ObjectId"),
+                                        minDamage = minDmg,
+                                        maxDamage = maxDmg,
+                                        speed = (string)proj.Element("Speed"),
+                                        lifetime = (string)proj.Element("LifetimeMS"),
+                                    });
                                 }
 
                                 foreach (var act in xDoc.Elements("ActivateOnEquip"))
@@ -191,6 +219,7 @@ namespace AdminDashboard.Controllers
                             xml,
                             sprite = item["sprite"]?.ToString(),
                             projectileSprites = item["projectileSprites"] as JObject,
+                            projectiles = itemProjectiles,
                             slotType,
                             tier,
                             bagType,
