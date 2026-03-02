@@ -805,16 +805,16 @@ namespace AdminDashboard.Controllers
 
                                 // Ensure <Enemy/> tag is present (required for server to spawn mob)
                                 if (!xml.Contains("<Enemy/>") && !xml.Contains("<Enemy />"))
-                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Enemy/>");
+                                    xml = Regex.Replace(xml, @"(<Object\s[^>]*>)", "$1\n\t<Enemy/>");
 
                                 // Auto-inject <Quest/> for boss mobs (triggers boss health bar in client)
                                 var isBoss = mobs[i]["isBoss"]?.Value<bool>() ?? false;
                                 if (isBoss && !xml.Contains("<Quest/>") && !xml.Contains("<Quest />"))
-                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", "$1\n\t<Quest/>");
+                                    xml = Regex.Replace(xml, @"(<Object\s[^>]*>)", "$1\n\t<Quest/>");
 
                                 // Inject <DisplayId> with the creator's original name (before any auto-rename)
                                 if (originalMobNames.TryGetValue(i, out var origMobName) && !xml.Contains("<DisplayId>"))
-                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origMobName)}</DisplayId>");
+                                    xml = Regex.Replace(xml, @"(<Object\s[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origMobName)}</DisplayId>");
 
                                 // Save processed block (with type code) for DungeonAssets
                                 processedMobBlocks.Add((i, xml.Trim()));
@@ -868,7 +868,7 @@ namespace AdminDashboard.Controllers
 
                                 // Inject <DisplayId> with the creator's original name (before any auto-rename)
                                 if (originalItemNames.TryGetValue(i, out var origItemName) && !xml.Contains("<DisplayId>"))
-                                    xml = Regex.Replace(xml, @"(<Object[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origItemName)}</DisplayId>");
+                                    xml = Regex.Replace(xml, @"(<Object\s[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origItemName)}</DisplayId>");
 
                                 // Save processed block (with type code) for DungeonAssets
                                 processedItemBlocks.Add((i, xml.Trim()));
