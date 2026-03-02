@@ -1484,33 +1484,33 @@ function renderPreview(data) {
             const spriteScale = 64;
             html += `<div class="preview-entity">`;
 
-            // Sprites (idle + attack + projectiles)
-            // Helper: get first frame from sprite entry (handles animated strips)
-            function getSprIcon(spr) {
-                if (!spr) return null;
-                if (spr.animated && spr.frames && spr.frames[0] && spr.frames[0][0]) return spr.frames[0][0];
-                return spr.data || null;
-            }
-            html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
-            // Support new sprites[] array and legacy spriteBase/spriteAttack
-            const sprBase = (mob.sprites && mob.sprites[0]) ? getSprIcon(mob.sprites[0]) : mob.spriteBase;
-            const sprAtk = (mob.sprites && mob.sprites[1]) ? getSprIcon(mob.sprites[1]) : mob.spriteAttack;
-            if (sprBase) {
-                html += `<div style="text-align:center;"><img src="${sprBase}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Base/Idle"><div style="font-size:10px;color:#666;">idle</div></div>`;
-            }
-            if (sprAtk) {
-                html += `<div style="text-align:center;"><img src="${sprAtk}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Attack"><div style="font-size:10px;color:#666;">attack</div></div>`;
-            }
-            // Show additional sprites beyond base+attack
-            if (mob.sprites && mob.sprites.length > 2) {
-                for (let s = 2; s < mob.sprites.length; s++) {
-                    const sprN = getSprIcon(mob.sprites[s]);
-                    if (sprN) html += `<div style="text-align:center;"><img src="${sprN}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="${esc(mob.sprites[s].name || 'alt ' + s)}"><div style="font-size:10px;color:#666;">${esc(mob.sprites[s].name || 'alt ' + s)}</div></div>`;
+            // Sprites — show full strips for review (security), with label
+            html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+            if (mob.sprites && mob.sprites.length > 0) {
+                for (let s = 0; s < mob.sprites.length; s++) {
+                    const spr = mob.sprites[s];
+                    if (!spr || !spr.data) continue;
+                    const label = spr.name || (s === 0 ? 'base' : s === 1 ? 'attack' : 'alt ' + s);
+                    const isAnim = spr.animated;
+                    html += `<div style="text-align:left;">`;
+                    html += `<div style="font-size:10px;color:#888;margin-bottom:2px;">${esc(label)}${isAnim ? ' (animated strip)' : ''}</div>`;
+                    // Full strip at natural size, scaled up with pixelated rendering
+                    html += `<img src="${spr.data}" style="image-rendering:pixelated;max-width:100%;height:${spriteScale}px;" title="${esc(label)} — full sprite">`;
+                    html += `</div>`;
+                }
+            } else {
+                // Legacy spriteBase/spriteAttack
+                if (mob.spriteBase) {
+                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">idle</div><img src="${mob.spriteBase}" style="image-rendering:pixelated;height:${spriteScale}px;" title="Base/Idle"></div>`;
+                }
+                if (mob.spriteAttack) {
+                    html += `<div><div style="font-size:10px;color:#888;margin-bottom:2px;">attack</div><img src="${mob.spriteAttack}" style="image-rendering:pixelated;height:${spriteScale}px;" title="Attack"></div>`;
+                }
+                if (!mob.spriteBase && !mob.spriteAttack) {
+                    html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
                 }
             }
-            if (!sprBase && !sprAtk) {
-                html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
-            }
+            html += '</div>';
             // Projectile sprites
             if (mob.projectileSprites) {
                 for (const [projId, src] of Object.entries(mob.projectileSprites)) {
