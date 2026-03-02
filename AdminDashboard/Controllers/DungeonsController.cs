@@ -275,7 +275,7 @@ namespace AdminDashboard.Controllers
                         tileList.Add(new { hex = prop.Name, id = prop.Value.ToString() });
                 }
 
-                return Ok(new
+                var response = new
                 {
                     id,
                     title = dungeon["title"]?.ToString(),
@@ -287,9 +287,16 @@ namespace AdminDashboard.Controllers
                     mapGroundThumbnail,
                     mapObjectsThumbnail,
                     customTiles = tileList,
-                    startingEquipment = dungeon["starting_equipment"] as JArray,
+                    startingEquipment = dungeon["starting_equipment"],
                     characterPreset = dungeon["character_preset"],
+                };
+                // Use Newtonsoft serializer to handle JToken/JObject/JArray fields properly
+                var json = JsonConvert.SerializeObject(response, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
                 });
+                return Content(json, "application/json");
             }
             catch (Exception ex)
             {
