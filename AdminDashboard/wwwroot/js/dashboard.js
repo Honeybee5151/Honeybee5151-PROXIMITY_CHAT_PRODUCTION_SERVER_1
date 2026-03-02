@@ -1485,14 +1485,30 @@ function renderPreview(data) {
             html += `<div class="preview-entity">`;
 
             // Sprites (idle + attack + projectiles)
+            // Helper: get first frame from sprite entry (handles animated strips)
+            function getSprIcon(spr) {
+                if (!spr) return null;
+                if (spr.animated && spr.frames && spr.frames[0] && spr.frames[0][0]) return spr.frames[0][0];
+                return spr.data || null;
+            }
             html += '<div style="display:flex;gap:6px;align-items:flex-start;">';
-            if (mob.spriteBase) {
-                html += `<div style="text-align:center;"><img src="${mob.spriteBase}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Base/Idle"><div style="font-size:10px;color:#666;">idle</div></div>`;
+            // Support new sprites[] array and legacy spriteBase/spriteAttack
+            const sprBase = (mob.sprites && mob.sprites[0]) ? getSprIcon(mob.sprites[0]) : mob.spriteBase;
+            const sprAtk = (mob.sprites && mob.sprites[1]) ? getSprIcon(mob.sprites[1]) : mob.spriteAttack;
+            if (sprBase) {
+                html += `<div style="text-align:center;"><img src="${sprBase}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Base/Idle"><div style="font-size:10px;color:#666;">idle</div></div>`;
             }
-            if (mob.spriteAttack) {
-                html += `<div style="text-align:center;"><img src="${mob.spriteAttack}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Attack"><div style="font-size:10px;color:#666;">attack</div></div>`;
+            if (sprAtk) {
+                html += `<div style="text-align:center;"><img src="${sprAtk}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="Attack"><div style="font-size:10px;color:#666;">attack</div></div>`;
             }
-            if (!mob.spriteBase && !mob.spriteAttack) {
+            // Show additional sprites beyond base+attack
+            if (mob.sprites && mob.sprites.length > 2) {
+                for (let s = 2; s < mob.sprites.length; s++) {
+                    const sprN = getSprIcon(mob.sprites[s]);
+                    if (sprN) html += `<div style="text-align:center;"><img src="${sprN}" class="preview-sprite" width="${spriteScale}" height="${spriteScale}" title="${esc(mob.sprites[s].name || 'alt ' + s)}"><div style="font-size:10px;color:#666;">${esc(mob.sprites[s].name || 'alt ' + s)}</div></div>`;
+                }
+            }
+            if (!sprBase && !sprAtk) {
                 html += `<div class="preview-sprite" style="width:${spriteScale}px;height:${spriteScale}px;display:flex;align-items:center;justify-content:center;color:#555;font-size:20px;">?</div>`;
             }
             // Projectile sprites
