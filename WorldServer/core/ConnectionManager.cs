@@ -214,7 +214,12 @@ namespace WorldServer.core
                     ShowDisplays = world.ShowDisplays,
                     DisableShooting = world.DisableShooting,
                     DisableAbilities = world.DisableAbilities,
-                    CommunityDungeon = world.IsCommunityDungeon
+                    CommunityDungeon = world.IsCommunityDungeon,
+                    //editor8182381 — Darkness zone
+                    DarknessZoneCenterX = world.DarknessZoneCenterX,
+                    DarknessZoneCenterY = world.DarknessZoneCenterY,
+                    DarknessZoneInnerRadius = world.DarknessZoneInnerRadius,
+                    DarknessZoneOuterRadius = world.DarknessZoneOuterRadius
                 }
             };
 

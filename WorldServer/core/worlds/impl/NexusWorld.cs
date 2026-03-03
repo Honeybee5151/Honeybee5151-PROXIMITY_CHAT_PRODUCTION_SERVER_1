@@ -37,6 +37,12 @@ namespace WorldServer.core.worlds.impl
 
         public override void Init()
         {
+            //editor8182381 — Darkness zone: darken screen outside nexus center area
+            DarknessZoneCenterX = Map.Width / 2f;
+            DarknessZoneCenterY = Map.Height / 2f;
+            DarknessZoneInnerRadius = 40f;
+            DarknessZoneOuterRadius = 60f;
+
             foreach (var shop in MerchantLists.Shops)
                 foreach (var data in Map.Regions.Where(r => shop.Key == r.Value))
                     _inactiveStorePoints.Add(new MerchantData()

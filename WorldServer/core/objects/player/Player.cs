@@ -549,7 +549,10 @@ namespace WorldServer.core.objects
                         var json = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>((string)value);
                         string rankName = json?.rankName;
                         if (!string.IsNullOrEmpty(rankName))
+                        {
                             SendInfo($"Thank you for your purchase! You are now a {rankName}!");
+                            SendInfo("Go to the title-menu and reenter for your rank.");
+                        }
                         db.KeyDelete(key);
                         _checkedRankNotification = true;
                     }

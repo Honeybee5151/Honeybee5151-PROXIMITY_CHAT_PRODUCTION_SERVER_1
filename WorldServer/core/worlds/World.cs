@@ -66,6 +66,12 @@ namespace WorldServer.core.worlds
         public int PresetManaPotions { get; set; }
         public bool PresetHasBackpack { get; set; }
 
+        //editor8182381 — Darkness zone: progressive screen darkening outside safe radius
+        public float DarknessZoneCenterX { get; protected set; }
+        public float DarknessZoneCenterY { get; protected set; }
+        public float DarknessZoneInnerRadius { get; protected set; }
+        public float DarknessZoneOuterRadius { get; protected set; }
+
         public readonly Wmap Map;
         public readonly GameServer GameServer;
         public bool ShowDisplays { get; protected set; }

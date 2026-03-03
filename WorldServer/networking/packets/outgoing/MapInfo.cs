@@ -18,6 +18,11 @@ namespace WorldServer.networking.packets.outgoing
         public bool DisableAbilities { get; set; }
         public bool CommunityDungeon { get; set; }
 
+        //editor8182381 — Darkness zone fields
+        public float DarknessZoneCenterX { get; set; }
+        public float DarknessZoneCenterY { get; set; }
+        public float DarknessZoneInnerRadius { get; set; }
+        public float DarknessZoneOuterRadius { get; set; }
 
         public override MessageId MessageId => MessageId.MAPINFO;
 
@@ -36,6 +41,11 @@ namespace WorldServer.networking.packets.outgoing
             wtr.Write(DisableShooting);
             wtr.Write(DisableAbilities);
             wtr.Write(CommunityDungeon);
+            //editor8182381 — Darkness zone
+            wtr.Write(DarknessZoneCenterX);
+            wtr.Write(DarknessZoneCenterY);
+            wtr.Write(DarknessZoneInnerRadius);
+            wtr.Write(DarknessZoneOuterRadius);
         }
     }
 }
