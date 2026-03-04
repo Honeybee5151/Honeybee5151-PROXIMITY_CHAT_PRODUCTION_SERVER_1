@@ -36,7 +36,8 @@ namespace App.Controllers
                 var skinDesc = _core.Resources.GameData.Skins[type];
                 var classStats = _core.Database.ReadClassStats(acc);
 
-                if (skinDesc.UnlockLevel > classStats[skinDesc.PlayerClassType].BestLevel || skinDesc.Cost > acc.Credits)
+                //editor8182381 — check rank requirement + level + cost
+                if (skinDesc.UnlockLevel > classStats[skinDesc.PlayerClassType].BestLevel || skinDesc.Cost > acc.Credits || acc.Rank < skinDesc.RequiredRank)
                 {
                     Response.CreateError("Failed to purchase skin");
                     return;

@@ -10,6 +10,7 @@ namespace Shared.resources
         public readonly int Size;
         public readonly ushort Type;
         public readonly int UnlockLevel;
+        public readonly int RequiredRank; //editor8182381 — donation rank required (0=none)
 
         public string ObjectId;
 
@@ -21,6 +22,7 @@ namespace Shared.resources
             UnlockLevel = e.GetValue<int>("UnlockLevel");
             Cost = e.GetValue("Cost", 300);
             Size = e.GetValue("Size", 100);
+            RequiredRank = e.GetValue("RequiredRank", 0); //editor8182381
         }
     }
 }
