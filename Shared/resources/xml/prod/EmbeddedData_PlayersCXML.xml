@@ -4,8 +4,8 @@
 		<Class>Player</Class>
 		<Description>A stealthy assassin who strikes from the shadows. Masters of deception, Rogues can turn invisible to bypass enemies and deliver devastating sneak attacks.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>0</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/rogue_hit</HitSound>
 		<DeathSound>player/rogue_death</DeathSound>
@@ -35,8 +35,8 @@
 		<Class>Player</Class>
 		<Description>A skilled marksman who rains arrows upon foes from a distance. Archers use quivers to enhance their shots with devastating effects.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>1</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/archer_hit</HitSound>
 		<DeathSound>player/archer_death</DeathSound>
@@ -66,8 +66,8 @@
 		<Class>Player</Class>
 		<Description>A master of the arcane arts who unleashes devastating spells. Wizards deal massive area damage with spell bombs, making them the ultimate glass cannons.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>2</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/wizard_hit</HitSound>
 		<DeathSound>player/wizard_death</DeathSound>
@@ -97,8 +97,8 @@
 		<Class>Player</Class>
 		<Description>A holy healer who supports allies with restorative powers. Priests wield tomes to heal nearby players and can sustain entire groups through dangerous encounters.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>3</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/priest_hit</HitSound>
 		<DeathSound>player/priest_death</DeathSound>
@@ -128,8 +128,8 @@
 		<Class>Player</Class>
 		<Description>A holy warrior who combines martial prowess with divine magic. Paladins use seals to heal and boost their allies while fighting on the front lines.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>4</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/warrior_hit</HitSound>
 		<DeathSound>player/warrior_death</DeathSound>
@@ -159,8 +159,8 @@
 		<Class>Player</Class>
 		<Description>A deadly killer who poisons enemies with toxic attacks. Assassins use poison vials to inflict damage over time while staying mobile and evasive.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>5</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/knight_hit</HitSound>
 		<DeathSound>player/knight_death</DeathSound>
@@ -190,8 +190,8 @@
 		<Class>Player</Class>
 		<Description>A dark mage who drains the life force of enemies. Necromancers use skulls to steal health from groups of foes, sustaining themselves through dark magic.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>6</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/paladin_hit</HitSound>
 		<DeathSound>player/paladin_death</DeathSound>
@@ -221,8 +221,8 @@
 		<Class>Player</Class>
 		<Description>A fierce hunter who traps enemies with magical snares. Huntresses throw traps that slow and damage foes, controlling the battlefield from range.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>7</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/rogue_hit</HitSound>
 		<DeathSound>player/rogue_death</DeathSound>
@@ -252,8 +252,8 @@
 		<Class>Player</Class>
 		<Description>An enigmatic spellcaster who bends reality with orbs of power. Mystics can stasis enemies, freezing them in time and controlling the flow of battle.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>8</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/wizard_hit</HitSound>
 		<DeathSound>player/wizard_death</DeathSound>
@@ -283,8 +283,8 @@
 		<Class>Player</Class>
 		<Description>A cunning illusionist who confuses enemies with decoys. Tricksters create teleporting prisms that distract foes and allow swift repositioning.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>9</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/archer_hit</HitSound>
 		<DeathSound>player/archer_death</DeathSound>
@@ -314,8 +314,8 @@
 		<Class>Player</Class>
 		<Description>A wielder of ancient scepters who commands chain lightning. Sorcerers unleash electrical attacks that jump between enemies, devastating entire groups.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>10</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/wizard_hit</HitSound>
 		<DeathSound>player/wizard_death</DeathSound>
@@ -345,8 +345,8 @@
 		<Class>Player</Class>
 		<Description>A swift shadow warrior who strikes with deadly precision. Ninjas throw shuriken stars and can dash through enemies with blazing speed.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>11</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/rogue_hit</HitSound>
 		<DeathSound>player/rogue_death</DeathSound>
@@ -376,8 +376,8 @@
 		<Class>Player</Class>
 		<Description>A mighty frontline fighter who leads the charge into battle. Warriors use helms to boost their attack speed and power, overwhelming foes with brute force.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>14</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/warrior_hit</HitSound>
 		<DeathSound>player/warrior_death</DeathSound>
@@ -407,8 +407,8 @@
 		<Class>Player</Class>
 		<Description>An armored champion who shields allies from harm. Knights use their shields to stun enemies and boast the highest defense of any class.</Description>
 		<AnimatedTexture>
-			<File>players</File>
-			<Index>15</Index>
+			<File>playerskins</File>
+			<Index>583</Index>
 		</AnimatedTexture>
 		<HitSound>player/archer_hit</HitSound>
 		<DeathSound>player/archer_death</DeathSound>
