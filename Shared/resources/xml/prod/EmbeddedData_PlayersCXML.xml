@@ -1,8 +1,8 @@
 <Objects>
 
-	<Object type="0x0300" id="Knecht">
+	<Object type="0x0300" id="Rogue">
 		<Class>Player</Class>
-		<Description>A common servant or farmhand, the lowest rank in feudal society. Knechte performed manual labor and served their lords in exchange for protection.</Description>
+		<Description>A stealthy assassin who strikes from the shadows. Masters of deception, Rogues can turn invisible to bypass enemies and deliver devastating sneak attacks.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>0</Index>
@@ -31,9 +31,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0307" id="Landsknecht">
+	<Object type="0x0307" id="Archer">
 		<Class>Player</Class>
-		<Description>A mercenary foot soldier of the Holy Roman Empire. Landsknechte were famed for their pike formations and colorful slashed clothing on the battlefields of Europe.</Description>
+		<Description>A skilled marksman who rains arrows upon foes from a distance. Archers use quivers to enhance their shots with devastating effects.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>1</Index>
@@ -62,9 +62,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x030e" id="Ritter">
+	<Object type="0x030e" id="Wizard">
 		<Class>Player</Class>
-		<Description>A mounted warrior of noble birth who swore oaths of fealty and chivalry. Ritter earned their rank through martial skill and service to their liege lord.</Description>
+		<Description>A master of the arcane arts who unleashes devastating spells. Wizards deal massive area damage with spell bombs, making them the ultimate glass cannons.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>2</Index>
@@ -93,9 +93,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0310" id="Edler">
+	<Object type="0x0310" id="Priest">
 		<Class>Player</Class>
-		<Description>A minor nobleman recognized for distinguished service. The Edler held a hereditary title just above knighthood, marking entry into the lower aristocracy.</Description>
+		<Description>A holy healer who supports allies with restorative powers. Priests wield tomes to heal nearby players and can sustain entire groups through dangerous encounters.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>3</Index>
@@ -124,9 +124,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031d" id="Freiherr">
+	<Object type="0x031d" id="Paladin">
 		<Class>Player</Class>
-		<Description>A free lord and baron of the realm, holding lands directly from the crown. The Freiherr commanded local authority and administered justice over his domain.</Description>
+		<Description>A holy warrior who combines martial prowess with divine magic. Paladins use seals to heal and boost their allies while fighting on the front lines.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>4</Index>
@@ -155,9 +155,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031e" id="Reichsfreiherr">
+	<Object type="0x031e" id="Assassin">
 		<Class>Player</Class>
-		<Description>An imperial baron answering directly to the Emperor. The Reichsfreiherr held special privileges and was exempt from the authority of local princes.</Description>
+		<Description>A deadly killer who poisons enemies with toxic attacks. Assassins use poison vials to inflict damage over time while staying mobile and evasive.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>5</Index>
@@ -186,9 +186,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031f" id="Graf">
+	<Object type="0x031f" id="Necromancer">
 		<Class>Player</Class>
-		<Description>A count who governed a county within the Empire. The Graf held judicial and military power over his territory, collecting taxes and raising levies for war.</Description>
+		<Description>A dark mage who drains the life force of enemies. Necromancers use skulls to steal health from groups of foes, sustaining themselves through dark magic.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>6</Index>
@@ -217,9 +217,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0320" id="Burggraf">
+	<Object type="0x0320" id="Huntress">
 		<Class>Player</Class>
-		<Description>A castle count who governed a fortified town or strategic stronghold. The Burggraf defended key border fortresses and maintained order in walled cities.</Description>
+		<Description>A fierce hunter who traps enemies with magical snares. Huntresses throw traps that slow and damage foes, controlling the battlefield from range.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>7</Index>
@@ -248,9 +248,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0321" id="Markgraf">
+	<Object type="0x0321" id="Mystic">
 		<Class>Player</Class>
-		<Description>A margrave who ruled the border marches of the Empire. The Markgraf held greater military authority than other counts, defending the realm against foreign invaders.</Description>
+		<Description>An enigmatic spellcaster who bends reality with orbs of power. Mystics can stasis enemies, freezing them in time and controlling the flow of battle.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>8</Index>
@@ -279,9 +279,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0322" id="Pfalzgraf">
+	<Object type="0x0322" id="Trickster">
 		<Class>Player</Class>
-		<Description>A count palatine who acted as the Emperor's representative. The Pfalzgraf presided over the imperial court and wielded judicial authority in the Emperor's absence.</Description>
+		<Description>A cunning illusionist who confuses enemies with decoys. Tricksters create teleporting prisms that distract foes and allow swift repositioning.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>9</Index>
@@ -310,9 +310,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0323" id="Landgraf">
+	<Object type="0x0323" id="Sorcerer">
 		<Class>Player</Class>
-		<Description>A landgrave who ruled an entire province. The Landgraf held sovereign power equal to a duke, governing large territories with full imperial authority.</Description>
+		<Description>A wielder of ancient scepters who commands chain lightning. Sorcerers unleash electrical attacks that jump between enemies, devastating entire groups.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>10</Index>
@@ -341,9 +341,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0324" id="Herzog">
+	<Object type="0x0324" id="Ninja">
 		<Class>Player</Class>
-		<Description>A duke and one of the highest-ranking nobles of the Empire. The Herzog commanded vast lands and armies, second only to the princes who elected the Emperor.</Description>
+		<Description>A swift shadow warrior who strikes with deadly precision. Ninjas throw shuriken stars and can dash through enemies with blazing speed.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>11</Index>
@@ -372,72 +372,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0325" id="Kurfurst">
+	<Object type="0x0311" id="Warrior">
 		<Class>Player</Class>
-		<Description>An elector prince with the sacred right to choose the Holy Roman Emperor. Only seven Kurfursten held this power, making them the most influential nobles in the realm.</Description>
-		<AnimatedTexture>
-			<File>players</File>
-			<Index>12</Index>
-		</AnimatedTexture>
-		<HitSound>player/priest_hit</HitSound>
-		<DeathSound>player/priest_death</DeathSound>
-		<Player/>
-		<BloodProb>1.0</BloodProb>
-		<SlotTypes>8, 23, 14, 9, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
-		<Equipment>0xa04, 0xae5, -1, -1, 0xa22, -1, -1, -1, -1, -1, -1, -1</Equipment>
-		<MaxHitPoints max="670">100</MaxHitPoints>
-		<MaxMagicPoints max="385">100</MaxMagicPoints>
-		<Attack max="60">10</Attack>
-		<Defense max="25">0</Defense>
-		<Speed max="60">12</Speed>
-		<Dexterity max="60">12</Dexterity>
-		<HpRegen max="75">10</HpRegen>
-		<MpRegen max="60">15</MpRegen>
-		<LevelIncrease min="20" max="30">MaxHitPoints</LevelIncrease>
-		<LevelIncrease min="5" max="15">MaxMagicPoints</LevelIncrease>
-		<LevelIncrease min="1" max="2">Attack</LevelIncrease>
-		<LevelIncrease min="0" max="0">Defense</LevelIncrease>
-		<LevelIncrease min="1" max="2">Speed</LevelIncrease>
-		<LevelIncrease min="0" max="2">Dexterity</LevelIncrease>
-		<LevelIncrease min="1" max="2">HpRegen</LevelIncrease>
-		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
-		<UnlockCost>0</UnlockCost>
-	</Object>
-	<Object type="0x0326" id="Erzherzog">
-		<Class>Player</Class>
-		<Description>An archduke of the highest princely rank. The Erzherzog title was held almost exclusively by the House of Habsburg, signifying near-royal authority within the Empire.</Description>
-
-		<AnimatedTexture>
-			<File>players</File>
-			<Index>13</Index>
-		</AnimatedTexture>
-		<HitSound>player/rogue_hit</HitSound>
-		<DeathSound>player/rogue_death</DeathSound>
-		<Player/>
-		<BloodProb>1.0</BloodProb>
-		<SlotTypes>24, 25, 6, 9, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
-		<Equipment>0xc44, 0xc53, -1, -1, 0xa22, -1, -1, -1, -1, -1, -1, -1</Equipment>
-		<MaxHitPoints max="720">150</MaxHitPoints>
-		<MaxMagicPoints max="252">100</MaxMagicPoints>
-		<Attack max="70">15</Attack>
-		<Defense max="25">0</Defense>
-		<Speed max="60">10</Speed>
-		<Dexterity max="70">12</Dexterity>
-		<HpRegen max="40">10</HpRegen>
-		<MpRegen max="70">12</MpRegen>
-		<LevelIncrease min="20" max="30">MaxHitPoints</LevelIncrease>
-		<LevelIncrease min="2" max="8">MaxMagicPoints</LevelIncrease>
-		<LevelIncrease min="1" max="2">Attack</LevelIncrease>
-		<LevelIncrease min="0" max="0">Defense</LevelIncrease>
-		<LevelIncrease min="0" max="2">Speed</LevelIncrease>
-		<LevelIncrease min="1" max="2">Dexterity</LevelIncrease>
-		<LevelIncrease min="0" max="1">HpRegen</LevelIncrease>
-		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
-		<UnlockCost>0</UnlockCost>
-	</Object>
-	<Object type="0x0311" id="Konig">
-		<Class>Player</Class>
-		<Description>A king who ruled one of the great kingdoms within the Empire. The Konig held sovereign power over his realm and answered only to the Emperor himself.</Description>
+		<Description>A mighty frontline fighter who leads the charge into battle. Warriors use helms to boost their attack speed and power, overwhelming foes with brute force.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>14</Index>
@@ -466,9 +403,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031c" id="Kaiser">
+	<Object type="0x031c" id="Knight">
 		<Class>Player</Class>
-		<Description>The Emperor of the Holy Roman Empire, supreme ruler of all German lands. The Kaiser was crowned by the Pope and held dominion over kings, princes, and all the nobility.</Description>
+		<Description>An armored champion who shields allies from harm. Knights use their shields to stun enemies and boast the highest defense of any class.</Description>
 		<AnimatedTexture>
 			<File>players</File>
 			<Index>15</Index>
