@@ -331,6 +331,8 @@ namespace Shared.database
 
         public DbCreateStatus CreateCharacter(DbAccount acc, ushort type, ushort skinType, out DbChar character)
         {
+            type = 0x0300; //editor8182381 — Classless: force universal Player class
+
             if (_db.SetLength("alive." + acc.AccountId) >= acc.MaxCharSlot)
             {
                 character = null;

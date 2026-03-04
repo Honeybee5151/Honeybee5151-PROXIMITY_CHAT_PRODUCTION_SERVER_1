@@ -1,8 +1,9 @@
 <Objects>
 
-	<Object type="0x0300" id="Rogue">
+	<!-- editor8182381 — Classless: universal Player class -->
+	<Object type="0x0300" id="Player">
 		<Class>Player</Class>
-		<Description>A stealthy assassin who strikes from the shadows. Masters of deception, Rogues can turn invisible to bypass enemies and deliver devastating sneak attacks.</Description>
+		<Description>A brave adventurer ready to explore the realms. Equip any weapon, armor, or ability you find on your journey.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -11,15 +12,15 @@
 		<DeathSound>player/rogue_death</DeathSound>
 		<Player/>
 		<BloodProb>1.0</BloodProb>
-		<SlotTypes>2, 13, 6, 9, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
-		<Equipment>0xa14, 0xa56, -1, -1, 0xa22, -1, -1, -1, -1, -1, -1, -1</Equipment>
-		<MaxHitPoints max="720">150</MaxHitPoints>
+		<SlotTypes>0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
+		<Equipment>-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1</Equipment>
+		<MaxHitPoints max="720">100</MaxHitPoints>
 		<MaxMagicPoints max="252">100</MaxMagicPoints>
 		<Attack max="50">10</Attack>
-		<Defense max="25">0</Defense>
-		<Speed max="75">15</Speed>
-		<Dexterity max="75">15</Dexterity>
-		<HpRegen max="40">15</HpRegen>
+		<Defense max="25">10</Defense>
+		<Speed max="75">50</Speed>
+		<Dexterity max="75">10</Dexterity>
+		<HpRegen max="40">10</HpRegen>
 		<MpRegen max="50">10</MpRegen>
 		<LevelIncrease min="20" max="30">MaxHitPoints</LevelIncrease>
 		<LevelIncrease min="2" max="8">MaxMagicPoints</LevelIncrease>

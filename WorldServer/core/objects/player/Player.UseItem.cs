@@ -187,7 +187,7 @@ namespace WorldServer.core.objects
             }
             else
                 FameCounter.DrinkPot();
-            if (item.InvUse || item.Consumable || item.SlotType == slotType)
+            if (item.InvUse || item.Consumable || slotType == 0 || item.SlotType == slotType) //editor8182381 — Classless: slotType==0 means any item fits
             {
                 Activate(clientTime, time, item, slot, pos, objId, useType);
                 if (item.SlotType == slotType)
