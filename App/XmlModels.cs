@@ -355,6 +355,17 @@ namespace App
                 );
         }
 
+        //editor8182381 — Filter owned skins by account rank
+        public ushort[] GetRankFilteredSkins(CoreService core)
+        {
+            return Skins.Where(skinType =>
+            {
+                if (core.Resources.GameData.Skins.TryGetValue(skinType, out var skinDesc))
+                    return Rank >= skinDesc.RequiredRank;
+                return false;
+            }).ToArray();
+        }
+
         public XElement PotionsToXml()
         {
             return new XElement("StoredPotions", string.Join(",", StoredPotions));
@@ -601,7 +612,7 @@ namespace App
                     ),
                     Lat == null ? null : new XElement("Lat", Lat),
                     Long == null ? null : new XElement("Long", Long),
-                    Account.Skins.Length > 0 ? new XElement("OwnedSkins", Account.Skins.ToCommaSepString()) : null,
+                    Account.Skins.Length > 0 ? new XElement("OwnedSkins", Account.GetRankFilteredSkins(core).ToCommaSepString()) : null,
                     core.ItemCostsXml,
                     MaxLevelList.ToXml(core)
                 );

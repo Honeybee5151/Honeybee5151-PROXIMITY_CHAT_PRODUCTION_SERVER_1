@@ -124,9 +124,11 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0311" id="Warrior">
+	<!-- Hidden classes: not in client Players.xml so they won't appear in character select,
+	     but server needs definitions for skins/equipment/puppets that reference these types -->
+	<Object type="0x0311" id="Samurai">
 		<Class>Player</Class>
-		<Description>A mighty frontline fighter who leads the charge into battle. Warriors use helms to boost their attack speed and power, overwhelming foes with brute force.</Description>
+		<Description>A disciplined warrior who channels elemental power through ancient techniques.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -155,9 +157,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031c" id="Knight">
+	<Object type="0x031c" id="Bard">
 		<Class>Player</Class>
-		<Description>An armored champion who shields allies from harm. Knights use their shields to stun enemies and boast the highest defense of any class.</Description>
+		<Description>A versatile performer who inspires allies with enchanting melodies.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -186,9 +188,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031d" id="Paladin">
+	<Object type="0x031d" id="Warrior">
 		<Class>Player</Class>
-		<Description>A holy warrior who combines martial prowess with divine magic. Paladins use seals to heal and boost their allies while fighting on the front lines.</Description>
+		<Description>A mighty frontline fighter who leads the charge into battle. Warriors use helms to boost their attack speed and power, overwhelming foes with brute force.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -217,9 +219,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031e" id="Assassin">
+	<Object type="0x031e" id="Knight">
 		<Class>Player</Class>
-		<Description>A deadly killer who poisons enemies with toxic attacks. Assassins use poison vials to inflict damage over time while staying mobile and evasive.</Description>
+		<Description>An armored champion who shields allies from harm. Knights use their shields to stun enemies and boast the highest defense of any class.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -248,9 +250,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x031f" id="Necromancer">
+	<Object type="0x031f" id="Paladin">
 		<Class>Player</Class>
-		<Description>A dark mage who drains the life force of enemies. Necromancers use skulls to steal health from groups of foes, sustaining themselves through dark magic.</Description>
+		<Description>A holy warrior who combines martial prowess with divine magic. Paladins use seals to heal and boost their allies while fighting on the front lines.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -279,9 +281,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0320" id="Huntress">
+	<Object type="0x0320" id="Assassin">
 		<Class>Player</Class>
-		<Description>A fierce hunter who traps enemies with magical snares. Huntresses throw traps that slow and damage foes, controlling the battlefield from range.</Description>
+		<Description>A deadly killer who poisons enemies with toxic attacks. Assassins use poison vials to inflict damage over time while staying mobile and evasive.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -310,9 +312,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0321" id="Mystic">
+	<Object type="0x0321" id="Necromancer">
 		<Class>Player</Class>
-		<Description>An enigmatic spellcaster who bends reality with orbs of power. Mystics can stasis enemies, freezing them in time and controlling the flow of battle.</Description>
+		<Description>A dark mage who drains the life force of enemies. Necromancers use skulls to steal health from groups of foes, sustaining themselves through dark magic.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -341,9 +343,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0322" id="Trickster">
+	<Object type="0x0322" id="Huntress">
 		<Class>Player</Class>
-		<Description>A cunning illusionist who confuses enemies with decoys. Tricksters create teleporting prisms that distract foes and allow swift repositioning.</Description>
+		<Description>A fierce hunter who traps enemies with magical snares. Huntresses throw traps that slow and damage foes, controlling the battlefield from range.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -372,9 +374,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0323" id="Sorcerer">
+	<Object type="0x0323" id="Mystic">
 		<Class>Player</Class>
-		<Description>A wielder of ancient scepters who commands chain lightning. Sorcerers unleash electrical attacks that jump between enemies, devastating entire groups.</Description>
+		<Description>An enigmatic spellcaster who bends reality with orbs of power. Mystics can stasis enemies, freezing them in time and controlling the flow of battle.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -403,9 +405,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0324" id="Ninja">
+	<Object type="0x0324" id="Trickster">
 		<Class>Player</Class>
-		<Description>A swift shadow warrior who strikes with deadly precision. Ninjas throw shuriken stars and can dash through enemies with blazing speed.</Description>
+		<Description>A cunning illusionist who confuses enemies with decoys. Tricksters create teleporting prisms that distract foes and allow swift repositioning.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -434,11 +436,9 @@
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<!-- Hidden classes: not in client Players.xml so they won't appear in character select,
-	     but server needs definitions for skins/equipment/puppets that reference these types -->
-	<Object type="0x0325" id="Samurai">
+	<Object type="0x0325" id="Sorcerer">
 		<Class>Player</Class>
-		<Description>A disciplined warrior who channels elemental power through ancient techniques.</Description>
+		<Description>A wielder of ancient scepters who commands chain lightning. Sorcerers unleash electrical attacks that jump between enemies, devastating entire groups.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>
@@ -467,9 +467,9 @@
 		<LevelIncrease min="1" max="2">MpRegen</LevelIncrease>
 		<UnlockCost>0</UnlockCost>
 	</Object>
-	<Object type="0x0326" id="Bard">
+	<Object type="0x0326" id="Ninja">
 		<Class>Player</Class>
-		<Description>A versatile performer who inspires allies with enchanting melodies.</Description>
+		<Description>A swift shadow warrior who strikes with deadly precision. Ninjas throw shuriken stars and can dash through enemies with blazing speed.</Description>
 		<AnimatedTexture>
 			<File>playerskins</File>
 			<Index>583</Index>

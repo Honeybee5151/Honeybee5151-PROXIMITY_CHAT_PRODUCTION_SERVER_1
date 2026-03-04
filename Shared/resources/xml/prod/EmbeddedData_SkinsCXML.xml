@@ -6733,22 +6733,7 @@
 		<PlayerClassType>0x307</PlayerClassType>
 		<NoSkinSelect/>
 	</Object>
-	<!-- editor8182381 — Donation rank skins (all classes) -->
-	<!-- Skeleton skin (free, no rank required) -->
-	<Object type="0x2500" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2501" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0307</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2502" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x030e</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2503" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0310</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2504" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0311</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2505" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x031c</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2506" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x031d</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2507" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x031e</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2508" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x031f</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x2509" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0320</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x250a" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0321</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x250b" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0322</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x250c" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0323</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
-	<Object type="0x250d" id="Skeleton"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>583</Index></AnimatedTexture><PlayerClassType>0x0324</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>0</RequiredRank><Cost>0</Cost></Object>
+	<!-- editor8182381 — Donation rank skins (all 16 classes including hidden Samurai/Bard) -->
 	<!-- Skeleguard skin (Supporter rank required) -->
 	<Object type="0x2510" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x2511" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0307</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
@@ -6764,6 +6749,8 @@
 	<Object type="0x251b" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0322</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x251c" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0323</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x251d" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0324</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
+	<Object type="0x251e" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0325</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
+	<Object type="0x251f" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0326</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
 	<!-- Skeleking skin (Sponsor rank required) -->
 	<Object type="0x2520" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x2521" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0307</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
@@ -6779,4 +6766,6 @@
 	<Object type="0x252b" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0322</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x252c" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0323</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
 	<Object type="0x252d" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0324</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
+	<Object type="0x252e" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0325</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
+	<Object type="0x252f" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0326</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
 </Objects>
