@@ -2,7 +2,7 @@
 
 namespace WorldServer.logic
 {
-    internal struct Cooldown
+    public struct Cooldown
     {
         public int CoolDown;
         public int Variance;

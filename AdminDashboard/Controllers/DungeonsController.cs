@@ -1422,6 +1422,44 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
+                // 5d. If dungeon has C# behavior code, validate and commit as .cs file
+                var behaviorCode = dungeon["behavior_code"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(behaviorCode))
+                {
+                    var (isValid, validationErrors) = Services.BehaviorCodeValidator.Validate(behaviorCode);
+                    if (!isValid)
+                    {
+                        var errorMsg = string.Join("; ", validationErrors);
+                        Console.WriteLine($"[DungeonsController] C# behavior validation failed: {errorMsg}");
+                        return BadRequest(new { error = $"C# behavior code validation failed: {errorMsg}" });
+                    }
+
+                    // Wrap user code in template for server-side compilation
+                    var safeBehaviorName = Regex.Replace(safeTitle, @"[^\w]", "_");
+                    if (safeBehaviorName.Length > 0 && char.IsDigit(safeBehaviorName[0]))
+                        safeBehaviorName = "_" + safeBehaviorName;
+
+                    var csContent = $@"using WorldServer.logic;
+using WorldServer.logic.behaviors;
+using WorldServer.logic.transitions;
+using WorldServer.logic.loot;
+using Shared.resources;
+
+namespace WorldServer.logic.db.community
+{{
+    public static class Behavior_{safeBehaviorName}
+    {{
+        public static void Register(BehaviorDb db)
+        {{
+            {behaviorCode}
+        }}
+    }}
+}}
+";
+                    files.Add(($"Shared/resources/behaviors/community/{safeTitle}.cs", csContent));
+                    Console.WriteLine($"[DungeonsController] C# behavior code validated and added for '{safeTitle}'");
+                }
+
                 // 6. Validate all XML files before committing (prevents malformed XML like dungeon-6 glitch)
                 foreach (var (path, content) in files)
                 {

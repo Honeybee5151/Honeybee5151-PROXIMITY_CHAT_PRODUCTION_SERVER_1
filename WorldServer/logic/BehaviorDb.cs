@@ -54,6 +54,31 @@ namespace WorldServer.logic
 
             // Load community dungeon behaviors from JSON files
             JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
+
+            // Load community dungeon behaviors from C# files (takes priority over JSON)
+            CSharpBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
+        }
+
+        public void RegisterCommunity(string id, State rootState, params MobDrops[] defs)
+        {
+            var dat = GameServer.Resources.GameData;
+
+            if (!dat.IdToObjectType.TryGetValue(id, out var type))
+            {
+                Log.Error($"[CSharpBehavior] Mob '{id}' not found in XML data.");
+                return;
+            }
+
+            if (Definitions.ContainsKey(type))
+                return; // don't override hardcoded or JSON behaviors
+
+            var d = new Dictionary<string, State>();
+            rootState.Resolve(d);
+            rootState.ResolveChildren(d);
+
+            Loot loot = defs.Length > 0 ? new Loot(defs) : null;
+            Definitions[type] = new Tuple<State, Loot>(rootState, loot);
+            Log.Info($"[CSharpBehavior] Registered '{id}' (0x{type:X})");
         }
 
         public void ResolveBehavior(Entity entity)
