@@ -22,21 +22,7 @@ namespace WorldServer.core.worlds.impl
         {
         }
 
-        public void AddChest(Entity original)
-        {
-            var vaultChest = new DbVaultSingle(Client.Account, Client.Account.VaultCount - 1);
-            var con = new Container(Client.GameServer, 0x0504, null, false, vaultChest)
-            {
-                BagOwners = new int[] { Client.Account.AccountId }
-            };
-            con.Inventory.SetItems(con.Inventory.ConvertTypeToItemArray(vaultChest.Items));
-            con.Inventory.SetDataItems(vaultChest.ItemDatas);
-            con.Inventory.InventoryChanged += (sender, e) => SaveChest(((Inventory)sender).Parent);
-            con.Move(original.X, original.Y);
-
-            EnterWorld(con);
-            LeaveWorld(original);
-        }
+        //editor8182381 — DELETED: AddChest() method (vault containers replaced by VaultScreen UI)
 
         public override bool AllowedAccess(Client client) => (AccountId == client.Account.AccountId) || client.Account.Admin;
 
@@ -103,25 +89,11 @@ namespace WorldServer.core.worlds.impl
             giftChestPosition.Sort((x, y) => Comparer<int>.Default.Compare((x.X - spawn.X) * (x.X - spawn.X) + (x.Y - spawn.Y) * (x.Y - spawn.Y), (y.X - spawn.X) * (y.X - spawn.X) + (y.Y - spawn.Y) * (y.Y - spawn.Y)));
             specialChestPosition.Sort((x, y) => Comparer<int>.Default.Compare((x.X - spawn.X) * (x.X - spawn.X) + (x.Y - spawn.Y) * (x.Y - spawn.Y), (y.X - spawn.X) * (y.X - spawn.X) + (y.Y - spawn.Y) * (y.Y - spawn.Y)));
 
-            for (var i = 0; i < Client.Account.VaultCount && vaultChestPosition.Count > 0; i++)
+            //editor8182381 — CHANGED: place single vault chest object (UI-based vault replaces per-chest containers)
+            if (vaultChestPosition.Count > 0)
             {
-                var vaultChest = new DbVaultSingle(Client.Account, i);
-                var con = new Container(Client.GameServer, 0x0504, null, false, vaultChest)
-                {
-                    BagOwners = new int[] { AccountId },
-                };
-                con.Inventory.SetItems(con.Inventory.ConvertTypeToItemArray(vaultChest.Items));
-                con.Inventory.SetDataItems(vaultChest.ItemDatas);
-                con.Inventory.InventoryChanged += (sender, e) => SaveChest(((Inventory)sender).Parent);
-                con.Move(vaultChestPosition[0].X + 0.5f, vaultChestPosition[0].Y + 0.5f);
-
-                EnterWorld(con);
-
-                vaultChestPosition.RemoveAt(0);
+                CreateNewEntity(0x0505, vaultChestPosition[0].X + 0.5f, vaultChestPosition[0].Y + 0.5f);
             }
-
-            foreach (var i in vaultChestPosition)
-                CreateNewEntity(0x0505, i.X + 0.5f, i.Y + 0.5f);
 
             var gifts = Client.Account.Gifts.ToList();
             while (gifts.Count > 0 && giftChestPosition.Count > 0)

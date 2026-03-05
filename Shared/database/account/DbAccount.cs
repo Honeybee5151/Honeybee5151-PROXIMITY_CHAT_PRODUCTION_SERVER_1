@@ -47,6 +47,7 @@ namespace Shared.database.account
         public int VaultCount { get => GetValue<int>("vaultCount"); set => SetValue("vaultCount", value); }
         public int[] StoredPotions { get => GetValue<int[]>("storedPotions"); set => SetValue("storedPotions", value); }
         public bool TutorialDone { get => GetValue<bool>("tutorialDone"); set => SetValue("tutorialDone", value); }
+        public bool VaultMigrated { get => GetValue<bool>("vaultMigrated"); set => SetValue("vaultMigrated", value); }
         //777592
         public string VoiceID { get => GetValue<string>("voiceID"); set => SetValue("voiceID", value); }
         internal string LockToken { get; set; }

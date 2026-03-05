@@ -95,5 +95,8 @@ public enum MessageId : byte
     PROXIMITY_VOICE = 88,
     CUSTOM_GROUNDS = 89,
     CUSTOM_DUNGEON_ASSETS = 90,
-    CUSTOM_OBJECTS = 91
+    CUSTOM_OBJECTS = 91,
+    VAULT_OPEN = 92,
+    VAULT_DATA = 93,
+    VAULT_SWAP = 94
 }
