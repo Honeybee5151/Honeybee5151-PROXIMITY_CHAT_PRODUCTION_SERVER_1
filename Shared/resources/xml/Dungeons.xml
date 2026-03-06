@@ -548,4 +548,18 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 	</World>
+	<World id="submit">
+		<Width>16</Width>
+		<Height>16</Height>
+		<MapJM>Dungeons/submit.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>submit Emberbrand</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>1000,100,10,0,50,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>true</PresetHasBackpack>
+	</World>
 </Worlds>
