@@ -52,10 +52,10 @@ namespace WorldServer.logic
             InitDb = null;
             _initializing = 0;
 
-            // Load community dungeon behaviors from JSON files
-            JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
+            // Load community dungeon behaviors from JSON files (disabled — C# is primary)
+            // JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
 
-            // Load community dungeon behaviors from C# files (takes priority over JSON)
+            // Load community dungeon behaviors from C# files
             CSharpBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
         }
 
@@ -71,8 +71,7 @@ namespace WorldServer.logic
 
             if (Definitions.ContainsKey(type))
             {
-                Log.Warn($"[CSharpBehavior] Skipping '{id}' — already has a behavior definition (hardcoded or JSON).");
-                return;
+                Log.Info($"[CSharpBehavior] Overriding existing behavior for '{id}' with C# version.");
             }
 
             var d = new Dictionary<string, State>();
