@@ -10,7 +10,7 @@ namespace WorldServer.logic.db.community
     {
         public static void Register(BehaviorDb db)
         {
-            db.RegisterCommunity("Frostscale Wyrm",
+            db.RegisterCommunity("submit3 Frostscale Wyrm",
     new State(
         new State("idle",
             new Prioritize(
@@ -59,7 +59,7 @@ namespace WorldServer.logic.db.community
         )
     ),
     new Threshold(0.01,
-        new ItemLoot("Emberbrand", 0.04)
+        new ItemLoot("submit3 Emberbrand", 0.04)
     )
 );
         }

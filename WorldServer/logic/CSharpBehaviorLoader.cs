@@ -148,7 +148,7 @@ namespace WorldServer.logic.db.community
             var references = GetCachedReferences();
 
             var compilation = CSharpCompilation.Create(
-                "CommunityBehaviors",
+                $"CommunityBehavior_{fileName}",
                 syntaxTrees: new[] { syntaxTree },
                 references: references,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)

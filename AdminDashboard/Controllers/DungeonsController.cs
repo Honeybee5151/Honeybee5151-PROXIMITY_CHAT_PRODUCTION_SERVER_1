@@ -1434,6 +1434,19 @@ namespace AdminDashboard.Controllers
                         return BadRequest(new { error = $"C# behavior code validation failed: {errorMsg}" });
                     }
 
+                    // Rewrite mob and item names in behavior code to match prefixed XML ids
+                    var rewrittenCode = behaviorCode;
+                    foreach (var rename in mobRenames)
+                    {
+                        rewrittenCode = rewrittenCode.Replace($"\"{rename.Key}\"", $"\"{rename.Value}\"");
+                        Console.WriteLine($"[DungeonsController] Rewrote mob name in C# behavior: '{rename.Key}' -> '{rename.Value}'");
+                    }
+                    foreach (var rename in itemRenames)
+                    {
+                        rewrittenCode = rewrittenCode.Replace($"\"{rename.Key}\"", $"\"{rename.Value}\"");
+                        Console.WriteLine($"[DungeonsController] Rewrote item name in C# behavior: '{rename.Key}' -> '{rename.Value}'");
+                    }
+
                     // Wrap user code in template for server-side compilation
                     var safeBehaviorName = Regex.Replace(safeTitle, @"[^\w]", "_");
                     if (safeBehaviorName.Length > 0 && char.IsDigit(safeBehaviorName[0]))
@@ -1451,7 +1464,7 @@ namespace WorldServer.logic.db.community
     {{
         public static void Register(BehaviorDb db)
         {{
-            {behaviorCode}
+            {rewrittenCode}
         }}
     }}
 }}
