@@ -19,6 +19,10 @@ namespace WorldServer.logic
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+        // Cached MetadataReferences — created once, reused for all compilations
+        private static List<MetadataReference> _cachedReferences;
+        private static readonly object _refLock = new object();
+
         private const string TEMPLATE = @"
 using WorldServer.logic;
 using WorldServer.logic.behaviors;
@@ -37,6 +41,43 @@ namespace WorldServer.logic.db.community
     }}
 }}
 ";
+
+        private static List<MetadataReference> GetCachedReferences()
+        {
+            if (_cachedReferences != null)
+                return _cachedReferences;
+
+            lock (_refLock)
+            {
+                if (_cachedReferences != null)
+                    return _cachedReferences;
+
+                var refs = new List<MetadataReference>
+                {
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(State).Assembly.Location),
+                };
+
+                var runtimeDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
+                var systemRuntime = Path.Combine(runtimeDir, "System.Runtime.dll");
+                if (File.Exists(systemRuntime))
+                    refs.Add(MetadataReference.CreateFromFile(systemRuntime));
+
+                var systemCollections = Path.Combine(runtimeDir, "System.Collections.dll");
+                if (File.Exists(systemCollections))
+                    refs.Add(MetadataReference.CreateFromFile(systemCollections));
+
+                var sharedAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == "Shared");
+                if (sharedAssembly != null)
+                    refs.Add(MetadataReference.CreateFromFile(sharedAssembly.Location));
+                else
+                    Log.Warn("[CSharpBehaviorLoader] Shared assembly not loaded — ConditionEffectIndex will not resolve");
+
+                _cachedReferences = refs;
+                return _cachedReferences;
+            }
+        }
 
         public static void LoadAll(BehaviorDb db, string resourcePath)
         {
@@ -88,9 +129,9 @@ namespace WorldServer.logic.db.community
                 fullSource = string.Format(TEMPLATE, safeName, sourceCode);
             }
 
-            // Validate with whitelist analyzer
-            var (isValid, errors) = BehaviorCodeAnalyzer.Analyze(fullSource);
-            if (!isValid)
+            // Validate with whitelist analyzer — returns the parsed SyntaxTree for reuse
+            var (isValid, errors, syntaxTree) = BehaviorCodeAnalyzer.Analyze(fullSource);
+            if (!isValid || syntaxTree == null)
             {
                 Log.Error($"[CSharpBehavior] '{fileName}' failed validation:");
                 foreach (var err in errors)
@@ -98,32 +139,8 @@ namespace WorldServer.logic.db.community
                 return false;
             }
 
-            // Compile with Roslyn
-            var syntaxTree = CSharpSyntaxTree.ParseText(fullSource);
-
-            var references = new List<MetadataReference>
-            {
-                // Core .NET runtime
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                // WorldServer assembly (contains State, behaviors, transitions, etc.)
-                MetadataReference.CreateFromFile(typeof(State).Assembly.Location),
-            };
-
-            // Add System.Runtime
-            var runtimeDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            var systemRuntime = Path.Combine(runtimeDir, "System.Runtime.dll");
-            if (File.Exists(systemRuntime))
-                references.Add(MetadataReference.CreateFromFile(systemRuntime));
-
-            var systemCollections = Path.Combine(runtimeDir, "System.Collections.dll");
-            if (File.Exists(systemCollections))
-                references.Add(MetadataReference.CreateFromFile(systemCollections));
-
-            // Add Shared assembly (for ConditionEffectIndex)
-            var sharedAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                .FirstOrDefault(a => a.GetName().Name == "Shared");
-            if (sharedAssembly != null)
-                references.Add(MetadataReference.CreateFromFile(sharedAssembly.Location));
+            // Compile with Roslyn using cached references and reused syntax tree
+            var references = GetCachedReferences();
 
             var compilation = CSharpCompilation.Create(
                 "CommunityBehaviors",
@@ -160,7 +177,20 @@ namespace WorldServer.logic.db.community
             }
 
             var registerMethod = registerType.GetMethod("Register", BindingFlags.Public | BindingFlags.Static);
-            registerMethod.Invoke(null, new object[] { db });
+            try
+            {
+                registerMethod.Invoke(null, new object[] { db });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Log.Error($"[CSharpBehavior] Register() threw exception in '{fileName}': {ex.InnerException?.Message ?? ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[CSharpBehavior] Failed to invoke Register() in '{fileName}': {ex.Message}");
+                return false;
+            }
 
             Log.Info($"[CSharpBehavior] Successfully loaded '{fileName}'");
             return true;

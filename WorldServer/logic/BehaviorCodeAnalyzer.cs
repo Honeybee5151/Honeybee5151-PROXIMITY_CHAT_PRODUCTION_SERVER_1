@@ -16,6 +16,10 @@ namespace WorldServer.logic
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+        // Cached MetadataReferences — created once, reused for all analyses
+        private static List<MetadataReference> _cachedReferences;
+        private static readonly object _refLock = new object();
+
         // Allowed namespace prefixes — any type in these namespaces is permitted
         private static readonly HashSet<string> AllowedNamespaces = new HashSet<string>
         {
@@ -55,9 +59,57 @@ namespace WorldServer.logic
             "unsafe", "dynamic", "extern", "stackalloc",
         };
 
-        public static (bool IsValid, List<string> Errors) Analyze(string sourceCode)
+        private static List<MetadataReference> GetCachedReferences()
+        {
+            if (_cachedReferences != null)
+                return _cachedReferences;
+
+            lock (_refLock)
+            {
+                if (_cachedReferences != null)
+                    return _cachedReferences;
+
+                var refs = new List<MetadataReference>
+                {
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(State).Assembly.Location),
+                };
+
+                var runtimeDir = System.IO.Path.GetDirectoryName(typeof(object).Assembly.Location);
+                var systemRuntime = System.IO.Path.Combine(runtimeDir, "System.Runtime.dll");
+                if (System.IO.File.Exists(systemRuntime))
+                    refs.Add(MetadataReference.CreateFromFile(systemRuntime));
+
+                var systemCollections = System.IO.Path.Combine(runtimeDir, "System.Collections.dll");
+                if (System.IO.File.Exists(systemCollections))
+                    refs.Add(MetadataReference.CreateFromFile(systemCollections));
+
+                var sharedAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == "Shared");
+                if (sharedAssembly != null)
+                    refs.Add(MetadataReference.CreateFromFile(sharedAssembly.Location));
+                else
+                    Log.Warn("[BehaviorCodeAnalyzer] Shared assembly not loaded — ConditionEffectIndex will not resolve");
+
+                _cachedReferences = refs;
+                return _cachedReferences;
+            }
+        }
+
+        /// <summary>
+        /// Analyze source code for whitelist compliance.
+        /// Returns validation result and the parsed SyntaxTree for reuse by the compiler.
+        /// </summary>
+        public static (bool IsValid, List<string> Errors, SyntaxTree Tree) Analyze(string sourceCode)
         {
             var errors = new List<string>();
+
+            // Reject excessively large source files (> 256KB)
+            if (sourceCode.Length > 256 * 1024)
+            {
+                errors.Add("Source file exceeds maximum allowed size (256KB)");
+                return (false, errors, null);
+            }
 
             // Parse the source
             var tree = CSharpSyntaxTree.ParseText(sourceCode);
@@ -69,33 +121,17 @@ namespace WorldServer.logic
             {
                 foreach (var diag in diagnostics)
                     errors.Add($"Parse error: {diag.GetMessage()}");
-                return (false, errors);
+                return (false, errors, null);
             }
 
             // Blocked syntax checks (before semantic analysis)
             CheckBlockedSyntax(root, errors);
 
             if (errors.Count > 0)
-                return (false, errors);
+                return (false, errors, null);
 
-            // Create compilation for semantic analysis
-            var references = new List<MetadataReference>
-            {
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(State).Assembly.Location), // WorldServer
-            };
-
-            // Add System.Runtime reference
-            var runtimeDir = System.IO.Path.GetDirectoryName(typeof(object).Assembly.Location);
-            var systemRuntime = System.IO.Path.Combine(runtimeDir, "System.Runtime.dll");
-            if (System.IO.File.Exists(systemRuntime))
-                references.Add(MetadataReference.CreateFromFile(systemRuntime));
-
-            // Add Shared assembly (for ConditionEffectIndex)
-            var sharedAssembly = AppDomain.CurrentDomain.GetAssemblies()
-                .FirstOrDefault(a => a.GetName().Name == "Shared");
-            if (sharedAssembly != null)
-                references.Add(MetadataReference.CreateFromFile(sharedAssembly.Location));
+            // Create compilation for semantic analysis using cached references
+            var references = GetCachedReferences();
 
             var compilation = CSharpCompilation.Create("CommunityBehaviors",
                 syntaxTrees: new[] { tree },
@@ -108,7 +144,7 @@ namespace WorldServer.logic
             var walker = new WhitelistWalker(model, errors);
             walker.Visit(root);
 
-            return (errors.Count == 0, errors);
+            return (errors.Count == 0, errors, tree);
         }
 
         private static void CheckBlockedSyntax(SyntaxNode root, List<string> errors)
@@ -131,6 +167,10 @@ namespace WorldServer.logic
             // No lambda expressions
             foreach (var node in root.DescendantNodes().OfType<LambdaExpressionSyntax>())
                 errors.Add($"Line {node.GetLocation().GetLineSpan().StartLinePosition.Line + 1}: Lambda expressions are not allowed");
+
+            // No LINQ query expressions (compile to lambdas internally)
+            foreach (var node in root.DescendantNodes().OfType<QueryExpressionSyntax>())
+                errors.Add($"Line {node.GetLocation().GetLineSpan().StartLinePosition.Line + 1}: LINQ query expressions are not allowed");
 
             // No dynamic type
             foreach (var node in root.DescendantNodes().OfType<IdentifierNameSyntax>())

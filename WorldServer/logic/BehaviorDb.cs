@@ -70,7 +70,10 @@ namespace WorldServer.logic
             }
 
             if (Definitions.ContainsKey(type))
-                return; // don't override hardcoded or JSON behaviors
+            {
+                Log.Warn($"[CSharpBehavior] Skipping '{id}' — already has a behavior definition (hardcoded or JSON).");
+                return;
+            }
 
             var d = new Dictionary<string, State>();
             rootState.Resolve(d);
@@ -117,7 +120,7 @@ namespace WorldServer.logic
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"[Behavior] {id} Error -> {e}");
+                    Log.Error($"[Behavior] {id} Error -> {e}");
                 }
                 return this;
             }
