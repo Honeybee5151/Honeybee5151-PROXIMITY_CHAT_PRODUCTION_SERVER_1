@@ -11,6 +11,9 @@
 
   <ItemGroup>
     <Compile Remove="resources\behaviors\community\*.cs" />
+    <Content Include="resources\behaviors\community\*.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
