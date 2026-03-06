@@ -1,0 +1,228 @@
+{
+  "submit4 Frostscale Wyrm": {
+    "states": {
+      "fury": {
+        "behaviors": [
+          {
+            "text": [
+              "You will be entombed in ice!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 4491519,
+            "period": 0.3,
+            "repeats": 5
+          },
+          {
+            "type": "Prioritize",
+            "children": [
+              {
+                "type": "Charge",
+                "range": 10,
+                "speed": 1,
+                "coolDown": 2500
+              },
+              {
+                "type": "Chase",
+                "range": 2,
+                "speed": 0.85,
+                "sightRange": 18
+              },
+              {
+                "type": "Swirl",
+                "speed": 0.6,
+                "radius": 2.5,
+                "targeted": true
+              }
+            ]
+          },
+          {
+            "type": "Shoot",
+            "count": 8,
+            "radius": 10,
+            "coolDown": 1000,
+            "shootAngle": 45,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 9,
+            "coolDown": 1600,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 10,
+            "radius": 9,
+            "coolDown": 1800,
+            "shootAngle": 36,
+            "projectileIndex": 1
+          },
+          {
+            "type": "Grenade",
+            "color": 4491519,
+            "range": 8,
+            "damage": 120,
+            "radius": 3,
+            "coolDown": 2800
+          },
+          {
+            "type": "HealSelf",
+            "amount": 500,
+            "coolDown": 12000
+          }
+        ],
+        "transitions": []
+      },
+      "idle": {
+        "behaviors": [
+          {
+            "type": "Prioritize",
+            "children": [
+              {
+                "type": "Orbit",
+                "speed": 0.5,
+                "radius": 4
+              },
+              {
+                "type": "Wander",
+                "speed": 0.4
+              }
+            ]
+          }
+        ],
+        "transitions": [
+          {
+            "dist": 11,
+            "type": "PlayerWithinTransition",
+            "target": "engage"
+          }
+        ]
+      },
+      "engage": {
+        "behaviors": [
+          {
+            "type": "Prioritize",
+            "children": [
+              {
+                "type": "Chase",
+                "range": 5,
+                "speed": 0.55,
+                "sightRange": 14
+              },
+              {
+                "type": "Orbit",
+                "speed": 0.5,
+                "radius": 3.5
+              },
+              {
+                "type": "Wander",
+                "speed": 0.3
+              }
+            ]
+          },
+          {
+            "type": "Shoot",
+            "count": 3,
+            "radius": 9,
+            "coolDown": 1800,
+            "shootAngle": 15,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 8,
+            "coolDown": 2400,
+            "shootAngle": 12,
+            "projectileIndex": 1
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "aggressive",
+            "threshold": 0.6
+          }
+        ]
+      },
+      "aggressive": {
+        "behaviors": [
+          {
+            "text": [
+              "The frost consumes all!"
+            ],
+            "type": "Taunt"
+          },
+          {
+            "type": "Flash",
+            "color": 8965375,
+            "period": 0.4,
+            "repeats": 3
+          },
+          {
+            "type": "ConditionalEffect",
+            "effect": "Armored",
+            "duration": 3000
+          },
+          {
+            "type": "Prioritize",
+            "children": [
+              {
+                "type": "Chase",
+                "range": 3,
+                "speed": 0.7,
+                "sightRange": 16
+              },
+              {
+                "type": "Swirl",
+                "speed": 0.55,
+                "radius": 3,
+                "targeted": true
+              },
+              {
+                "type": "Wander",
+                "speed": 0.35
+              }
+            ]
+          },
+          {
+            "type": "Shoot",
+            "count": 5,
+            "radius": 10,
+            "coolDown": 1400,
+            "shootAngle": 18,
+            "projectileIndex": 0
+          },
+          {
+            "type": "Shoot",
+            "count": 7,
+            "radius": 9,
+            "coolDown": 2000,
+            "shootAngle": 10,
+            "projectileIndex": 1
+          },
+          {
+            "type": "Grenade",
+            "color": 8965375,
+            "range": 7,
+            "damage": 90,
+            "radius": 2.5,
+            "coolDown": 3500
+          }
+        ],
+        "transitions": [
+          {
+            "type": "HpLessTransition",
+            "target": "fury",
+            "threshold": 0.3
+          }
+        ]
+      }
+    },
+    "initialState": "idle"
+  }
+}
