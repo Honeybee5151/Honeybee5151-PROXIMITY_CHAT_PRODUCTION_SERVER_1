@@ -19,8 +19,12 @@ namespace WorldServer.logic
         public static void LoadAll(BehaviorDb db, string resourcePath)
         {
             var dir = Path.Combine(resourcePath, "behaviors", "community");
+            Log.Info($"[JsonBehavior] Looking for .json files in: {dir}");
             if (!Directory.Exists(dir))
+            {
+                Log.Warn($"[JsonBehavior] Directory does not exist: {dir}");
                 return;
+            }
 
             var files = Directory.GetFiles(dir, "*.json");
             var total = 0;

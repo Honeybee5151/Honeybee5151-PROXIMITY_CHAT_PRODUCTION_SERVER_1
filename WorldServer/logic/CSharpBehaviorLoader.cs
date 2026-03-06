@@ -82,10 +82,15 @@ namespace WorldServer.logic.db.community
         public static void LoadAll(BehaviorDb db, string resourcePath)
         {
             var dir = Path.Combine(resourcePath, "behaviors", "community");
+            Log.Info($"[CSharpBehavior] Looking for .cs files in: {dir}");
             if (!Directory.Exists(dir))
+            {
+                Log.Warn($"[CSharpBehavior] Directory does not exist: {dir}");
                 return;
+            }
 
             var files = Directory.GetFiles(dir, "*.cs");
+            Log.Info($"[CSharpBehavior] Found {files.Length} .cs files: {string.Join(", ", files.Select(Path.GetFileName))}");
             if (files.Length == 0)
                 return;
 
