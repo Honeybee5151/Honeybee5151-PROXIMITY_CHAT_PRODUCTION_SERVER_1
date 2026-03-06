@@ -148,7 +148,7 @@ namespace WorldServer.logic.db.community
             var references = GetCachedReferences();
 
             var compilation = CSharpCompilation.Create(
-                $"CommunityBehavior_{fileName}",
+                "CommunityBehaviors",
                 syntaxTrees: new[] { syntaxTree },
                 references: references,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
@@ -167,9 +167,10 @@ namespace WorldServer.logic.db.community
                 return false;
             }
 
-            // Load the compiled assembly
+            // Load into isolated context to avoid assembly name collisions
             ms.Seek(0, SeekOrigin.Begin);
-            var assembly = AssemblyLoadContext.Default.LoadFromStream(ms);
+            var context = new AssemblyLoadContext($"CommunityBehavior_{fileName}", isCollectible: false);
+            var assembly = context.LoadFromStream(ms);
 
             // Find and invoke the Register method
             var registerType = assembly.GetTypes()
