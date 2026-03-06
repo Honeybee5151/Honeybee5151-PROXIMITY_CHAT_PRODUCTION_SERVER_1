@@ -32,4 +32,11 @@ namespace WorldServer.logic.behaviors
         {
         }
     }
+
+    /// <summary>Alias for ConditionEffectBehavior — used by AI-generated community behaviors</summary>
+    internal class ConditionalEffect : ConditionEffectBehavior
+    {
+        public ConditionalEffect(ConditionEffectIndex effect, bool perm = false, int duration = -1)
+            : base(effect, perm, duration) { }
+    }
 }

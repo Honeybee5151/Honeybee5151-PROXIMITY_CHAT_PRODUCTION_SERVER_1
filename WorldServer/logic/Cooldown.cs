@@ -7,7 +7,7 @@ namespace WorldServer.logic
         public int CoolDown;
         public int Variance;
 
-        public Cooldown(int cooldown, int variance)
+        public Cooldown(int cooldown, int variance = 0)
         {
             CoolDown = cooldown;
             Variance = variance;
