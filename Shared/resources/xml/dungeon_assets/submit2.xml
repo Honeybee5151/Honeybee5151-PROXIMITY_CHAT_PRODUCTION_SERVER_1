@@ -1,0 +1,111 @@
+<DungeonAssets>
+<SpriteSheets>
+<Sheet name="dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_32x32_anim_0_0" tileW="32" tileH="32" animated="true">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</Sheet>
+<Sheet name="dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAAIAAAAAICAYAAAAx3fd+AAAABHNCSVQICAgIfAhkiAAAAMZJREFUWIXtljEKhDAQRX+CsJDOxgt4DFtvZG9hv+yF0noZm+0Eq2w1OM6a7AaEDcs8COr8FIH/MyMg2IYmbEMT6Lub1iD3KP+DpRdpfCoE3bSGWDCefR9o8dq1x1auwgJHsyXz6Aywh4CeVOdwo2vvTUxTysEA6QDc7sshAEC++Vw/05TfYVPmfwuZ+2jbqMFU105QFvbTBj7v5TgA8m62hqA8LLX4FPPoDJkvQ1B7b3Lauo6Asqhiwh4M96ad/QPkoCEohxfLzHAA5TN77QAAAABJRU5ErkJggg==</Sheet>
+</SpriteSheets>
+<Objects>
+<Object type="0x5073" id="submit2 Frostscale Wyrm">
+	<AnimatedTexture>
+		<File>dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_32x32_anim_0_0</File>
+		<Index>0</Index>
+	</AnimatedTexture>
+	<DisplayId>Frostscale Wyrm</DisplayId>
+    <Enemy/>
+    <Class>Character</Class>
+    
+    <HitSound>monster/dragons_hit</HitSound>
+    <DeathSound>monster/dragons_death</DeathSound>
+    <MaxHitPoints>4800</MaxHitPoints>
+    <Size>130</Size>
+    <Defense>28</Defense>
+    <XpMult>0.18</XpMult>
+    <Flying/>
+    <ShowName/>
+    <Projectile id="0">
+        <ObjectId>submit2 Frostscale Wyrm Proj 0</ObjectId>
+        <Speed>90</Speed>
+        <MinDamage>70</MinDamage>
+        <MaxDamage>105</MaxDamage>
+        <Size>80</Size>
+        <LifetimeMS>900</LifetimeMS>
+        <MultiHit/>
+        <ConditionEffect duration="3">Slowed</ConditionEffect>
+    </Projectile>
+    <Projectile id="1">
+        <ObjectId>submit2 Frostscale Wyrm Proj 1</ObjectId>
+        <Speed>55</Speed>
+        <MinDamage>55</MinDamage>
+        <MaxDamage>85</MaxDamage>
+        <Size>60</Size>
+        <LifetimeMS>1400</LifetimeMS>
+        <Wavy/>
+        <Amplitude>0.6</Amplitude>
+        <Frequency>2</Frequency>
+        <PassesCover/>
+        <ConditionEffect duration="2">Weak</ConditionEffect>
+    </Projectile>
+</Object>
+<Object type="0x4986" id="submit2 Frostscale Wyrm Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_8x8</File>
+		<Index>0</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x4987" id="submit2 Frostscale Wyrm Proj 1">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_8x8</File>
+		<Index>1</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x4988" id="submit2 Emberbrand Proj 0">
+	<Class>Projectile</Class>
+	<Texture>
+		<File>dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_8x8</File>
+		<Index>3</Index>
+	</Texture>
+	<AngleCorrection>1</AngleCorrection>
+</Object>
+<Object type="0x5076" id="submit2 Emberbrand">
+	<Texture>
+		<File>dungeon_69867a89-fe56-494c-8cba-b14ab414b86b_8x8</File>
+		<Index>2</Index>
+	</Texture>
+	<DisplayId>Emberbrand</DisplayId>
+        <Class>Equipment</Class>
+        <Item/>
+        <Soulbound/>
+        
+        <SlotType>1</SlotType>
+        <Tier>-1</Tier>
+        <Description>An ancient blade perpetually wreathed in living flame. Its molten edge sears through armor and flesh alike, leaving trails of cinder in every swing.</Description>
+        <RateOfFire>1.15</RateOfFire>
+        <Sound>weapon/long_sword</Sound>
+        <NumProjectiles>3</NumProjectiles>
+        <ArcGap>10</ArcGap>
+        <Projectile>
+            <ObjectId>submit2 Emberbrand Proj 0</ObjectId>
+            <Speed>110</Speed>
+            <MinDamage>90</MinDamage>
+            <MaxDamage>175</MaxDamage>
+            <LifetimeMS>420</LifetimeMS>
+            <Size>90</Size>
+            <ConditionEffect duration="3">Bleeding</ConditionEffect>
+        </Projectile>
+        <ActivateOnEquip>
+            <AddStat stat="20" amount="5"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="28" amount="3"/>
+        </ActivateOnEquip>
+        <ActivateOnEquip>
+            <AddStat stat="21" amount="-3"/>
+        </ActivateOnEquip>
+        <BagType>6</BagType>
+        <FameBonus>6</FameBonus>
+    </Object>
+</Objects>
+</DungeonAssets>
