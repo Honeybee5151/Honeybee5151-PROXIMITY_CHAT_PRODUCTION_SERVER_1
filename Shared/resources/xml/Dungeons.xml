@@ -604,4 +604,18 @@
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>true</PresetHasBackpack>
 	</World>
+	<World id="submitmusic">
+		<Width>16</Width>
+		<Height>9</Height>
+		<MapJM>Dungeons/submitmusic.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<StartingEquipment>submitmusic Emberbrand,submitmusic Helm of the Stoneborn Titan</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>1000,100,200,0,50,200,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>true</PresetHasBackpack>
+	</World>
 </Worlds>
