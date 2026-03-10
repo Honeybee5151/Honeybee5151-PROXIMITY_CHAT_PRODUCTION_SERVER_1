@@ -342,6 +342,7 @@ namespace AdminDashboard.Controllers
                 var title = dungeon["title"]?.ToString() ?? "Untitled";
                 var mapJm = dungeon["map_jm"];
                 var customTiles = dungeon["custom_tiles"] as JObject;
+                var musicUrl = (dungeon["music"] as JObject)?["trackUrl"]?.ToString();
 
                 if (mapJm == null || mapJm.Type == JTokenType.Null)
                     return BadRequest(new { error = "Dungeon has no map data" });
@@ -1188,6 +1189,10 @@ namespace AdminDashboard.Controllers
                     ? $"\t\t<DisplayId>{EscapeXml(title)}</DisplayId>\n"
                     : "";
 
+                var musicStr = !string.IsNullOrEmpty(musicUrl)
+                    ? $"\t\t<Music>\n\t\t\t<Track>{EscapeXml(musicUrl)}</Track>\n\t\t</Music>\n"
+                    : "";
+
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
                     worldDisplayId +
                     $"\t\t<Width>{width}</Width>\n" +
@@ -1196,6 +1201,7 @@ namespace AdminDashboard.Controllers
                     $"\t\t<VisibilityType>1</VisibilityType>\n" +
                     $"\t\t<Dungeon/>\n" +
                     $"\t\t<CommunityDungeon/>\n" +
+                    musicStr +
                     presetStr +
                     $"\t</World>\n";
 

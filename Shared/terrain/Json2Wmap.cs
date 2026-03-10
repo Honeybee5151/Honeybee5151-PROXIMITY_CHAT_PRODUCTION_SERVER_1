@@ -127,6 +127,28 @@ namespace Shared.terrain
                             Buffer.BlockCopy(decodedPixels, 0, padded, 0, decodedPixels.Length);
                             decodedPixels = padded;
                         }
+                        // Decode animation frames if present
+                        byte frameCount = 1;
+                        List<byte[]> framePixels = null;
+                        if (o.objs[0].objectFrameCount > 1 && o.objs[0].objectFramePixels != null)
+                        {
+                            frameCount = (byte)Math.Min(o.objs[0].objectFrameCount, 255);
+                            framePixels = new List<byte[]>();
+                            for (int fi = 0; fi < o.objs[0].objectFramePixels.Length && fi < frameCount - 1; fi++)
+                            {
+                                byte[] frameDec;
+                                try { frameDec = System.Convert.FromBase64String(o.objs[0].objectFramePixels[fi] ?? ""); }
+                                catch { frameDec = new byte[expectedBytes]; }
+                                if (frameDec.Length < expectedBytes)
+                                {
+                                    var padded = new byte[expectedBytes];
+                                    Buffer.BlockCopy(frameDec, 0, padded, 0, frameDec.Length);
+                                    frameDec = padded;
+                                }
+                                framePixels.Add(frameDec);
+                            }
+                        }
+
                         customObjects.Add(new CustomObjectEntry
                         {
                             TypeCode = typeCode,
@@ -134,7 +156,9 @@ namespace Shared.terrain
                             ObjectPixels = o.objs[0].objectPixels,
                             ObjectClass = objClass,
                             SpriteSize = spriteSize,
-                            DecodedPixels = decodedPixels
+                            DecodedPixels = decodedPixels,
+                            FrameCount = frameCount,
+                            FramePixels = framePixels
                         });
                     }
                     tileObjId = customObjPixelsMap[dedupKey];
@@ -245,6 +269,8 @@ namespace Shared.terrain
             public string objectPixels;
             public string objectClass;
             public int objectSize;
+            public int objectFrameCount;
+            public string[] objectFramePixels;
         }
     }
 }
