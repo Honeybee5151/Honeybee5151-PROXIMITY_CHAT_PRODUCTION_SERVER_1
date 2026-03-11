@@ -597,27 +597,6 @@ namespace WorldServer.core.worlds
                 else if (entry.ObjectClass == "Wall") classFlag = 3;
                 else if (entry.ObjectClass == "Blocker") classFlag = 4;
                 bw.Write(classFlag);
-
-                // Animation frames
-                byte frameCount = (byte)(entry.FrameCount > 0 ? entry.FrameCount : 1);
-                bw.Write(frameCount);
-                if (frameCount > 1 && entry.FramePixels != null && entry.SpriteSize > 0)
-                {
-                    int expectedFrameBytes = entry.SpriteSize * entry.SpriteSize * 3;
-                    for (int f = 0; f < frameCount - 1; f++)
-                    {
-                        if (f < entry.FramePixels.Count && entry.FramePixels[f] != null)
-                        {
-                            bw.Write(entry.FramePixels[f], 0, Math.Min(entry.FramePixels[f].Length, expectedFrameBytes));
-                            if (entry.FramePixels[f].Length < expectedFrameBytes)
-                                bw.Write(new byte[expectedFrameBytes - entry.FramePixels[f].Length]);
-                        }
-                        else
-                        {
-                            bw.Write(new byte[expectedFrameBytes]);
-                        }
-                    }
-                }
             }
             bw.Flush();
             return Ionic.Zlib.ZlibStream.CompressBuffer(ms.ToArray());

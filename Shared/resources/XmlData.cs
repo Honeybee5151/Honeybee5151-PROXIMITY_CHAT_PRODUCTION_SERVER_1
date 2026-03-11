@@ -40,8 +40,6 @@ namespace Shared.resources
         public string ObjectClass;   // "Object", "Wall", "Destructible", "Decoration", "Blocker"
         public byte SpriteSize;      // 8, 16, or 32 — sprite dimension in pixels
         public byte[] DecodedPixels; // cached decoded RGB bytes (size*size*3), set once at load
-        public byte FrameCount = 1;           // 1=static, 2+=animated
-        public List<byte[]> FramePixels;      // decoded RGB for frames 1..N-1 (null if static)
     }
 
     public class XmlData

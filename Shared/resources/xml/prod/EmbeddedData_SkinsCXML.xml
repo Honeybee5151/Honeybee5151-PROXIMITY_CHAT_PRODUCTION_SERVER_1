@@ -6738,6 +6738,4 @@
 	<Object type="0x2510" id="Skeleguard"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>584</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>2</RequiredRank><Cost>0</Cost></Object>
 	<!-- Skeleking skin (Sponsor rank required) -->
 	<Object type="0x2520" id="Skeleking"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins</File><Index>585</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>3</RequiredRank><Cost>0</Cost></Object>
-	<!-- Admin skin (Admin rank required) — editor8182381 -->
-	<Object type="0x2530" id="Admin"><Skin/><Class>Skin</Class><AnimatedTexture><File>playerskins16</File><Index>42</Index></AnimatedTexture><PlayerClassType>0x0300</PlayerClassType><UnlockLevel>0</UnlockLevel><RequiredRank>6</RequiredRank><Cost>0</Cost></Object>
 </Objects>
