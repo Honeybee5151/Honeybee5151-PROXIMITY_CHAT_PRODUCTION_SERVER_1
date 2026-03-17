@@ -76,6 +76,13 @@ namespace AdminDashboard
                     return;
                 }
 
+                // Allow music proxy (unauthenticated — Flash client needs direct access)
+                if (path == "/api/music/proxy")
+                {
+                    await next();
+                    return;
+                }
+
                 // Check Bearer token
                 var authHeader = context.Request.Headers["Authorization"].ToString();
                 if (authHeader == $"Bearer {adminToken}")

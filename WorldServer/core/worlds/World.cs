@@ -1,4 +1,4 @@
-﻿using Pipelines.Sockets.Unofficial.Arenas;
+using Pipelines.Sockets.Unofficial.Arenas;
 using Shared.database;
 using Shared.resources;
 using System.Xml.Linq;
@@ -123,7 +123,12 @@ namespace WorldServer.core.worlds
 
             if (resource.Music.Count > 0)
             {
-                Music = resource.Music[Random.Shared.Next(0, resource.Music.Count)];
+                var rawMusic = resource.Music[Random.Shared.Next(0, resource.Music.Count)];
+                // Rewrite external URLs to go through music proxy (Flash can't load cross-domain audio)
+                if (rawMusic.StartsWith("http"))
+                    Music = $"http://89.167.53.217:8889/api/music/proxy?url={Uri.EscapeDataString(rawMusic)}";
+                else
+                    Music = rawMusic;
                 StaticLogger.Instance.Info($"[Music] World '{IdName}' music: {Music}");
             }
             else
