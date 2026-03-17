@@ -1188,6 +1188,15 @@ namespace AdminDashboard.Controllers
                     ? $"\t\t<DisplayId>{EscapeXml(title)}</DisplayId>\n"
                     : "";
 
+                // Extract custom music URL if present
+                var musicStr = "";
+                var musicObj = dungeon["music"] as JObject;
+                var trackUrl = musicObj?["trackUrl"]?.ToString();
+                if (!string.IsNullOrEmpty(trackUrl))
+                {
+                    musicStr = $"\t\t<Music>\n\t\t\t<Track>{EscapeXml(trackUrl)}</Track>\n\t\t</Music>\n";
+                }
+
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
                     worldDisplayId +
                     $"\t\t<Width>{width}</Width>\n" +
@@ -1197,6 +1206,7 @@ namespace AdminDashboard.Controllers
                     $"\t\t<Dungeon/>\n" +
                     $"\t\t<CommunityDungeon/>\n" +
                     presetStr +
+                    musicStr +
                     $"\t</World>\n";
 
                 var updatedDungeonsXml = dungeonsXml.Replace("</Worlds>", worldEntry + "</Worlds>");
