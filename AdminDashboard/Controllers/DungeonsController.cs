@@ -1189,12 +1189,15 @@ namespace AdminDashboard.Controllers
                     : "";
 
                 // Extract custom music URL if present
+                // Prefer fileUrl (resolved direct MP3 URL) over trackUrl (FMA page URL)
                 var musicStr = "";
                 var musicObj = dungeon["music"] as JObject;
-                var trackUrl = musicObj?["trackUrl"]?.ToString();
-                if (!string.IsNullOrEmpty(trackUrl))
+                var musicUrl = musicObj?["fileUrl"]?.ToString();
+                if (string.IsNullOrEmpty(musicUrl))
+                    musicUrl = musicObj?["trackUrl"]?.ToString();
+                if (!string.IsNullOrEmpty(musicUrl))
                 {
-                    musicStr = $"\t\t<Music>\n\t\t\t<Track>{EscapeXml(trackUrl)}</Track>\n\t\t</Music>\n";
+                    musicStr = $"\t\t<Music>\n\t\t\t<Track>{EscapeXml(musicUrl)}</Track>\n\t\t</Music>\n";
                 }
 
                 var worldEntry = $"\t<World id=\"{EscapeXml(safeTitle)}\">\n" +
