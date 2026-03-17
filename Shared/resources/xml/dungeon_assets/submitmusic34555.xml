@@ -103,6 +103,7 @@
             <Size>90</Size>
             <ConditionEffect duration="3">Bleeding</ConditionEffect>
         </Projectile>
+        <Usable/>
         <ActivateOnEquip>
             <AddStat stat="20" amount="5"/>
         </ActivateOnEquip>

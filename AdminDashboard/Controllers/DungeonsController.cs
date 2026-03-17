@@ -928,6 +928,20 @@ namespace AdminDashboard.Controllers
                                 if (originalItemNames.TryGetValue(i, out var origItemName) && !xml.Contains("<DisplayId>"))
                                     xml = Regex.Replace(xml, @"(<Object\s[^>]*>)", $"$1\n\t<DisplayId>{EscapeXml(origItemName)}</DisplayId>");
 
+                                // Auto-inject <Usable/> for ability items (required by client to allow spacebar use)
+                                if (xml.Contains("<Activate") && !xml.Contains("<Usable/>"))
+                                {
+                                    var slotTypeMatch = Regex.Match(xml, @"<SlotType>(\d+)</SlotType>");
+                                    if (slotTypeMatch.Success)
+                                    {
+                                        var st = int.Parse(slotTypeMatch.Groups[1].Value);
+                                        // Ability slot types: 4=Tome,5=Shield,11=Spell,12=Seal,13=Cloak,15=Quiver,16=Helm,18=Poison,19=Skull,20=Trap,21=Orb,22=Prism,23=Scepter,25=Shuriken,27=Waki,28=Lute
+                                        var abilitySlotTypes = new HashSet<int> { 4, 5, 11, 12, 13, 15, 16, 18, 19, 20, 21, 22, 23, 25, 27, 28 };
+                                        if (abilitySlotTypes.Contains(st))
+                                            xml = xml.Replace("<Activate", "<Usable/>\n        <Activate");
+                                    }
+                                }
+
                                 // Save processed block (with type code) for DungeonAssets
                                 processedItemBlocks.Add((i, xml.Trim()));
                             }

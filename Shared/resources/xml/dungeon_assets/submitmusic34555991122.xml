@@ -124,7 +124,8 @@
         <Class>Equipment</Class>
         <Item/>
         <Soulbound/>
-        
+        <Usable/>
+
         <SlotType>13</SlotType>
         <Tier>-1</Tier>
         <Description>Carved from the skull of an ancient earth titan. Its weight is immense, but so is its power — the ground trembles with each charge.</Description>
