@@ -124,7 +124,7 @@ namespace WorldServer.core.worlds
             if (resource.Music.Count > 0)
             {
                 Music = resource.Music[Random.Shared.Next(0, resource.Music.Count)];
-                StaticLogger.Instance.Info($"[Music] World '{Name}' music: {Music}");
+                StaticLogger.Instance.Info($"[Music] World '{IdName}' music: {Music}");
             }
             else
                 Music = ""; // no default music — custom music only
