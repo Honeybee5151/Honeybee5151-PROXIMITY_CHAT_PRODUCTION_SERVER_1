@@ -124,7 +124,7 @@ namespace WorldServer.core.worlds
             if (resource.Music.Count > 0)
                 Music = resource.Music[Random.Shared.Next(0, resource.Music.Count)];
             else
-                Music = "sorc";
+                Music = ""; // no default music — custom music only
 
             WorldBranch = new WorldBranch(this);
             ParentWorld = parent;
