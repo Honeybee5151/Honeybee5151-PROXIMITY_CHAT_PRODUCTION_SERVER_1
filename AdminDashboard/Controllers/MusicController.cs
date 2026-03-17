@@ -2,7 +2,6 @@
 // Unauthenticated endpoint so Flash Sound.load() can fetch audio directly
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -34,12 +33,11 @@ namespace AdminDashboard.Controllers
         }
 
         /// <summary>
-        /// Attempts to extract a direct MP3/audio URL from a FMA track page.
+        /// Extracts a direct MP3 URL from a FMA track page using data-track-info JSON.
         /// Returns null if not found.
         /// </summary>
         private async Task<string?> ResolveFmaPageToMp3(string pageUrl)
         {
-            // Return cached resolved URL if available
             if (_resolvedUrlCache.TryGetValue(pageUrl, out var cachedMp3))
             {
                 Console.WriteLine($"[Music] Using cached resolved URL: {cachedMp3}");
@@ -59,49 +57,45 @@ namespace AdminDashboard.Controllers
                 return null;
             }
 
-            // Pattern 1: files.freemusicarchive.org direct mp3 link
-            var match = Regex.Match(html,
-                @"https://files\.freemusicarchive\.org/[^""'\s<>]+\.mp3",
-                RegexOptions.IgnoreCase);
-
-            if (match.Success)
+            // Extract data-track-info JSON attribute from the page
+            var match = Regex.Match(html, @"data-track-info=""([^""]+)""");
+            if (!match.Success)
             {
-                var mp3Url = match.Value;
-                Console.WriteLine($"[Music] Found MP3 via pattern 1: {mp3Url}");
-                _resolvedUrlCache[pageUrl] = mp3Url;
-                return mp3Url;
+                Console.WriteLine($"[Music] Could not find data-track-info on page: {pageUrl}");
+                return null;
             }
 
-            // Pattern 2: data-track-url or similar HTML attributes
-            match = Regex.Match(html,
-                @"(?:data-track-url|data-url|href)=[""']([^""']+\.mp3)[""']",
-                RegexOptions.IgnoreCase);
+            // Decode HTML entities (&quot; -> ")
+            var json = System.Net.WebUtility.HtmlDecode(match.Groups[1].Value);
 
-            if (match.Success)
+            try
             {
-                var mp3Url = match.Groups[1].Value;
-                if (!mp3Url.StartsWith("http"))
-                    mp3Url = "https://freemusicarchive.org" + mp3Url;
-                Console.WriteLine($"[Music] Found MP3 via pattern 2: {mp3Url}");
-                _resolvedUrlCache[pageUrl] = mp3Url;
-                return mp3Url;
+                var trackInfo = System.Text.Json.JsonDocument.Parse(json);
+
+                // Prefer fileUrl (direct CDN mp3), fall back to downloadUrl
+                if (trackInfo.RootElement.TryGetProperty("fileUrl", out var fileUrl))
+                {
+                    var mp3 = fileUrl.GetString();
+                    Console.WriteLine($"[Music] Resolved fileUrl: {mp3}");
+                    _resolvedUrlCache[pageUrl] = mp3!;
+                    return mp3;
+                }
+
+                if (trackInfo.RootElement.TryGetProperty("downloadUrl", out var downloadUrl))
+                {
+                    var dl = downloadUrl.GetString();
+                    Console.WriteLine($"[Music] Resolved downloadUrl: {dl}");
+                    _resolvedUrlCache[pageUrl] = dl!;
+                    return dl;
+                }
+
+                Console.WriteLine($"[Music] data-track-info had no fileUrl or downloadUrl: {json}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Music] Failed to parse track JSON: {ex.Message}");
             }
 
-            // Pattern 3: JSON-embedded src or file fields
-            match = Regex.Match(html,
-                @"""(?:file|src|url|stream_url)""\s*:\s*""([^""]+\.mp3)""",
-                RegexOptions.IgnoreCase);
-
-            if (match.Success)
-            {
-                var mp3Url = match.Groups[1].Value
-                    .Replace("\\/", "/"); // unescape JSON slashes
-                Console.WriteLine($"[Music] Found MP3 via pattern 3: {mp3Url}");
-                _resolvedUrlCache[pageUrl] = mp3Url;
-                return mp3Url;
-            }
-
-            Console.WriteLine($"[Music] Could not find MP3 link in FMA page: {pageUrl}");
             return null;
         }
 
@@ -181,7 +175,7 @@ namespace AdminDashboard.Controllers
                     Console.WriteLine($"[Music] WARNING: Got non-audio response for {downloadUrl} " +
                                       $"(contentType={contentType}, size={data.Length})");
 
-                    // Clear any bad resolved URL from cache so next request retries scraping
+                    // Clear bad resolved URL from cache so next request retries scraping
                     _resolvedUrlCache.TryRemove(url, out _);
 
                     return StatusCode(502, "Music source returned non-audio content. The page structure may have changed.");
