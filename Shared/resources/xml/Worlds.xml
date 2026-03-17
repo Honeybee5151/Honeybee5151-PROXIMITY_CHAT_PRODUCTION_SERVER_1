@@ -10,9 +10,6 @@
 		<Width>2048</Width>
 		<Height>2048</Height>
 		<MapJM>Realm of the Mad God.jm</MapJM>
-		<Music>
-			<Track>wanderlust</Track>
-		</Music>
 		<Persists/>
 	</World>
 	<World id="Nexus">
@@ -21,9 +18,6 @@
 		<Capacity>300</Capacity>
 		<MapJM>Exalt/Nexus.jm</MapJM>
 		<Instance enum="nexus"/>
-		<Music>
-			<Track>wanderlust</Track>
-		</Music>
 		<Persists/>
 		<ShowDisplays/>
 		<!--<DisableShooting/>-->
