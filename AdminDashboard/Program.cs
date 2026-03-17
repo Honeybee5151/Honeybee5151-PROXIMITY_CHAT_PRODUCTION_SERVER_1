@@ -95,6 +95,11 @@ namespace AdminDashboard
                 await context.Response.WriteAsync("Unauthorized");
             });
 
+            // Flash crossdomain.xml — allows Sound.load() from any origin
+            app.Map("/crossdomain.xml", () => Results.Content(
+                "<?xml version=\"1.0\"?>\n<cross-domain-policy>\n  <allow-access-from domain=\"*\" />\n</cross-domain-policy>",
+                "text/xml"));
+
             app.UseStaticFiles();
             app.UseRouting();
             app.MapControllers();
