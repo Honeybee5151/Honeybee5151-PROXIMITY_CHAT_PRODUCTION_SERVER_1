@@ -334,7 +334,7 @@ namespace WorldServer.logic.loot
             {
                 if (player != null)
                 {
-                    if (player != null && i.BagType == 6) // white bag
+                    if (player != null && i.BagType == 6 && enemy.World?.IsCommunityDungeon != true) // white bag (skip in community dungeons)
                     {
                         var msg = new StringBuilder($" {player.Client.Account.Name} has obtained:");
                         msg.Append($" [{i.DisplayId ?? i.ObjectId}], by doing {Math.Round(100.0 * (hitters[player] / (double)enemy.DamageCounter.TotalDamage), 0)}% damage!");
