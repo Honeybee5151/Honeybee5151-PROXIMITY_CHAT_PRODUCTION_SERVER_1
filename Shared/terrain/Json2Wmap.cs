@@ -127,6 +127,25 @@ namespace Shared.terrain
                             Buffer.BlockCopy(decodedPixels, 0, padded, 0, decodedPixels.Length);
                             decodedPixels = padded;
                         }
+                        // Decode animation frames if present
+                        List<byte[]> animFrames = null;
+                        if (o.objs[0].objectAnimFrames != null && o.objs[0].objectAnimFrames.Length > 0)
+                        {
+                            animFrames = new List<byte[]>();
+                            foreach (var frameB64 in o.objs[0].objectAnimFrames)
+                            {
+                                byte[] framePixels;
+                                try { framePixels = System.Convert.FromBase64String(frameB64 ?? ""); }
+                                catch { framePixels = new byte[expectedBytes]; }
+                                if (framePixels.Length < expectedBytes)
+                                {
+                                    var padded = new byte[expectedBytes];
+                                    Buffer.BlockCopy(framePixels, 0, padded, 0, framePixels.Length);
+                                    framePixels = padded;
+                                }
+                                animFrames.Add(framePixels);
+                            }
+                        }
                         customObjects.Add(new CustomObjectEntry
                         {
                             TypeCode = typeCode,
@@ -134,7 +153,8 @@ namespace Shared.terrain
                             ObjectPixels = o.objs[0].objectPixels,
                             ObjectClass = objClass,
                             SpriteSize = spriteSize,
-                            DecodedPixels = decodedPixels
+                            DecodedPixels = decodedPixels,
+                            AnimFrames = animFrames
                         });
                     }
                     tileObjId = customObjPixelsMap[dedupKey];
@@ -245,6 +265,7 @@ namespace Shared.terrain
             public string objectPixels;
             public string objectClass;
             public int objectSize;
+            public string[] objectAnimFrames;
         }
     }
 }
