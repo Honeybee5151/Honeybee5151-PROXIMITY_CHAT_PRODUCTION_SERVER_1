@@ -146,6 +146,8 @@ namespace Shared.terrain
                                 animFrames.Add(framePixels);
                             }
                         }
+                        var hasAnim = animFrames != null && animFrames.Count > 0;
+                        Console.WriteLine($"[Json2Wmap] Custom obj {objId}: size={spriteSize}, class={objClass}, animFrames={animFrames?.Count ?? 0}, rawField={(o.objs[0].objectAnimFrames != null ? o.objs[0].objectAnimFrames.Length.ToString() : "null")}");
                         customObjects.Add(new CustomObjectEntry
                         {
                             TypeCode = typeCode,
