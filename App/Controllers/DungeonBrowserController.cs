@@ -23,9 +23,9 @@ namespace App.Controllers
         }
 
         [HttpPost("list")]
-        public void List()
+        public void List([FromForm] string type = "community")
         {
-            var names = GetCommunityDungeonNames();
+            var names = type == "official" ? GetOfficialDungeonNames() : GetCommunityDungeonNames();
             var db = _core.Database.Conn;
             var results = new List<object>();
 
@@ -75,8 +75,9 @@ namespace App.Controllers
                 return;
             }
 
-            var names = GetCommunityDungeonNames();
-            if (!names.Contains(dungeonName))
+            var allNames = GetCommunityDungeonNames();
+            allNames.AddRange(GetOfficialDungeonNames());
+            if (!allNames.Contains(dungeonName))
             {
                 Response.CreateError("Dungeon not found");
                 return;
@@ -126,6 +127,18 @@ namespace App.Controllers
         private List<string> GetCommunityDungeonNames()
         {
             var path = Path.Combine(_core.Resources.ResourcePath, "worlds", "community-dungeons.txt");
+            if (!System.IO.File.Exists(path))
+                return new List<string>();
+
+            return System.IO.File.ReadAllLines(path)
+                .Select(l => l.Trim())
+                .Where(l => !string.IsNullOrEmpty(l))
+                .ToList();
+        }
+
+        private List<string> GetOfficialDungeonNames()
+        {
+            var path = Path.Combine(_core.Resources.ResourcePath, "worlds", "official-dungeons.txt");
             if (!System.IO.File.Exists(path))
                 return new List<string>();
 

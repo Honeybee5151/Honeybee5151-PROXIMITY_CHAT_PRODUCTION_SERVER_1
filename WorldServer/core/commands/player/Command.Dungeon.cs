@@ -16,31 +16,43 @@ namespace WorldServer.core.commands.player
 
         protected override bool Process(Player player, TickTime time, string args)
         {
-            var names = GetCommunityDungeonNames(player.GameServer);
+            var communityNames = GetDungeonNames(player.GameServer, "community-dungeons.txt");
+            var officialNames = GetDungeonNames(player.GameServer, "official-dungeons.txt");
+            var allNames = new List<string>(communityNames);
+            allNames.AddRange(officialNames);
 
             if (string.IsNullOrWhiteSpace(args))
             {
-                if (names.Count == 0)
+                if (allNames.Count == 0)
                 {
-                    player.SendInfo("No community dungeons available yet.");
+                    player.SendInfo("No dungeons available yet.");
                     return true;
                 }
 
-                player.SendInfo("Community Dungeons:");
-                for (int i = 0; i < names.Count; i++)
-                    player.SendInfo($"  {i + 1}. {names[i]}");
+                if (officialNames.Count > 0)
+                {
+                    player.SendInfo("Official Dungeons:");
+                    for (int i = 0; i < officialNames.Count; i++)
+                        player.SendInfo($"  {i + 1}. {officialNames[i]}");
+                }
+                if (communityNames.Count > 0)
+                {
+                    player.SendInfo("Community Dungeons:");
+                    for (int i = 0; i < communityNames.Count; i++)
+                        player.SendInfo($"  {i + 1}. {communityNames[i]}");
+                }
                 player.SendInfo("Use /dungeon <name> to enter.");
                 return true;
             }
 
             // Find matching dungeon (case-insensitive, partial match)
-            var match = names.FirstOrDefault(n => n.Equals(args, StringComparison.OrdinalIgnoreCase));
+            var match = allNames.FirstOrDefault(n => n.Equals(args, StringComparison.OrdinalIgnoreCase));
             if (match == null)
-                match = names.FirstOrDefault(n => n.StartsWith(args, StringComparison.OrdinalIgnoreCase));
+                match = allNames.FirstOrDefault(n => n.StartsWith(args, StringComparison.OrdinalIgnoreCase));
 
             if (match == null)
             {
-                player.SendError($"Community dungeon '{args}' not found. Use /dungeon to see the list.");
+                player.SendError($"Dungeon '{args}' not found. Use /dungeon to see the list.");
                 return false;
             }
 
@@ -94,9 +106,9 @@ namespace WorldServer.core.commands.player
             }
         }
 
-        private List<string> GetCommunityDungeonNames(GameServer server)
+        private List<string> GetDungeonNames(GameServer server, string filename)
         {
-            var path = Path.Combine(server.Resources.ResourcePath, "worlds", "community-dungeons.txt");
+            var path = Path.Combine(server.Resources.ResourcePath, "worlds", filename);
             if (!File.Exists(path))
                 return new List<string>();
 
