@@ -90,21 +90,7 @@ namespace WorldServer.core.worlds.impl
                 Console.WriteLine($"[NexusWorld] ERROR spawning Dungeon Browser: {ex}");
             }
 
-            // Spawn Banner near dungeon browser
-            try
-            {
-                if (GameServer.Resources.GameData.IdToObjectType.TryGetValue("Banner", out var bannerType))
-                {
-                    var banner = Entity.Resolve(GameServer, bannerType);
-                    banner.Move(102.5f, 131.5f);
-                    EnterWorld(banner);
-                    Console.WriteLine($"[NexusWorld] Banner spawned at (102.5, 131.5)");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[NexusWorld] ERROR spawning Banner: {ex}");
-            }
+
         }
 
         protected override void UpdateLogic(ref TickTime time)
