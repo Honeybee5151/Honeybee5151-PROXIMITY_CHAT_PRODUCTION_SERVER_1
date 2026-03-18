@@ -416,20 +416,49 @@ namespace AdminDashboard.Controllers
                                         var sprSize = spr?["size"]?.Value<int>() ?? size;
                                         var sprAnimated = spr?["animated"]?.Value<bool>() == true || mobIsAnimated;
 
-                                        // Auto-detect animated strips: width == 7 * height (standard 7-frame layout)
+                                        // Auto-detect animated strips: any horizontal strip where width is a multiple of height
                                         if (!sprAnimated)
                                         {
                                             using var probe = SpriteSheetService.DecodeDataUrl(dataUrl);
-                                            if (probe.Width > probe.Height && probe.Width == probe.Height * 7)
+                                            if (probe.Width > probe.Height && probe.Width % probe.Height == 0)
                                                 sprAnimated = true;
                                         }
 
                                         if (sprAnimated)
                                         {
-                                            // Animated strip — store as individual sheet, skip grid packing
+                                            // Animated strip — normalize to 7 frames (client AnimatedChar expects 7 per direction)
                                             using (var bmp = SpriteSheetService.DecodeDataUrl(dataUrl))
                                             {
-                                                using var encoded = bmp.Encode(SKEncodedImageFormat.Png, 100);
+                                                var frameH = bmp.Height;
+                                                var frameCount = bmp.Width / frameH;
+                                                SKBitmap finalBmp = bmp;
+                                                bool disposeFinal = false;
+
+                                                if (frameCount < 7)
+                                                {
+                                                    // Pad to 7 frames by repeating frame 0
+                                                    finalBmp = new SKBitmap(frameH * 7, frameH);
+                                                    using var canvas = new SKCanvas(finalBmp);
+                                                    canvas.Clear(SKColors.Transparent);
+                                                    // Copy existing frames
+                                                    canvas.DrawBitmap(bmp, 0, 0);
+                                                    // Pad remaining slots with frame 0
+                                                    for (int f = frameCount; f < 7; f++)
+                                                        canvas.DrawBitmap(bmp, new SKRect(0, 0, frameH, frameH), new SKRect(f * frameH, 0, (f + 1) * frameH, frameH));
+                                                    disposeFinal = true;
+                                                }
+                                                else if (frameCount > 7 && frameCount < 14)
+                                                {
+                                                    // Truncate to 7 frames
+                                                    finalBmp = new SKBitmap(frameH * 7, frameH);
+                                                    using var canvas = new SKCanvas(finalBmp);
+                                                    canvas.Clear(SKColors.Transparent);
+                                                    canvas.DrawBitmap(bmp, new SKRect(0, 0, frameH * 7, frameH), new SKRect(0, 0, frameH * 7, frameH));
+                                                    disposeFinal = true;
+                                                }
+                                                // frameCount == 7 or >= 14: use as-is
+
+                                                using var encoded = finalBmp.Encode(SKEncodedImageFormat.Png, 100);
                                                 var base64 = Convert.ToBase64String(encoded.ToArray());
                                                 var animSheetName = $"dungeon_{request.DungeonId}_{sprSize}x{sprSize}_anim_{i}_{j}";
                                                 perDungeonSheets[animSheetName] = (base64, sprSize, sprSize);
@@ -437,6 +466,8 @@ namespace AdminDashboard.Controllers
                                                 if (!pdAnimatedMobSheets.ContainsKey(i))
                                                     pdAnimatedMobSheets[i] = new List<(string, int)>();
                                                 pdAnimatedMobSheets[i].Add((animSheetName, j));
+
+                                                if (disposeFinal) finalBmp.Dispose();
                                             }
                                         }
                                         else
