@@ -132,6 +132,7 @@ namespace AdminDashboard.Controllers
                         {
                             name = string.IsNullOrEmpty(name) ? "Unknown Mob" : name,
                             xml,
+                            behavior = mob["behavior"]?.ToString(),
                             sprites = mob["sprites"] as JArray,
                             spriteBase = (mob["spriteBase"] ?? mob["sprite"])?.ToString(),
                             spriteAttack = mob["spriteAttack"]?.ToString(),
@@ -350,6 +351,7 @@ namespace AdminDashboard.Controllers
                     mapObjectsThumbnail,
                     customTiles = tileList,
                     customMapObjects = customMapObjects.Count > 0 ? customMapObjects : null,
+                    behaviorCode = dungeon["behavior_code"]?.ToString(),
                     startingEquipment = dungeon["starting_equipment"],
                     characterPreset = dungeon["character_preset"],
                     creatorStorageUsed,

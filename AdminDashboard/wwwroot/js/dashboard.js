@@ -1636,12 +1636,25 @@ function renderPreview(data) {
             }
 
             html += `<span class="preview-xml-toggle" onclick="toggleXml(this)">Show XML</span>
-                <div class="preview-xml" style="display:none;">${esc(mob.xml)}</div>
-            </div>`;
+                <div class="preview-xml" style="display:none;">${esc(mob.xml)}</div>`;
+            if (mob.behavior) {
+                html += `<span class="preview-xml-toggle" onclick="toggleXml(this)" style="margin-left:8px;color:#22c55e;">Show Behavior</span>
+                    <div class="preview-xml" style="display:none;border-color:#22c55e33;">${esc(mob.behavior)}</div>`;
+            }
+            html += `</div>`;
 
             html += '</div>';
         }
         html += '</div>';
+    }
+
+    // Behavior code (full C# source)
+    if (data.behaviorCode) {
+        html += `<div class="preview-section">
+            <h4>Behavior Code (C#)</h4>
+            <span class="preview-xml-toggle" onclick="toggleXml(this)" style="color:#22c55e;">Show/Hide Code</span>
+            <div class="preview-xml" style="display:none;border-color:#22c55e33;max-height:500px;overflow-y:auto;white-space:pre;font-family:monospace;font-size:12px;">${esc(data.behaviorCode)}</div>
+        </div>`;
     }
 
     // Items
