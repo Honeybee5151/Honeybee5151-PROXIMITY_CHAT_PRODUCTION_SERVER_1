@@ -1407,6 +1407,8 @@ async function previewDungeon(id) {
         const data = await apiFetch(`/api/dungeons/preview/${id}`);
         title.textContent = data.title || 'Untitled Dungeon';
         content.innerHTML = renderPreview(data);
+        // Render custom object filmstrip canvases
+        renderCustomObjCanvases(content);
     } catch (e) {
         content.innerHTML = `<div style="color:#f87171;text-align:center;padding:40px;">Failed to load preview: ${esc(e.message)}</div>`;
     }
@@ -1414,6 +1416,54 @@ async function previewDungeon(id) {
 
 function hidePreview() {
     document.getElementById('preview-overlay').classList.remove('active');
+}
+
+function renderCustomObjCanvases(container) {
+    const canvases = container.querySelectorAll('canvas[data-custom-obj]');
+    for (const canvas of canvases) {
+        try {
+            const data = JSON.parse(canvas.getAttribute('data-custom-obj'));
+            const size = data.size || 8;
+            const scale = 4;
+            const gap = 2;
+
+            // Decode frame 0
+            const allFramePixels = [data.pixels];
+            if (data.animFrames) allFramePixels.push(...data.animFrames);
+
+            const fw = size * scale;
+            const fh = size * scale;
+            canvas.width = allFramePixels.length * (fw + gap) - gap;
+            canvas.height = fh;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            for (let fi = 0; fi < allFramePixels.length; fi++) {
+                const bin = atob(allFramePixels[fi]);
+                const img = ctx.createImageData(size, size);
+                for (let i = 0; i < size * size; i++) {
+                    const r = bin.charCodeAt(i * 3);
+                    const g = bin.charCodeAt(i * 3 + 1);
+                    const b = bin.charCodeAt(i * 3 + 2);
+                    if (r === 0x2a && g === 0x2a && b === 0x2a) {
+                        img.data[i * 4 + 3] = 0; // transparent placeholder
+                    } else {
+                        img.data[i * 4] = r;
+                        img.data[i * 4 + 1] = g;
+                        img.data[i * 4 + 2] = b;
+                        img.data[i * 4 + 3] = 255;
+                    }
+                }
+                // Draw to temp canvas then scale up
+                const tmp = new OffscreenCanvas(size, size);
+                const tctx = tmp.getContext('2d');
+                tctx.putImageData(img, 0, 0);
+                ctx.drawImage(tmp, 0, 0, size, size, fi * (fw + gap), 0, fw, fh);
+            }
+        } catch (e) {
+            console.error('Failed to render custom obj canvas:', e);
+        }
+    }
 }
 
 function renderPreview(data) {
@@ -1488,6 +1538,21 @@ function renderPreview(data) {
             html += `<div class="preview-tile" style="background:#${esc(t.hex)};" title="${esc(t.id)}"></div>`;
         }
         html += '</div></div>';
+    }
+
+    // Custom map objects (with animation filmstrip)
+    if (data.customMapObjects && data.customMapObjects.length > 0) {
+        html += `<div class="preview-section"><h4>Custom Map Objects (${data.customMapObjects.length})</h4>`;
+        for (const obj of data.customMapObjects) {
+            const frameCount = obj.animFrames ? obj.animFrames.length + 1 : 1;
+            const label = `${obj.size}px ${obj.objectClass} — ${frameCount} frame${frameCount > 1 ? 's' : ''}`;
+            html += `<div style="margin-bottom:12px;padding:8px;background:#1a1a2e;border:1px solid #333;border-radius:4px;">`;
+            html += `<div style="font-size:11px;color:#888;margin-bottom:6px;">${esc(obj.id)}</div>`;
+            html += `<div style="font-size:10px;color:#aaa;margin-bottom:4px;">${esc(label)}</div>`;
+            html += `<canvas data-custom-obj='${JSON.stringify({ pixels: obj.pixels, animFrames: obj.animFrames, size: obj.size })}' style="image-rendering:pixelated;height:${obj.size * 4}px;"></canvas>`;
+            html += `</div>`;
+        }
+        html += `</div>`;
     }
 
     // Mobs

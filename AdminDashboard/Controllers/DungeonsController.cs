@@ -267,6 +267,49 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
+                // Custom map objects (from JM dict entries with objectPixels)
+                var customMapObjects = new List<object>();
+                if (mapJm != null && mapJm.Type != JTokenType.Null)
+                {
+                    var dict = mapJm["dict"] as JArray;
+                    var seen = new HashSet<string>();
+                    if (dict != null)
+                    {
+                        foreach (var entry in dict)
+                        {
+                            var objs = entry["objs"] as JArray;
+                            if (objs == null || objs.Count == 0) continue;
+                            var obj = objs[0];
+                            var pixelsB64 = obj["objectPixels"]?.ToString();
+                            if (string.IsNullOrEmpty(pixelsB64)) continue;
+                            if (seen.Contains(pixelsB64)) continue;
+                            seen.Add(pixelsB64);
+
+                            var objSize = obj["objectSize"]?.Value<int>() ?? 8;
+                            var objId = obj["id"]?.ToString() ?? "unknown";
+                            var objClass = obj["objectClass"]?.ToString() ?? "Object";
+
+                            // Collect animation frame base64 strings
+                            var animFrames = new List<string>();
+                            var animArr = obj["objectAnimFrames"] as JArray;
+                            if (animArr != null)
+                            {
+                                foreach (var frame in animArr)
+                                    animFrames.Add(frame.ToString());
+                            }
+
+                            customMapObjects.Add(new
+                            {
+                                id = objId,
+                                objectClass = objClass,
+                                size = objSize,
+                                pixels = pixelsB64,
+                                animFrames = animFrames.Count > 0 ? animFrames : null,
+                            });
+                        }
+                    }
+                }
+
                 // Custom tiles
                 var tileList = new List<object>();
                 if (customTiles != null)
@@ -306,6 +349,7 @@ namespace AdminDashboard.Controllers
                     mapGroundThumbnail,
                     mapObjectsThumbnail,
                     customTiles = tileList,
+                    customMapObjects = customMapObjects.Count > 0 ? customMapObjects : null,
                     startingEquipment = dungeon["starting_equipment"],
                     characterPreset = dungeon["character_preset"],
                     creatorStorageUsed,
