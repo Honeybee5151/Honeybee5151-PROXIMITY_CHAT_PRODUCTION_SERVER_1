@@ -197,26 +197,22 @@ namespace Shared.terrain
                 };
             }
 
-            // Override TileDesc for custom ground tiles with special properties
+            // Register TileDesc for ALL custom ground tiles (required for server tile lookups)
             foreach (var cg in customGrounds)
             {
-                if (cg.NoWalk || cg.BlendPriority != -1 || cg.Speed != 1.0f ||
-                    cg.MinDamage > 0 || cg.MaxDamage > 0 || cg.Sink || cg.Push || cg.SlideAmount != 0)
-                {
-                    var xml = $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
-                        "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
-                        (cg.NoWalk ? "<NoWalk/>" : "") +
-                        (cg.BlendPriority != -1 ? $"<BlendPriority>{cg.BlendPriority}</BlendPriority>" : "") +
-                        (cg.Speed != 1.0f ? $"<Speed>{cg.Speed}</Speed>" : "") +
-                        (cg.MinDamage > 0 ? $"<MinDamage>{cg.MinDamage}</MinDamage>" : "") +
-                        (cg.MaxDamage > 0 ? $"<MaxDamage>{cg.MaxDamage}</MaxDamage>" : "") +
-                        (cg.Sink ? "<Sink/>" : "") +
-                        (cg.AnimateType != 0 ? $"<Animate dx=\"{cg.AnimateDx}\" dy=\"{cg.AnimateDy}\">{(cg.AnimateType == 1 ? "Wave" : "Flow")}</Animate>" : "") +
-                        (cg.Push ? "<Push/>" : "") +
-                        (cg.SlideAmount != 0 ? $"<SlideAmount>{cg.SlideAmount}</SlideAmount>" : "") +
-                        "</Ground>";
-                    data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, System.Xml.Linq.XElement.Parse(xml));
-                }
+                var xml = $"<Ground type=\"0x{cg.TypeCode:X4}\" id=\"{cg.GroundId}\">" +
+                    "<Texture><File>lofiEnvironment2</File><Index>0x0b</Index></Texture>" +
+                    (cg.NoWalk ? "<NoWalk/>" : "") +
+                    (cg.BlendPriority != -1 ? $"<BlendPriority>{cg.BlendPriority}</BlendPriority>" : "") +
+                    (cg.Speed != 1.0f ? $"<Speed>{cg.Speed}</Speed>" : "") +
+                    (cg.MinDamage > 0 ? $"<MinDamage>{cg.MinDamage}</MinDamage>" : "") +
+                    (cg.MaxDamage > 0 ? $"<MaxDamage>{cg.MaxDamage}</MaxDamage>" : "") +
+                    (cg.Sink ? "<Sink/>" : "") +
+                    (cg.AnimateType != 0 ? $"<Animate dx=\"{cg.AnimateDx}\" dy=\"{cg.AnimateDy}\">{(cg.AnimateType == 1 ? "Wave" : "Flow")}</Animate>" : "") +
+                    (cg.Push ? "<Push/>" : "") +
+                    (cg.SlideAmount != 0 ? $"<SlideAmount>{cg.SlideAmount}</SlideAmount>" : "") +
+                    "</Ground>";
+                data.Tiles[cg.TypeCode] = new TileDesc(cg.TypeCode, System.Xml.Linq.XElement.Parse(xml));
             }
 
             var tiles = new TerrainTile[obj.width, obj.height];
