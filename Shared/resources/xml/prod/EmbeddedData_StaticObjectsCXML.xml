@@ -8779,4 +8779,15 @@
          <Index>0x5c5</Index>
       </Texture>
    </Object>
+   <Object type="0x5100" id="Banner">
+      <Class>GameObject</Class>
+      <Model>Banner</Model>
+      <Texture>
+         <File>lofiEnvironment2</File>
+         <Index>0x5d</Index>
+      </Texture>
+      <Static/>
+      <OccupySquare/>
+      <ShadowSize>0</ShadowSize>
+   </Object>
 </Objects>
