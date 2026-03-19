@@ -15,6 +15,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
     /// a cone in the direction the boss is facing (toward its chase target).
     /// Cone uses linear taper: θ(d) = θ_max × (1 - 0.4 × d/R) — narrows to 60% at max range.
     /// Players outside the safe cone take periodic damage + optional condition effect.
+    /// Damage runs independently of target tracking — even if no chase target, zone still hurts.
     /// </summary>
     public sealed class NewDangerZone : Behavior
     {
@@ -67,30 +68,32 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 state = s;
             }
 
+            // --- Cone direction tracking (uses chase target if available) ---
             var target = host.World.FindPlayerTarget(host);
-            if (target == null)
+            if (target != null)
             {
-                if (s.Active)
-                    s.Active = false;
-                return;
-            }
-
-            var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
-            if (!s.Initialized)
-            {
-                s.Initialized = true;
-                s.FacingAngle = desiredAngle;
-            }
-            else
-            {
-                var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
-                var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
-                if (MathF.Abs(angleDiff) <= maxRotation)
+                var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
+                if (!s.Initialized)
+                {
+                    s.Initialized = true;
                     s.FacingAngle = desiredAngle;
+                }
                 else
-                    s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
-                s.FacingAngle = NormalizeAngle(s.FacingAngle);
+                {
+                    var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
+                    var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
+                    if (MathF.Abs(angleDiff) <= maxRotation)
+                        s.FacingAngle = desiredAngle;
+                    else
+                        s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
+                    s.FacingAngle = NormalizeAngle(s.FacingAngle);
+                }
             }
+            // If no target, cone keeps facing last known direction
+
+            // --- Visual broadcast (always runs once initialized) ---
+            if (!s.Initialized)
+                return; // Never had a target yet — don't activate
 
             s.Active = true;
             s.BroadcastTickMs += time.ElapsedMsDelta;
@@ -107,10 +110,12 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 }, host);
             }
 
+            // --- Warmup ---
             s.WarmupMs += time.ElapsedMsDelta;
             if (s.WarmupMs < 3000)
                 return;
 
+            // --- Damage tick (always runs while zone is active) ---
             s.GlobalTickMs += time.ElapsedMsDelta;
             if (s.GlobalTickMs < TickRateMs)
                 return;
@@ -126,7 +131,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 var pdy = player.Y - host.Y;
                 var dist = MathF.Sqrt(pdx * pdx + pdy * pdy);
 
-                // Effective half-angle at this distance (linear taper)
                 var effectiveHalf = EffectiveHalfAngle(dist);
 
                 var angleToPlayer = MathF.Atan2(player.Y - host.Y, player.X - host.X);
