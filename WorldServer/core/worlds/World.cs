@@ -754,13 +754,45 @@ namespace WorldServer.core.worlds
                     EntitiesToRemove.Add(pet);
             }
 
+            HashSet<Entity> tickedEnemies = null;
             if (EnemiesCollision != null)
             {
-                foreach (var entity in EnemiesCollision.GetActiveChunks(PlayersCollision))
+                var activeEnemies = EnemiesCollision.GetActiveChunks(PlayersCollision);
+                tickedEnemies = new HashSet<Entity>(activeEnemies);
+                foreach (var entity in tickedEnemies)
                 {
                     entity.Tick(ref time);
                     if (entity.Dead)
                         EntitiesToRemove.Add(entity);
+                }
+
+                // Second pass: tick extended-sight enemies that weren't in active chunks
+                // (e.g. bosses with SightRadius > 48 tiles that are still near a player)
+                foreach (var entry in Enemies)
+                {
+                    var entity = entry.Value;
+                    if (entity.Dead || entity.ObjectDesc?.SightRadius <= 0)
+                        continue;
+                    if (tickedEnemies.Contains(entity))
+                        continue;
+
+                    var sr = entity.ObjectDesc.SightRadius;
+                    var sqRange = (float)sr * sr;
+                    var inRange = false;
+                    foreach (var player in Players.Values)
+                    {
+                        if (entity.SqDistTo(player) < sqRange)
+                        {
+                            inRange = true;
+                            break;
+                        }
+                    }
+                    if (inRange)
+                    {
+                        entity.Tick(ref time);
+                        if (entity.Dead)
+                            EntitiesToRemove.Add(entity);
+                    }
                 }
             }
             else
