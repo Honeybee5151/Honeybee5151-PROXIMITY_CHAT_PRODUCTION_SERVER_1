@@ -22,7 +22,8 @@ namespace WorldServer.networking.packets.outgoing
         Earthquake = 14,
         Flashing = 15,      //period=pos1.x, numCycles=pos1.y
         BeachBall = 16,
-        Inspired = 17
+        Inspired = 17,
+        ChargePath = 18
     }
 
     public class ShowEffect : OutgoingMessage

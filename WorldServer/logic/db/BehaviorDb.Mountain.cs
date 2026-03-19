@@ -104,6 +104,7 @@ namespace WorldServer.logic
                 new DropPortalOnDeath("Snake Pit Portal", .25),
                 new StayAbove(1, 200),
                 new OrderedBehavior(
+                    new NewChargeWithIndicator(cooldown: 6.0f, speed: 10.0f, range: 12.0f, windupTime: 1.2f, pathWidth: 2.0f),
                     new NewFollow(range: 7, speed: 1.0f),
                     new NewWander(0.4f)
                     ),
