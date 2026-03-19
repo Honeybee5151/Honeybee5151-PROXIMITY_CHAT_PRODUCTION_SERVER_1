@@ -532,10 +532,6 @@ namespace WorldServer.core.objects
                     Dismount();
                     SendInfo("Your mount is gone!");
                 }
-                else
-                {
-                    Move(mount.X, mount.Y);
-                }
             }
 
             if (KeepAlive(time))
