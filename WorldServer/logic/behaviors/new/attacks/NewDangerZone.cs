@@ -12,24 +12,26 @@ namespace WorldServer.logic.behaviors.@new.attacks
 {
     /// <summary>
     /// Danger zone — the entire area around the boss is a damage zone EXCEPT
-    /// a cone in the direction the boss is facing (toward its chase target).
-    /// Players outside the safe cone take periodic damage.
-    /// A ShowEffect is broadcast so the client can render the red overlay with cone cutout.
+    /// a curved cone in the direction the boss is facing (toward its chase target).
+    /// The cone uses a power curve (exponent 1.5) so edges bow inward — narrow near
+    /// the boss, wider at the tip, preventing the safe zone from being too broad.
     /// </summary>
     public sealed class NewDangerZone : Behavior
     {
-        private readonly float HalfConeAngle; // radians
+        private const float ConeExponent = 1.5f; // must match client CONE_EXPONENT
+
+        private readonly float HalfConeAngle; // radians (max angle at tip)
         private readonly float Range;
         private readonly int Damage;
         private readonly int TickRateMs;
         private readonly uint Color;
         private readonly int DurationMs;
-        private readonly float TurnSpeed; // radians per second — how fast the cone rotates
+        private readonly float TurnSpeed; // radians per second
         private readonly ConditionEffectIndex Effect;
         private readonly int EffectDuration;
 
         public NewDangerZone(
-            float halfConeAngleDeg = 70f,
+            float halfConeAngleDeg = 55f,
             float range = 30f,
             int damage = 50,
             int tickRateMs = 500,
@@ -63,11 +65,8 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var target = host.World.FindPlayerTarget(host);
             if (target == null)
             {
-                // No target — deactivate visual if active
                 if (s.Active)
-                {
                     s.Active = false;
-                }
                 return;
             }
 
@@ -76,11 +75,10 @@ namespace WorldServer.logic.behaviors.@new.attacks
             if (!s.Initialized)
             {
                 s.Initialized = true;
-                s.FacingAngle = desiredAngle; // snap to target immediately on first tick
+                s.FacingAngle = desiredAngle;
             }
             else
             {
-                // Slowly rotate the cone toward the target (not instant snap)
                 var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
                 var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
                 if (MathF.Abs(angleDiff) <= maxRotation)
@@ -90,8 +88,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 s.FacingAngle = NormalizeAngle(s.FacingAngle);
             }
 
-            // Re-broadcast visual periodically so players entering range see it
-            // Client deduplicates — won't stack multiple effects for same boss
+            // Re-broadcast visual periodically
             s.Active = true;
             s.BroadcastTickMs += time.ElapsedMsDelta;
             if (s.BroadcastTickMs >= 5000)
@@ -103,11 +100,11 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     TargetObjectId = host.Id,
                     Pos1 = new Position() { X = HalfConeAngle, Y = Range },
                     Color = new ARGB(Color),
-                    Duration = 600000 // 10 minutes — effectively permanent until boss dies
+                    Duration = 600000
                 }, host);
             }
 
-            // Warmup: no damage for first 3 seconds so player can see the zone
+            // Warmup: no damage for first 3 seconds
             s.WarmupMs += time.ElapsedMsDelta;
             if (s.WarmupMs < 3000)
                 return;
@@ -125,11 +122,19 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (p is not Player player)
                     return;
 
-                // Check if player is in the safe cone
+                // Distance from boss to player
+                var pdx = player.X - host.X;
+                var pdy = player.Y - host.Y;
+                var dist = MathF.Sqrt(pdx * pdx + pdy * pdy);
+
+                // Effective half-angle at this distance (power curve)
+                var t = MathF.Min(dist / Range, 1f);
+                var effectiveHalf = HalfConeAngle * MathF.Pow(t, ConeExponent);
+
                 var angleToPlayer = MathF.Atan2(player.Y - host.Y, player.X - host.X);
                 var diff = NormalizeAngle(angleToPlayer - s.FacingAngle);
 
-                if (MathF.Abs(diff) <= HalfConeAngle)
+                if (MathF.Abs(diff) <= effectiveHalf)
                     return; // Player is in safe cone — no damage
 
                 // Player is outside safe cone — damage them
@@ -163,7 +168,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             public float FacingAngle;
             public int GlobalTickMs;
             public int WarmupMs;
-            public int BroadcastTickMs = 5000; // start at max so first tick broadcasts immediately
+            public int BroadcastTickMs = 5000;
         }
     }
 }

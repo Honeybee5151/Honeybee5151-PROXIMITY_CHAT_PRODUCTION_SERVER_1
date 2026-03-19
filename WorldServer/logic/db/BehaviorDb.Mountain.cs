@@ -131,7 +131,7 @@ namespace WorldServer.logic
                 new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0), coolDownOffset: 3000),
                 new Shoot(12, count: 1, projectileIndex: 0, angleOffset: -15, coolDown: new Cooldown(1200, 600), coolDownOffset: 3000),
                 // Danger zone covers entire map — 10000 damage outside = instant kill
-                new NewDangerZone(halfConeAngleDeg: 70f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
+                new NewDangerZone(halfConeAngleDeg: 55f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
             )
         )
         .Init("Ent God",
