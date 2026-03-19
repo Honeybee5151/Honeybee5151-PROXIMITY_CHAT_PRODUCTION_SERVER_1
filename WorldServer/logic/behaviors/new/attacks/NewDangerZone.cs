@@ -12,30 +12,30 @@ namespace WorldServer.logic.behaviors.@new.attacks
 {
     /// <summary>
     /// Danger zone — the entire area around the boss is a damage zone EXCEPT
-    /// a curved cone in the direction the boss is facing (toward its chase target).
-    /// The cone uses a power curve (exponent 1.5) so edges bow inward — narrow near
-    /// the boss, wider at the tip, preventing the safe zone from being too broad.
+    /// a cone in the direction the boss is facing (toward its chase target).
+    /// Cone uses linear taper: θ(d) = θ_max × (1 - 0.4 × d/R) — narrows to 60% at max range.
+    /// Players outside the safe cone take periodic damage + optional condition effect.
     /// </summary>
     public sealed class NewDangerZone : Behavior
     {
-        private const float ConeExponent = 1.5f; // must match client CONE_EXPONENT
+        private const float ConeTaper = 0.4f; // must match client CONE_TAPER
 
-        private readonly float HalfConeAngle; // radians (max angle at tip)
+        private readonly float HalfConeAngle; // radians
         private readonly float Range;
         private readonly int Damage;
         private readonly int TickRateMs;
         private readonly uint Color;
         private readonly int DurationMs;
-        private readonly float TurnSpeed; // radians per second
+        private readonly float TurnSpeed;
         private readonly ConditionEffectIndex Effect;
         private readonly int EffectDuration;
 
         public NewDangerZone(
-            float halfConeAngleDeg = 55f,
+            float halfConeAngleDeg = 60f,
             float range = 30f,
             int damage = 50,
             int tickRateMs = 500,
-            uint color = 0x80FF0000,
+            uint color = 0x8080D0FF,
             int durationMs = 0,
             float turnSpeedDegPerSec = 60f,
             ConditionEffectIndex effect = 0,
@@ -52,6 +52,12 @@ namespace WorldServer.logic.behaviors.@new.attacks
             EffectDuration = effectDuration;
         }
 
+        private float EffectiveHalfAngle(float dist)
+        {
+            var t = MathF.Min(dist / Range, 1f);
+            return HalfConeAngle * (1f - ConeTaper * t);
+        }
+
         protected override void TickCore(Entity host, TickTime time, ref object state)
         {
             var s = state as DangerState;
@@ -61,7 +67,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 state = s;
             }
 
-            // Find chase target
             var target = host.World.FindPlayerTarget(host);
             if (target == null)
             {
@@ -70,7 +75,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 return;
             }
 
-            // Initialize facing angle toward target on first tick
             var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
             if (!s.Initialized)
             {
@@ -88,7 +92,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 s.FacingAngle = NormalizeAngle(s.FacingAngle);
             }
 
-            // Re-broadcast visual periodically
             s.Active = true;
             s.BroadcastTickMs += time.ElapsedMsDelta;
             if (s.BroadcastTickMs >= 5000)
@@ -104,40 +107,34 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 }, host);
             }
 
-            // Warmup: no damage for first 3 seconds
             s.WarmupMs += time.ElapsedMsDelta;
             if (s.WarmupMs < 3000)
                 return;
 
-            // Tick damage timers
             s.GlobalTickMs += time.ElapsedMsDelta;
             if (s.GlobalTickMs < TickRateMs)
                 return;
             s.GlobalTickMs -= TickRateMs;
 
-            // Check all players in range
             var pos = new Position(host.X, host.Y);
             host.World.AOE(pos, Range, true, p =>
             {
                 if (p is not Player player)
                     return;
 
-                // Distance from boss to player
                 var pdx = player.X - host.X;
                 var pdy = player.Y - host.Y;
                 var dist = MathF.Sqrt(pdx * pdx + pdy * pdy);
 
-                // Effective half-angle at this distance (power curve)
-                var t = MathF.Min(dist / Range, 1f);
-                var effectiveHalf = HalfConeAngle * MathF.Pow(t, ConeExponent);
+                // Effective half-angle at this distance (linear taper)
+                var effectiveHalf = EffectiveHalfAngle(dist);
 
                 var angleToPlayer = MathF.Atan2(player.Y - host.Y, player.X - host.X);
                 var diff = NormalizeAngle(angleToPlayer - s.FacingAngle);
 
                 if (MathF.Abs(diff) <= effectiveHalf)
-                    return; // Player is in safe cone — no damage
+                    return; // Player is in safe cone
 
-                // Player is outside safe cone — damage them
                 var hitPos = new Position(player.X, player.Y);
                 host.World.BroadcastIfVisible(
                     new AoeMessage(hitPos, 1f, Damage, Effect, EffectDuration / 1000f, host.ObjectType, new ARGB(Color)),

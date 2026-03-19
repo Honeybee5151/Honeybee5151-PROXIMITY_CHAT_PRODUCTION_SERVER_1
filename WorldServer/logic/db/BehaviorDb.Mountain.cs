@@ -130,8 +130,8 @@ namespace WorldServer.logic
                 // Alternating tusk shots: left tusk then right tusk (3s delay matches danger zone warmup)
                 new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0), coolDownOffset: 3000),
                 new Shoot(12, count: 1, projectileIndex: 0, angleOffset: -15, coolDown: new Cooldown(1200, 600), coolDownOffset: 3000),
-                // Danger zone covers entire map — 10000 damage outside = instant kill
-                new NewDangerZone(halfConeAngleDeg: 55f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
+                // Ice danger zone — 100 damage/sec + slow outside safe cone
+                new NewDangerZone(halfConeAngleDeg: 60f, range: 100f, damage: 100, tickRateMs: 1000, color: 0x8080D0FF, turnSpeedDegPerSec: 30f, effect: ConditionEffectIndex.Slowed, effectDuration: 1500)
             )
         )
         .Init("Ent God",
