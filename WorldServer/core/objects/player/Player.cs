@@ -805,6 +805,7 @@ namespace WorldServer.core.objects
             var dt = time.ElapsedMsDelta;
             for (var slot = 0; slot < 4; slot++)
                 _slotEffectCooldowns[slot] = Math.Max(_slotEffectCooldowns[slot] - dt, 0);
+            DashCooldown = Math.Max(DashCooldown - dt, 0);
         }
     }
 }

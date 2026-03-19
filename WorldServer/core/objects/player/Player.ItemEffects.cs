@@ -8,6 +8,7 @@ namespace WorldServer.core.objects
     public partial class Player
     {
         private readonly int[] _slotEffectCooldowns = new int[4];
+        public int DashCooldown;
         private void PlayerShootEffects(float angle)
         {
             for (var i = 0; i < 4; i++)
