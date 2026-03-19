@@ -340,10 +340,8 @@ namespace WorldServer.core.objects
                 Muted = !Client.Account.Admin && t.IsCompleted && t.Result;
             });
 
-            _ = GameServer.Database.IsLegend(AccountId).ContinueWith(t =>
-            {
-                Glow = t.Result && account.GlowColor == 0 ? 0xFF0000 : account.GlowColor;
-            });
+            // Legend glow disabled — glow reserved for custom uses (e.g. /glow command)
+            Glow = account.GlowColor;
 
             if (account.Hidden)
             {
