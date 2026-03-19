@@ -255,10 +255,6 @@ namespace WorldServer.logic.loot
 
                         drops.Add(item);
                     }
-                    else
-                    {
-                        Log.Info($"[Loot] Threshold check failed for '{i.Item}': threshold={i.Threshold} >= dmgRatio={Math.Round(tupPlayer.Item2 / (double)enemy.DamageCounter.TotalDamage, 4)}");
-                    }
                 }
 
                 privDrops[player] = drops;
