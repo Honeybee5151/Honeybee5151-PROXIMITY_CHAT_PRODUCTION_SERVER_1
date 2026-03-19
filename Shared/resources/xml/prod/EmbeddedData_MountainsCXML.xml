@@ -270,6 +270,26 @@
          <Size>110</Size>
       </Projectile>
    </Object>
+   <Object type="0x65A" id="Medusa 2">
+      <Enemy/>
+      <Class>Character</Class>
+      <AnimatedTexture>
+         <File>chars16x16dMountains1</File>
+         <Index>0x02</Index>
+      </AnimatedTexture>
+      <HitSound>monster/medusa_hit</HitSound>
+      <DeathSound>monster/medusa_death</DeathSound>
+      <Size>140</Size>
+      <MaxHitPoints>10000</MaxHitPoints>
+      <Defense>20</Defense>
+      <Projectile id="0">
+         <ObjectId>White Bolt</ObjectId>
+         <Damage>150</Damage>
+         <Speed>60</Speed>
+         <LifetimeMS>2500</LifetimeMS>
+         <Size>130</Size>
+      </Projectile>
+   </Object>
    <Object type="0x0905" id="Rock Bot">
       <Group>Rocks</Group>
       <Enemy/>

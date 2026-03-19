@@ -24,7 +24,8 @@ namespace WorldServer.networking.packets.outgoing
         BeachBall = 16,
         Inspired = 17,
         ChargePath = 18,
-        ExpandingRing = 19
+        ExpandingRing = 19,
+        DangerZone = 20
     }
 
     public class ShowEffect : OutgoingMessage
