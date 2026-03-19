@@ -56,6 +56,7 @@ namespace Shared.resources
         public readonly bool StunImmune;
         public readonly bool HealthBarBoss;
         public readonly bool ShowName;
+        public readonly int SightRadius; // 0 = default (15), otherwise custom sight distance for this entity
         public readonly TerrainType Terrain;
 
         public string Class;
@@ -143,6 +144,7 @@ namespace Shared.resources
             Connects = e.HasElement("Connects");
             ProtectFromGroundDamage = e.HasElement("ProtectFromGroundDamage");
             ProtectFromSink = e.HasElement("ProtectFromSink");
+            SightRadius = e.GetValue<int>("SightRadius");
 
             foreach (var i in e.Elements("Projectile"))
             {

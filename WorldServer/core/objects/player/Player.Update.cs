@@ -70,6 +70,14 @@ namespace WorldServer.core.objects
                 if (entity is Player || _activeTiles.Contains(new IntPoint((int)entity.X, (int)entity.Y)))
                     continue;
 
+                // Extended sight radius — keep entity visible if within its custom range
+                if (entity.ObjectDesc?.SightRadius > 0)
+                {
+                    var sr = entity.ObjectDesc.SightRadius;
+                    if (entity.SqDistTo(this) < sr * sr)
+                        continue;
+                }
+
                 drops.Add(entity.Id);
                 update.Drops.Add(entity.Id);
             }
@@ -267,6 +275,17 @@ namespace WorldServer.core.objects
                 intPoint.Y = (int)entity.Y;
 
                 if (_activeTiles.Contains(intPoint) && _newObjects.Add(entity))
+                    update.NewObjs.Add(entity.ToDefinition());
+            }
+
+            // Extended sight radius — add enemies beyond normal range if they have SightRadius set
+            foreach (var entry in World.Enemies)
+            {
+                var entity = entry.Value;
+                if (entity.Dead || entity.ObjectDesc?.SightRadius <= 0)
+                    continue;
+                var sr = entity.ObjectDesc.SightRadius;
+                if (entity.SqDistTo(this) < sr * sr && _newObjects.Add(entity))
                     update.NewObjs.Add(entity.ToDefinition());
             }
 

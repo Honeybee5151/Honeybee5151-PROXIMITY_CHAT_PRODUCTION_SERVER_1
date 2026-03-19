@@ -173,8 +173,14 @@ namespace WorldServer.core.worlds
 
         public void BroadcastIfVisible(OutgoingMessage outgoingMessage, Entity host)
         {
+            var cullSq = CULL_RANGE * CULL_RANGE;
+            if (host.ObjectDesc?.SightRadius > 0)
+            {
+                var sr = host.ObjectDesc.SightRadius;
+                cullSq = sr * sr;
+            }
             foreach (var player in Players.Values)
-                if (player.SqDistTo(host) < CULL_RANGE * CULL_RANGE)
+                if (player.SqDistTo(host) < cullSq)
                 {
                     if (outgoingMessage is EnemyShootMessage)
                         player.ProcessEnemyShoot(outgoingMessage as EnemyShootMessage);
@@ -184,8 +190,14 @@ namespace WorldServer.core.worlds
 
         public void BroadcastEnemyShootIfVisible(EnemyShootMessage enemyShoot, Entity host)
         {
+            var cullSq = CULL_RANGE * CULL_RANGE;
+            if (host.ObjectDesc?.SightRadius > 0)
+            {
+                var sr = host.ObjectDesc.SightRadius;
+                cullSq = sr * sr;
+            }
             foreach (var player in Players.Values)
-                if (player.SqDistTo(host) < CULL_RANGE * CULL_RANGE)
+                if (player.SqDistTo(host) < cullSq)
                 {
                     player.ProcessEnemyShoot(enemyShoot);
                     player.Client.SendPacket(enemyShoot);

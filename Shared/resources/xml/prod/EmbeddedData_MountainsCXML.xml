@@ -282,6 +282,7 @@
       <Size>140</Size>
       <MaxHitPoints>10000</MaxHitPoints>
       <Defense>20</Defense>
+      <SightRadius>100</SightRadius>
       <Projectile id="0">
          <ObjectId>White Bolt</ObjectId>
          <Damage>150</Damage>
