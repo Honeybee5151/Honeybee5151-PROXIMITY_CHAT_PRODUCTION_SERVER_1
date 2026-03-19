@@ -81,11 +81,13 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
             s.FacingAngle = NormalizeAngle(s.FacingAngle);
 
-            // Broadcast visual once on activation — client effect persists and tracks the boss
-            if (!s.Active)
+            // Re-broadcast visual periodically so players entering range see it
+            // Client deduplicates — won't stack multiple effects for same boss
+            s.Active = true;
+            s.BroadcastTickMs += time.ElapsedMsDelta;
+            if (s.BroadcastTickMs >= 5000)
             {
-                s.Active = true;
-
+                s.BroadcastTickMs = 0;
                 host.World.BroadcastIfVisible(new ShowEffect()
                 {
                     EffectType = EffectType.DangerZone,
@@ -145,6 +147,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             public bool Active;
             public float FacingAngle;
             public int GlobalTickMs;
+            public int BroadcastTickMs = 5000; // start at max so first tick broadcasts immediately
         }
     }
 }
