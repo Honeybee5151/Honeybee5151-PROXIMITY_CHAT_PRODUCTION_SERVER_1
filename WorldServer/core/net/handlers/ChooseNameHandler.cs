@@ -27,7 +27,7 @@ namespace WorldServer.core.net.handlers
 
             client.GameServer.Database.ReloadAccount(client.Account);
 
-            if (name.Length < 1 || name.Length > 10 || !name.All(char.IsLetter) || !IsValid(name) || Database.GuestNames.Contains(name, StringComparer.InvariantCultureIgnoreCase))
+            if (name.Length < 1 || name.Length > 16 || !name.All(char.IsLetter) || !IsValid(name) || Database.GuestNames.Contains(name, StringComparer.InvariantCultureIgnoreCase))
                 client.SendPacket(new NameResult()
                 {
                     Success = false,
@@ -90,7 +90,7 @@ namespace WorldServer.core.net.handlers
         private bool IsValid(string text)
         {
             var nonDup = new Regex(@"([a-zA-z]{2,})\1{1,}");
-            var alpha = new Regex(@"^[A-Za-z]{1,10}$");
+            var alpha = new Regex(@"^[A-Za-z]{1,16}$");
 
             return !(nonDup.Matches(text).Count > 0) && alpha.Matches(text).Count > 0;
         }

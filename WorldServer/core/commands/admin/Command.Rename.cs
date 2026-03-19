@@ -33,10 +33,10 @@ namespace WorldServer.core.commands
                     return false;
                 }
 
-                if (newPlayerName.Length < 3 || newPlayerName.Length > 15 || !newPlayerName.All(char.IsLetter) ||
+                if (newPlayerName.Length < 3 || newPlayerName.Length > 16 || !newPlayerName.All(char.IsLetter) ||
                     Database.GuestNames.Contains(newPlayerName, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    player.SendError("New name is invalid. Must be between 3-15 char long and contain only letters.");
+                    player.SendError("New name is invalid. Must be between 3-16 char long and contain only letters.");
                     return false;
                 }
 
