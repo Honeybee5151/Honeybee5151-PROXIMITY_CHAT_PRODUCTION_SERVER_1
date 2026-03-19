@@ -129,7 +129,7 @@ namespace WorldServer.logic
                 ),
                 new Shoot(12, count: 3, shootAngle: 15, coolDown: 1500, projectileIndex: 0),
                 new NewExpandingRing(maxRadius: 8.0f, expandDuration: 1.8f, ringThickness: 1.5f, damage: 100, cooldown: 10.0f, color: 0xFFBB4400),
-                new NewDangerZone(halfConeAngleDeg: 70f, range: 30f, damage: 50, tickRateMs: 500, color: 0x80FF0000)
+                new NewDangerZone(halfConeAngleDeg: 70f, range: 15f, damage: 50, tickRateMs: 500, color: 0x80FF0000)
             )
         )
         .Init("Ent God",

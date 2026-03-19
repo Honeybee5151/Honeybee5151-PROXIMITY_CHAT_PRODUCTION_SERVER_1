@@ -81,11 +81,10 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
             s.FacingAngle = NormalizeAngle(s.FacingAngle);
 
-            // Broadcast visual on first activation or periodically re-send (every 2s for new clients)
-            if (!s.Active || s.VisualRefreshMs <= 0)
+            // Broadcast visual once on activation — client effect persists and tracks the boss
+            if (!s.Active)
             {
                 s.Active = true;
-                s.VisualRefreshMs = 2000;
 
                 host.World.BroadcastIfVisible(new ShowEffect()
                 {
@@ -93,10 +92,9 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     TargetObjectId = host.Id,
                     Pos1 = new Position() { X = HalfConeAngle, Y = Range },
                     Color = new ARGB(Color),
-                    Duration = 2500 // slightly longer than refresh interval
+                    Duration = 600000 // 10 minutes — effectively permanent until boss dies
                 }, host);
             }
-            s.VisualRefreshMs -= time.ElapsedMsDelta;
 
             // Tick damage timers
             s.GlobalTickMs += time.ElapsedMsDelta;
@@ -147,7 +145,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
             public bool Active;
             public float FacingAngle;
             public int GlobalTickMs;
-            public int VisualRefreshMs;
         }
     }
 }
