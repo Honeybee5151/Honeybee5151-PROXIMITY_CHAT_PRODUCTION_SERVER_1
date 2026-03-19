@@ -1,4 +1,5 @@
 using System;
+using NLog;
 using Shared.resources;
 using WorldServer.core.net.datas;
 using WorldServer.core.objects;
@@ -17,6 +18,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
     /// </summary>
     public sealed class NewExpandingRing : Behavior
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private readonly float MaxRadius;
         private readonly float ExpandDurationSec;
         private readonly float RingThickness;
@@ -73,20 +75,26 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 var innerEdge = currentRadius - RingThickness / 2f;
                 var outerEdge = currentRadius + RingThickness / 2f;
 
-                // Query all players within outer edge
-                host.World.AOE(new Position(host.X, host.Y), outerEdge, true, p =>
+                // Query all players near the ring
+                var pos = new Position(host.X, host.Y);
+                var searchRadius = outerEdge + 2f;
+                Log.Info($"[Ring] tick: radius={currentRadius:F1} inner={innerEdge:F1} outer={outerEdge:F1} search={searchRadius:F1}");
+                host.World.AOE(pos, searchRadius, true, p =>
                 {
                     if (p is not Player player)
                         return;
+
+                    var dist = player.DistTo(host.X, host.Y);
+                    Log.Info($"[Ring] player {player.Name} dist={dist:F2} inner={innerEdge:F1} outer={outerEdge:F1} alreadyHit={s.HitPlayers.Contains(player.Id)}");
 
                     // Skip players already hit by this ring
                     if (s.HitPlayers.Contains(player.Id))
                         return;
 
-                    var dist = player.DistTo(host);
                     if (dist >= innerEdge && dist <= outerEdge)
                     {
-                        player.Damage(Damage, host);
+                        Log.Info($"[Ring] HIT! Damaging {player.Name} for {Damage}");
+                        (p as IPlayer).Damage(Damage, host);
                         s.HitPlayers.Add(player.Id);
 
                         if (Effect != 0 && !player.HasConditionEffect(ConditionEffectIndex.Invincible) && !player.HasConditionEffect(ConditionEffectIndex.Invulnerable))
