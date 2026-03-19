@@ -179,6 +179,8 @@ namespace WorldServer.logic.loot
                 if (i.Threshold <= 0 && chance < i.Probabilty)
                 {
                     var items = GetItems(i.ItemType, i.Tier);
+                    if (items == null || items.Count == 0)
+                        continue;
                     var chosenTieredItem = items[Random.Shared.Next(items.Count)];
                     pubDrops.Add(chosenTieredItem);
                 }

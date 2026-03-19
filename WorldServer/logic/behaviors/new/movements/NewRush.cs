@@ -1,22 +1,24 @@
+using Shared.resources;
 using WorldServer.core.objects;
-using WorldServer.core.structures;
 using WorldServer.core.worlds;
 
 namespace WorldServer.logic.behaviors.@new.movements
 {
+    /// <summary>
+    /// Temporarily applies Speedy condition to boost the mob's movement speed.
+    /// Works with existing Chase/Follow behaviors — just makes them faster.
+    /// </summary>
     public sealed class NewRush : Behavior
     {
         private readonly float Cooldown;
-        private readonly float Speed;
-        private readonly float Range;
         private readonly float Duration;
+        private readonly float Range;
 
-        public NewRush(float cooldown = 5.0f, float speed = 6.0f, float range = 15.0f, float duration = 2.0f)
+        public NewRush(float cooldown = 5.0f, float duration = 2.0f, float range = 15.0f)
         {
             Cooldown = cooldown;
-            Speed = speed;
-            Range = range;
             Duration = duration;
+            Range = range;
         }
 
         protected override bool TickCoreOrdered(Entity host, TickTime time, ref object state)
@@ -25,7 +27,6 @@ namespace WorldServer.logic.behaviors.@new.movements
             if (state == null)
                 state = s;
 
-            // Currently rushing — track and chase the player
             if (s.Rushing)
             {
                 s.DurationLeft -= time.DeltaTime;
@@ -33,42 +34,34 @@ namespace WorldServer.logic.behaviors.@new.movements
                 {
                     s.Rushing = false;
                     s.CooldownLeft = Cooldown;
+                    host.RemoveCondition(ConditionEffectIndex.Speedy);
                     return false;
                 }
-
-                // Re-acquire target position each tick for tracking
-                var target = host.World.FindPlayerTarget(host);
-                if (target == null)
-                {
-                    s.Rushing = false;
-                    s.CooldownLeft = Cooldown;
-                    return false;
-                }
-
-                var targetPos = new Position(target.X, target.Y);
-                host.MoveToward(ref targetPos, Speed * time.BehaviourTickTime);
-                return true;
+                return false; // Don't block other behaviors — let Chase/Follow run at boosted speed
             }
 
-            // Cooldown
             s.CooldownLeft -= time.DeltaTime;
             if (s.CooldownLeft > 0.0f)
                 return false;
 
-            var rushTarget = host.World.FindPlayerTarget(host);
-            if (rushTarget == null || host.DistTo(rushTarget) > Range)
+            var target = host.World.FindPlayerTarget(host);
+            if (target == null || host.DistTo(target) > Range)
                 return false;
 
+            // Apply Speedy and let existing movement behaviors handle the rest
             s.Rushing = true;
             s.DurationLeft = Duration;
-            return true;
+            host.ApplyConditionEffect(ConditionEffectIndex.Speedy, (int)(Duration * 1000));
+            return false;
         }
 
         protected override void OnStateExit(Entity host, TickTime time, ref object state)
         {
-            var s = state == null ? new RushState() : (RushState)state;
-            s.Rushing = false;
-            s.CooldownLeft = 0.0f;
+            if (state is RushState s && s.Rushing)
+            {
+                s.Rushing = false;
+                host.RemoveCondition(ConditionEffectIndex.Speedy);
+            }
         }
 
         class RushState

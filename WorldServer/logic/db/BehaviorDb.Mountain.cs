@@ -143,7 +143,7 @@ namespace WorldServer.logic
         .Init("Beholder",
             new State(
                 new OrderedBehavior(
-                    new NewRush(cooldown: 5.0f, speed: 6.0f, range: 10.0f, duration: 1.5f),
+                    new NewRush(cooldown: 5.0f, duration: 2.0f, range: 10.0f),
                     new NewFollow(range: 7, speed: 1.0f),
                     new NewWander(0.4f)
                     ),
