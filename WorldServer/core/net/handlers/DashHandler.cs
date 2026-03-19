@@ -1,5 +1,6 @@
 using Shared;
 using Shared.resources;
+using WorldServer.core.net.datas;
 using WorldServer.core.net.stats;
 using WorldServer.core.structures;
 using WorldServer.core.worlds;

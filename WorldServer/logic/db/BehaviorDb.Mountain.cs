@@ -3,6 +3,7 @@ using WorldServer.logic.behaviors;
 using WorldServer.logic.loot;
 using WorldServer.logic.transitions;
 using WorldServer.logic.behaviors.@new.movements;
+using WorldServer.logic.behaviors.@new.attacks;
 using WorldServer.logic.behaviors.@new;
 
 namespace WorldServer.logic
@@ -110,6 +111,7 @@ namespace WorldServer.logic
                     ),
                 new Shoot(12, count: 5, shootAngle: 10, coolDown: 1000),
                 new Grenade(4, 150, range: 8, coolDown: 3000),
+                new NewExpandingRing(maxRadius: 10.0f, expandDuration: 2.0f, ringThickness: 1.5f, damage: 80, cooldown: 8.0f),
                 new Reproduce(densityMax: 3)
                 ),
             new Threshold(0.01,

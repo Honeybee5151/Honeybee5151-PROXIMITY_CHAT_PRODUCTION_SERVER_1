@@ -23,7 +23,8 @@ namespace WorldServer.networking.packets.outgoing
         Flashing = 15,      //period=pos1.x, numCycles=pos1.y
         BeachBall = 16,
         Inspired = 17,
-        ChargePath = 18
+        ChargePath = 18,
+        ExpandingRing = 19
     }
 
     public class ShowEffect : OutgoingMessage
