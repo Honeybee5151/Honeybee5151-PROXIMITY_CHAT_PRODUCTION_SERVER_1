@@ -24,6 +24,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
         private readonly int TickRateMs;
         private readonly uint Color;
         private readonly int DurationMs;
+        private readonly float TurnSpeed; // radians per second — how fast the cone rotates
         private readonly ConditionEffectIndex Effect;
         private readonly int EffectDuration;
 
@@ -34,6 +35,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             int tickRateMs = 500,
             uint color = 0x80FF0000,
             int durationMs = 0,
+            float turnSpeedDegPerSec = 60f,
             ConditionEffectIndex effect = 0,
             int effectDuration = 0)
         {
@@ -43,6 +45,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             TickRateMs = tickRateMs;
             Color = color;
             DurationMs = durationMs;
+            TurnSpeed = turnSpeedDegPerSec * MathF.PI / 180f;
             Effect = effect;
             EffectDuration = effectDuration;
         }
@@ -68,8 +71,15 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 return;
             }
 
-            // Compute facing direction toward target
-            s.FacingAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
+            // Slowly rotate the cone toward the target (not instant snap)
+            var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
+            var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
+            var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
+            if (MathF.Abs(angleDiff) <= maxRotation)
+                s.FacingAngle = desiredAngle;
+            else
+                s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
+            s.FacingAngle = NormalizeAngle(s.FacingAngle);
 
             // Broadcast visual on first activation or periodically re-send (every 2s for new clients)
             if (!s.Active || s.VisualRefreshMs <= 0)
