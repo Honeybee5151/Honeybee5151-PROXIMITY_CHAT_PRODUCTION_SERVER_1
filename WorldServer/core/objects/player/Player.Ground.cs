@@ -68,26 +68,32 @@ namespace WorldServer.core.objects
             if (!GameServer.Resources.GameData.Tiles.TryGetValue(tile.TileId, out var tileDesc))
                 return;
 
+            int dmg;
             if (tileDesc.Damaging && (objDesc == null || !objDesc.ProtectFromGroundDamage))
             {
-                int dmg = (int)Client.Random.NextIntRange((uint)tileDesc.MinDamage, (uint)tileDesc.MaxDamage);
-
-                Health -= dmg;
-
-                if (Health <= 0)
-                {
-                    Death(tileDesc.ObjectId, tile.Spawned);
-                    return;
-                }
-
-                World.BroadcastIfVisibleExclude(new DamageMessage()
-                {
-                    TargetId = Id,
-                    DamageAmount = dmg,
-                    Kill = Health <= 0,
-                }, this, this);
-                anticheat = true;
+                dmg = (int)Client.Random.NextIntRange((uint)tileDesc.MinDamage, (uint)tileDesc.MaxDamage);
             }
+            else
+            {
+                // Client-authoritative danger zone damage — trust the client
+                dmg = 100;
+            }
+
+            Health -= dmg;
+
+            if (Health <= 0)
+            {
+                Death(tileDesc.Damaging ? tileDesc.ObjectId : "danger zone", tile.Spawned);
+                return;
+            }
+
+            World.BroadcastIfVisibleExclude(new DamageMessage()
+            {
+                TargetId = Id,
+                DamageAmount = dmg,
+                Kill = Health <= 0,
+            }, this, this);
+            anticheat = true;
         }
 
         public void GroundEffect(TickTime time)

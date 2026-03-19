@@ -1,61 +1,40 @@
 using System;
-using System.Collections.Generic;
 using Shared.resources;
 using WorldServer.core.net.datas;
 using WorldServer.core.objects;
 using WorldServer.core.structures;
 using WorldServer.core.worlds;
 using WorldServer.networking.packets.outgoing;
-using WorldServer.utils;
 
 namespace WorldServer.logic.behaviors.@new.attacks
 {
     /// <summary>
-    /// Danger zone — the entire area around the boss is a damage zone EXCEPT
-    /// a cone in the direction the boss is facing (toward its chase target).
-    /// Cone uses linear taper: θ(d) = θ_max × (1 - 0.4 × d/R) — narrows to 60% at max range.
-    /// Players outside the safe cone take periodic damage + optional condition effect.
+    /// Danger zone — broadcasts a ShowEffect so the client renders the zone + handles damage client-side.
+    /// Server only tracks cone direction (for the visual broadcast) and re-broadcasts periodically.
+    /// All damage is client-authoritative (uses groundDamage like lava tiles).
     /// </summary>
     public sealed class NewDangerZone : Behavior
     {
-        private const float ConeTaper = 0.4f; // must match client CONE_TAPER
-
         private readonly float HalfConeAngle; // radians
         private readonly float Range;
-        private readonly int Damage;
-        private readonly int TickRateMs;
         private readonly uint Color;
-        private readonly int DurationMs;
         private readonly float TurnSpeed;
-        private readonly ConditionEffectIndex Effect;
-        private readonly int EffectDuration;
 
         public NewDangerZone(
             float halfConeAngleDeg = 60f,
             float range = 30f,
-            int damage = 50,
-            int tickRateMs = 500,
+            int damage = 0,       // unused — damage is client-side
+            int tickRateMs = 0,   // unused
             uint color = 0x8080D0FF,
-            int durationMs = 0,
+            int durationMs = 0,   // unused
             float turnSpeedDegPerSec = 60f,
-            ConditionEffectIndex effect = 0,
-            int effectDuration = 0)
+            ConditionEffectIndex effect = 0,  // unused
+            int effectDuration = 0)           // unused
         {
             HalfConeAngle = halfConeAngleDeg * MathF.PI / 180f;
             Range = range;
-            Damage = damage;
-            TickRateMs = tickRateMs;
             Color = color;
-            DurationMs = durationMs;
             TurnSpeed = turnSpeedDegPerSec * MathF.PI / 180f;
-            Effect = effect;
-            EffectDuration = effectDuration;
-        }
-
-        private float EffectiveHalfAngle(float dist)
-        {
-            var t = MathF.Min(dist / Range, 1f);
-            return HalfConeAngle * (1f - ConeTaper * t);
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
@@ -67,36 +46,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 state = s;
             }
 
-            // Find closest player (no range limit — searches entire world)
-            var target = host.World.FindPlayerTarget(host);
-            if (target == null)
-            {
-                // No visible player — pause zone (invisible/paused/newbie players are protected)
-                if (s.Active)
-                    s.Active = false;
-                return;
-            }
-
-            // Cone direction tracking
-            var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
-            if (!s.Initialized)
-            {
-                s.Initialized = true;
-                s.FacingAngle = desiredAngle;
-            }
-            else
-            {
-                var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
-                var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
-                if (MathF.Abs(angleDiff) <= maxRotation)
-                    s.FacingAngle = desiredAngle;
-                else
-                    s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
-                s.FacingAngle = NormalizeAngle(s.FacingAngle);
-            }
-
-            // Visual broadcast
-            s.Active = true;
+            // Re-broadcast visual periodically so clients see the zone
             s.BroadcastTickMs += time.ElapsedMsDelta;
             if (s.BroadcastTickMs >= 5000)
             {
@@ -107,70 +57,14 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     TargetObjectId = host.Id,
                     Pos1 = new Position() { X = HalfConeAngle, Y = Range },
                     Color = new ARGB(Color),
-                    Duration = 8000 // 8s — server re-broadcasts every 5s to refresh
+                    Duration = 8000
                 }, host);
             }
-
-            // Warmup
-            s.WarmupMs += time.ElapsedMsDelta;
-            if (s.WarmupMs < 3000)
-                return;
-
-            // Damage tick
-            s.GlobalTickMs += time.ElapsedMsDelta;
-            if (s.GlobalTickMs < TickRateMs)
-                return;
-            s.GlobalTickMs -= TickRateMs;
-
-            var pos = new Position(host.X, host.Y);
-            host.World.AOE(pos, Range, true, p =>
-            {
-                if (p is not Player player)
-                    return;
-
-                var pdx = player.X - host.X;
-                var pdy = player.Y - host.Y;
-                var dist = MathF.Sqrt(pdx * pdx + pdy * pdy);
-
-                var effectiveHalf = EffectiveHalfAngle(dist);
-
-                var angleToPlayer = MathF.Atan2(player.Y - host.Y, player.X - host.X);
-                var diff = NormalizeAngle(angleToPlayer - s.FacingAngle);
-
-                if (MathF.Abs(diff) <= effectiveHalf)
-                    return; // Player is in safe cone
-
-                var hitPos = new Position(player.X, player.Y);
-                host.World.BroadcastIfVisible(
-                    new AoeMessage(hitPos, 1f, Damage, Effect, EffectDuration / 1000f, host.ObjectType, new ARGB(Color)),
-                    player);
-
-                (p as IPlayer).Damage(Damage, host);
-
-                if (Effect != 0 &&
-                    !player.HasConditionEffect(ConditionEffectIndex.Invincible) &&
-                    !player.HasConditionEffect(ConditionEffectIndex.Invulnerable))
-                {
-                    player.ApplyConditionEffect(new ConditionEffect(Effect, EffectDuration));
-                }
-            });
-        }
-
-        private static float NormalizeAngle(float angle)
-        {
-            while (angle > MathF.PI) angle -= 2f * MathF.PI;
-            while (angle < -MathF.PI) angle += 2f * MathF.PI;
-            return angle;
         }
 
         private class DangerState
         {
-            public bool Active;
-            public bool Initialized;
-            public float FacingAngle;
-            public int GlobalTickMs;
-            public int WarmupMs;
-            public int BroadcastTickMs = 5000;
+            public int BroadcastTickMs = 5000; // start at max so first tick broadcasts immediately
         }
     }
 }
