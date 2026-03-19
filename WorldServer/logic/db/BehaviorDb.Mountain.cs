@@ -127,9 +127,11 @@ namespace WorldServer.logic
                     new NewFollow(range: 1, speed: 0.8f),
                     new NewWander(0.3f)
                 ),
-                new Shoot(12, count: 3, shootAngle: 15, coolDown: 1500, projectileIndex: 0),
-                new NewExpandingRing(maxRadius: 8.0f, expandDuration: 1.8f, ringThickness: 1.5f, damage: 100, cooldown: 10.0f, color: 0xFFBB4400),
-                new NewDangerZone(halfConeAngleDeg: 70f, range: 15f, damage: 50, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
+                // Alternating tusk shots: left tusk then right tusk
+                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0)),
+                new Shoot(12, count: 1, projectileIndex: 1, angleOffset: -15, coolDown: new Cooldown(1200, 600)),
+                // Danger zone covers entire map — 10000 damage outside = instant kill
+                new NewDangerZone(halfConeAngleDeg: 70f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
             )
         )
         .Init("Ent God",
