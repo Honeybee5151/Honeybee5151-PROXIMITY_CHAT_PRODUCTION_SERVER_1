@@ -289,6 +289,7 @@
          <Speed>60</Speed>
          <LifetimeMS>2500</LifetimeMS>
          <Size>130</Size>
+         <ParticleTrail intensity="1.5" lifetimeMS="400">0x80D0FF</ParticleTrail>
       </Projectile>
    </Object>
    <Object type="0x0905" id="Rock Bot">
