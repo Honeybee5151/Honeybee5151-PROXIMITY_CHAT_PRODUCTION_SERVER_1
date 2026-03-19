@@ -36,11 +36,8 @@ namespace WorldServer.core.miscfile
 
         public void Realm(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return;
-            foreach (var client in GameServer.ConnectionManager.Clients.Keys)
-                if (client.Player != null)
-                    client.Player.RealmRecieved(text);
+            // Disabled — realm event notifications removed
+            return;
         }
 
         public void Arena(string text)
