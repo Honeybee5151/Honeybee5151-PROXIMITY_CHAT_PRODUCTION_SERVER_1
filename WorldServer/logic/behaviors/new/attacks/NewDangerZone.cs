@@ -103,7 +103,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     TargetObjectId = host.Id,
                     Pos1 = new Position() { X = HalfConeAngle, Y = Range },
                     Color = new ARGB(Color),
-                    Duration = 600000
+                    Duration = 8000 // 8s — server re-broadcasts every 5s to refresh
                 }, host);
             }
 
