@@ -83,6 +83,10 @@ namespace WorldServer.logic.loot
             var allItems = gameServer.Resources.GameData.Items;
             foreach (var item in allItems.Values)
             {
+                // Skip custom/community items (0x5000+) from tier loot pool
+                if (item.ObjectType >= 0x5000)
+                    continue;
+
                 var itemType = TierLoot.SlotTypesToItemType(item.SlotType);
                 if (!Items.TryGetValue(itemType, out var dict))
                     Items[itemType] = dict = new Dictionary<int, List<Item>>();

@@ -34,7 +34,7 @@ namespace WorldServer.logic.behaviors.@new.movements
 
         protected override bool TickCoreOrdered(Entity host, TickTime time, ref object state)
         {
-            var s = state == null ? new ChargeIndicatorState() : (ChargeIndicatorState)state;
+            var s = state == null ? new ChargeIndicatorState { CooldownLeft = Cooldown } : (ChargeIndicatorState)state;
             if (state == null)
                 state = s;
 
