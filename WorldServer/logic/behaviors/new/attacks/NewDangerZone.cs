@@ -71,15 +71,24 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 return;
             }
 
-            // Slowly rotate the cone toward the target (not instant snap)
+            // Initialize facing angle toward target on first tick
             var desiredAngle = MathF.Atan2(target.Y - host.Y, target.X - host.X);
-            var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
-            var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
-            if (MathF.Abs(angleDiff) <= maxRotation)
-                s.FacingAngle = desiredAngle;
+            if (!s.Initialized)
+            {
+                s.Initialized = true;
+                s.FacingAngle = desiredAngle; // snap to target immediately on first tick
+            }
             else
-                s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
-            s.FacingAngle = NormalizeAngle(s.FacingAngle);
+            {
+                // Slowly rotate the cone toward the target (not instant snap)
+                var angleDiff = NormalizeAngle(desiredAngle - s.FacingAngle);
+                var maxRotation = TurnSpeed * (time.ElapsedMsDelta / 1000f);
+                if (MathF.Abs(angleDiff) <= maxRotation)
+                    s.FacingAngle = desiredAngle;
+                else
+                    s.FacingAngle += MathF.Sign(angleDiff) * maxRotation;
+                s.FacingAngle = NormalizeAngle(s.FacingAngle);
+            }
 
             // Re-broadcast visual periodically so players entering range see it
             // Client deduplicates — won't stack multiple effects for same boss
@@ -97,6 +106,11 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     Duration = 600000 // 10 minutes — effectively permanent until boss dies
                 }, host);
             }
+
+            // Warmup: no damage for first 3 seconds so player can see the zone
+            s.WarmupMs += time.ElapsedMsDelta;
+            if (s.WarmupMs < 3000)
+                return;
 
             // Tick damage timers
             s.GlobalTickMs += time.ElapsedMsDelta;
@@ -145,8 +159,10 @@ namespace WorldServer.logic.behaviors.@new.attacks
         private class DangerState
         {
             public bool Active;
+            public bool Initialized;
             public float FacingAngle;
             public int GlobalTickMs;
+            public int WarmupMs;
             public int BroadcastTickMs = 5000; // start at max so first tick broadcasts immediately
         }
     }
