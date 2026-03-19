@@ -127,9 +127,9 @@ namespace WorldServer.logic
                     new NewFollow(range: 1, speed: 0.8f),
                     new NewWander(0.3f)
                 ),
-                // Alternating tusk shots: left tusk then right tusk
-                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0)),
-                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: -15, coolDown: new Cooldown(1200, 600)),
+                // Alternating tusk shots: left tusk then right tusk (3s delay matches danger zone warmup)
+                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0), coolDownOffset: 3000),
+                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: -15, coolDown: new Cooldown(1200, 600), coolDownOffset: 3000),
                 // Danger zone covers entire map — 10000 damage outside = instant kill
                 new NewDangerZone(halfConeAngleDeg: 70f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
             )
