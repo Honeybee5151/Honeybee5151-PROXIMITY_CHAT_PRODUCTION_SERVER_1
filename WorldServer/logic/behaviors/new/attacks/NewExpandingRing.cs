@@ -78,22 +78,22 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 // Query all players near the ring
                 var pos = new Position(host.X, host.Y);
                 var searchRadius = outerEdge + 2f;
-                Log.Info($"[Ring] tick: radius={currentRadius:F1} inner={innerEdge:F1} outer={outerEdge:F1} search={searchRadius:F1}");
                 host.World.AOE(pos, searchRadius, true, p =>
                 {
                     if (p is not Player player)
                         return;
 
                     var dist = player.DistTo(host.X, host.Y);
-                    Log.Info($"[Ring] player {player.Name} dist={dist:F2} inner={innerEdge:F1} outer={outerEdge:F1} alreadyHit={s.HitPlayers.Contains(player.Id)}");
-
                     // Skip players already hit by this ring
                     if (s.HitPlayers.Contains(player.Id))
                         return;
 
                     if (dist >= innerEdge && dist <= outerEdge)
                     {
-                        Log.Info($"[Ring] HIT! Damaging {player.Name} for {Damage}");
+                        // Send AoE message so client shows damage popup
+                        var hitPos = new Position(player.X, player.Y);
+                        host.World.BroadcastIfVisible(new AoeMessage(hitPos, 1f, Damage, Effect, EffectDuration / 1000f, host.ObjectType, new ARGB(Color)), player);
+
                         (p as IPlayer).Damage(Damage, host);
                         s.HitPlayers.Add(player.Id);
 
