@@ -243,6 +243,30 @@ namespace WorldServer.core.objects
             set => _speedMult.SetValue(value);
         }
 
+        private StatTypeValue<int> _ridingEntityId;
+        public int RidingEntityId
+        {
+            get => _ridingEntityId.GetValue();
+            set => _ridingEntityId.SetValue(value);
+        }
+
+        public bool IsRiding => RidingEntityId > 0;
+
+        public Enemy GetRidingEnemy()
+        {
+            if (!IsRiding || World == null) return null;
+            var entity = World.GetEntity(RidingEntityId);
+            return entity as Enemy;
+        }
+
+        public void Dismount()
+        {
+            var mount = GetRidingEnemy();
+            if (mount != null)
+                mount.IsBeingRidden = false;
+            RidingEntityId = -1;
+        }
+
         public Player(GameServer gameServer, Client client, ushort objectType)
             : base(gameServer, objectType)
         {
@@ -279,6 +303,7 @@ namespace WorldServer.core.objects
             _colorchat = new StatTypeValue<int>(this, StatDataType.ColorChat, 0);
             _partyId = new StatTypeValue<int>(this, StatDataType.PartyId, account.PartyId, true);
             _speedMult = new StatTypeValue<int>(this, StatDataType.SpeedMult, 100, true);
+            _ridingEntityId = new StatTypeValue<int>(this, StatDataType.RidingEntityId, -1, true);
 
             Name = account.Name;
             Health = character.Health;
@@ -499,6 +524,20 @@ namespace WorldServer.core.objects
         }
         public override void Tick(ref TickTime time)
         {
+            if (IsRiding)
+            {
+                var mount = GetRidingEnemy();
+                if (mount == null || mount.Dead)
+                {
+                    Dismount();
+                    SendInfo("Your mount is gone!");
+                }
+                else
+                {
+                    Move(mount.X, mount.Y);
+                }
+            }
+
             if (KeepAlive(time))
             {
                 if (ShowDeltaTimeLog)

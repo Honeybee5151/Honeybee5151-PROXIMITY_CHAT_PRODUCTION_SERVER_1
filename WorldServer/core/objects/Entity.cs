@@ -330,6 +330,9 @@ namespace WorldServer.core.objects
         {
             _conditionEffectManager.Update(ref time);
 
+            if (this is Enemy e && e.IsBeingRidden)
+                return; // Skip AI but allow movement when ridden
+
             if (HasConditionEffect(ConditionEffectIndex.Stasis))
                 return;
             TickState(time);

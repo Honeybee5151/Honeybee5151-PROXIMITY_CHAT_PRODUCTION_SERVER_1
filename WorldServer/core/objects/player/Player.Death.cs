@@ -93,6 +93,10 @@ namespace WorldServer.core.objects
         {
             if (Client.State == ProtocolState.Disconnected || Dead)
                 return;
+
+            if (IsRiding)
+                Dismount();
+
             Dead = true;
 
             if (HandleTestWorld())

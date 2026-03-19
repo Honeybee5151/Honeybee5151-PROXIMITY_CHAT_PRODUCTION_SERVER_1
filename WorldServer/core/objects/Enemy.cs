@@ -35,6 +35,7 @@ namespace WorldServer.core.objects
         public bool IsEpic { get; set; }
         public bool IsLegendary { get; set; }
         public bool IsRare { get; set; }
+        public bool IsBeingRidden { get; set; }
         
         public Enemy(GameServer manager, ushort objType)
             : base(manager, objType)
@@ -194,6 +195,19 @@ namespace WorldServer.core.objects
         {
             if (!Dead)
             {
+                // Dismount any player riding this enemy
+                if (IsBeingRidden && World != null)
+                {
+                    foreach (var player in World.Players.Values)
+                    {
+                        if (player.RidingEntityId == Id)
+                        {
+                            player.Dismount();
+                            player.SendInfo("Your mount has died!");
+                        }
+                    }
+                }
+
                 DamageCounter.Death();
                 CurrentState?.OnDeath(this, ref time);
                 if (GameServer.BehaviorDb.Definitions.TryGetValue(ObjectType, out var loot))

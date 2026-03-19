@@ -108,6 +108,7 @@
         BackPackData6 = 140,
         BackPackData7 = 141,
         SpeedMult = 142,
+        RidingEntityId = 143,
         None = 255
     }
 }
