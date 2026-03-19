@@ -289,13 +289,6 @@
          <LifetimeMS>2500</LifetimeMS>
          <Size>130</Size>
       </Projectile>
-      <Projectile id="1">
-         <ObjectId>White Bolt</ObjectId>
-         <Damage>150</Damage>
-         <Speed>60</Speed>
-         <LifetimeMS>2500</LifetimeMS>
-         <Size>130</Size>
-      </Projectile>
    </Object>
    <Object type="0x0905" id="Rock Bot">
       <Group>Rocks</Group>

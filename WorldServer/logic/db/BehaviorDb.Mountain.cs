@@ -129,7 +129,7 @@ namespace WorldServer.logic
                 ),
                 // Alternating tusk shots: left tusk then right tusk
                 new Shoot(12, count: 1, projectileIndex: 0, angleOffset: 15, coolDown: new Cooldown(1200, 0)),
-                new Shoot(12, count: 1, projectileIndex: 1, angleOffset: -15, coolDown: new Cooldown(1200, 600)),
+                new Shoot(12, count: 1, projectileIndex: 0, angleOffset: -15, coolDown: new Cooldown(1200, 600)),
                 // Danger zone covers entire map — 10000 damage outside = instant kill
                 new NewDangerZone(halfConeAngleDeg: 70f, range: 100f, damage: 10000, tickRateMs: 500, color: 0x80FF0000, turnSpeedDegPerSec: 30f)
             )
