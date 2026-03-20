@@ -35,8 +35,13 @@ namespace WorldServer.core.commands
                     return false;
                 }
 
+                if (raft.Id == -1)
+                    raft.Id = player.World.GetNextEntityId();
+                raft.Init(player.World);
                 raft.Move(player.X, player.Y);
-                player.World.EnterWorld(raft);
+                // AddToWorld directly so entity is immediately in dictionary
+                // (EnterWorld queues for next tick → GetRidingEnemy() returns null → instant dismount)
+                player.World.AddToWorld(raft);
 
                 // Attach player to raft
                 raftEnemy.IsBeingRidden = true;
