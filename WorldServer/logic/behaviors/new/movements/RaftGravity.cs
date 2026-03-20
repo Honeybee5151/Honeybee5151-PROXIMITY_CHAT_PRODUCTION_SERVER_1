@@ -7,10 +7,19 @@ namespace WorldServer.logic.behaviors.@new.movements
 {
     public sealed class RaftGravity : Behavior
     {
-        // Raft dimensions in tiles
-        private const float HALF_WIDTH = 2.0f;    // 4 tiles wide / 2
-        private const float RAFT_HEIGHT = 6.0f;   // 6 tiles tall (sprite extends upward from anchor)
-        private const float VISUAL_CENTER_Y = -3.0f; // visual center is 3 tiles above anchor
+        // Raft walkable bounds from anchor (tuned to match visible oval sprite)
+        // Anchor is at bottom-center of sprite
+        private const float MIN_X = -1.0f;  // left edge
+        private const float MAX_X = 0.0f;   // right edge
+        private const float MIN_Y = -4.0f;  // top edge
+        private const float MAX_Y = 0.0f;   // bottom edge
+
+        // Visual center of the raft (midpoint of walkable bounds)
+        private const float CENTER_X = (MIN_X + MAX_X) / 2;  // -0.5
+        private const float CENTER_Y = (MIN_Y + MAX_Y) / 2;  // -2.0
+
+        private const float HALF_W = (MAX_X - MIN_X) / 2;    // 0.5
+        private const float HALF_H = (MAX_Y - MIN_Y) / 2;    // 2.0
 
         private const float DRIFT_SPEED = 1.5f;   // tiles/sec max drift
         private const float DEADZONE = 0.3f;       // center deadzone in tiles
@@ -27,13 +36,12 @@ namespace WorldServer.logic.behaviors.@new.movements
             if (riders.Count == 0)
                 return;
 
-            // Compute average offset from raft VISUAL center (not anchor)
-            // Anchor is at bottom-center; visual center is 3 tiles above anchor
+            // Compute average offset from raft visual center
             float avgOffsetX = 0, avgOffsetY = 0;
             foreach (var rider in riders)
             {
-                avgOffsetX += rider.RaftOffsetX;
-                avgOffsetY += rider.RaftOffsetY - VISUAL_CENTER_Y; // shift so visual center = 0
+                avgOffsetX += rider.RaftOffsetX - CENTER_X;
+                avgOffsetY += rider.RaftOffsetY - CENTER_Y;
             }
             avgOffsetX /= riders.Count;
             avgOffsetY /= riders.Count;
@@ -46,8 +54,8 @@ namespace WorldServer.logic.behaviors.@new.movements
                 return;
 
             // Drift proportional to offset from visual center
-            float driftX = (avgOffsetX / HALF_WIDTH) * DRIFT_SPEED * time.DeltaTime;
-            float driftY = (avgOffsetY / (RAFT_HEIGHT / 2)) * DRIFT_SPEED * time.DeltaTime;
+            float driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * time.DeltaTime;
+            float driftY = (avgOffsetY / HALF_H) * DRIFT_SPEED * time.DeltaTime;
 
             // Try both axes, then each independently (allows sliding along walls)
             float finalX = host.X;
@@ -81,13 +89,13 @@ namespace WorldServer.logic.behaviors.@new.movements
 
         private static bool IsRaftPassable(World world, float cx, float cy)
         {
-            // Sprite is bottom-center anchored: X [-2, +2], Y [-6, 0] from anchor
-            // Check corners, edge midpoints, and center
-            float top = cy - RAFT_HEIGHT;   // -6 from anchor
-            float bot = cy;                  // 0 from anchor
-            float left = cx - HALF_WIDTH;    // -2
-            float right = cx + HALF_WIDTH;   // +2
-            float midY = cy - RAFT_HEIGHT / 2; // -3 (visual center)
+            // Check bounds of visible raft area
+            float left = cx + MIN_X;
+            float right = cx + MAX_X;
+            float top = cy + MIN_Y;
+            float bot = cy + MAX_Y;
+            float midX = cx + CENTER_X;
+            float midY = cy + CENTER_Y;
 
             return world.Map.Contains(cx, cy) &&
                    world.IsPassable(left, top) &&
@@ -96,8 +104,8 @@ namespace WorldServer.logic.behaviors.@new.movements
                    world.IsPassable(right, bot) &&
                    world.IsPassable(left, midY) &&
                    world.IsPassable(right, midY) &&
-                   world.IsPassable(cx, top) &&
-                   world.IsPassable(cx, bot);
+                   world.IsPassable(midX, top) &&
+                   world.IsPassable(midX, bot);
         }
     }
 }
