@@ -56,6 +56,7 @@ namespace Shared.resources
         public readonly bool StunImmune;
         public readonly bool HealthBarBoss;
         public readonly bool ShowName;
+        public readonly bool Raft;
         public readonly int SightRadius; // 0 = default (15), otherwise custom sight distance for this entity
         public readonly TerrainType Terrain;
 
@@ -94,6 +95,7 @@ namespace Shared.resources
             CanPutSoulboundObjects = e.HasElement("CanPutSoulboundObjects");
             Loot = e.HasElement("Loot");
             HealthBarBoss = e.HasElement("HealthBarBoss");
+            Raft = e.HasElement("Raft");
             Size = e.GetValue("Size", 100);
             Enemy = e.HasElement("Enemy");
             MaxHP = e.GetValue<int>("MaxHitPoints");

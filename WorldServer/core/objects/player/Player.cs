@@ -252,11 +252,22 @@ namespace WorldServer.core.objects
 
         public bool IsRiding => RidingEntityId > 0;
 
+        // Raft: player's offset from raft center (server-only, not synced)
+        public float RaftOffsetX;
+        public float RaftOffsetY;
+
         public Enemy GetRidingEnemy()
         {
             if (!IsRiding || World == null) return null;
             var entity = World.GetEntity(RidingEntityId);
             return entity as Enemy;
+        }
+
+        public bool IsOnRaft()
+        {
+            if (!IsRiding) return false;
+            var mount = GetRidingEnemy();
+            return mount?.ObjectDesc.Raft == true;
         }
 
         public void Dismount()
@@ -265,6 +276,8 @@ namespace WorldServer.core.objects
             if (mount != null)
                 mount.IsBeingRidden = false;
             RidingEntityId = -1;
+            RaftOffsetX = 0;
+            RaftOffsetY = 0;
         }
 
         public Player(GameServer gameServer, Client client, ushort objectType)

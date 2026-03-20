@@ -45,8 +45,19 @@ namespace WorldServer.core.net.handlers
                     player.Dismount();
                     player.SendInfo("Your mount is gone!");
                 }
+                else if (mount.ObjectDesc.Raft)
+                {
+                    // Raft: player sends desired world position, server clamps to raft bounds
+                    var offsetX = Math.Clamp(newX - mount.X, -2.0f, 2.0f);
+                    var offsetY = Math.Clamp(newY - mount.Y, -3.0f, 3.0f);
+                    player.RaftOffsetX = offsetX;
+                    player.RaftOffsetY = offsetY;
+                    player.Move(mount.X + offsetX, mount.Y + offsetY);
+                    player.UpdateTiles();
+                }
                 else if (newX != -1 && newY != -1 && player.World.Map.Contains(newX, newY))
                 {
+                    // Regular mount: player controls mount position
                     mount.Move(newX, newY);
                     player.Move(newX, newY);
                     player.UpdateTiles();

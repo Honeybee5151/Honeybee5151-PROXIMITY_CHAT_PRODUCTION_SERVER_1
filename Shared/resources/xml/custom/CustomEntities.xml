@@ -142,6 +142,24 @@
 		<NoMiniMap/>
 		<ShadowSize>0</ShadowSize>
 	</Object>
+	<Object type="0x49D0" id="Raft">
+		<Class>Character</Class>
+		<Enemy/>
+		<Raft/>
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0x45</Index>
+		</Texture>
+		<Size>200</Size>
+		<MaxHitPoints>99999</MaxHitPoints>
+		<Defense>99999</Defense>
+		<Invincible/>
+		<StasisImmune/>
+		<StunImmune/>
+		<ParalyzeImmune/>
+		<SlowedImmune/>
+		<NoMiniMap/>
+	</Object>
 	<Object type="0x49b0" id="Sandstorm Effect">
 		<Class>GameObject</Class>
 		<Effect>Sandstorm</Effect>

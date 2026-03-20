@@ -330,8 +330,8 @@ namespace WorldServer.core.objects
         {
             _conditionEffectManager.Update(ref time);
 
-            if (this is Enemy e && e.IsBeingRidden)
-                return; // Skip AI but allow movement when ridden
+            if (this is Enemy e && e.IsBeingRidden && !e.ObjectDesc.Raft)
+                return; // Skip AI for mounts, but NOT for rafts (need RaftGravity behavior)
 
             if (HasConditionEffect(ConditionEffectIndex.Stasis))
                 return;
