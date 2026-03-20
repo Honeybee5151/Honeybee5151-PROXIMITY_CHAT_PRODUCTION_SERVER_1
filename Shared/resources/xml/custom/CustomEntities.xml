@@ -146,6 +146,7 @@
 		<Class>Character</Class>
 		<Enemy/>
 		<Raft/>
+		<Flying/>
 		<DrawUnder/>
 		<Texture>
 			<File>communitySprites32x32</File>
