@@ -46,14 +46,52 @@ namespace WorldServer.logic.behaviors.@new.movements
             float driftX = (avgOffsetX / HALF_WIDTH) * DRIFT_SPEED * time.DeltaTime;
             float driftY = (avgOffsetY / HALF_HEIGHT) * DRIFT_SPEED * time.DeltaTime;
 
+            // Try both axes, then each independently (allows sliding along walls)
+            float finalX = host.X;
+            float finalY = host.Y;
+
+            if (IsRaftPassable(host.World, host.X + driftX, host.Y + driftY))
+            {
+                finalX = host.X + driftX;
+                finalY = host.Y + driftY;
+            }
+            else if (driftX != 0 && IsRaftPassable(host.World, host.X + driftX, host.Y))
+            {
+                // Slide along X only
+                finalX = host.X + driftX;
+            }
+            else if (driftY != 0 && IsRaftPassable(host.World, host.X, host.Y + driftY))
+            {
+                // Slide along Y only
+                finalY = host.Y + driftY;
+            }
+            else
+            {
+                return; // Completely blocked
+            }
+
             // Move raft
-            host.Move(host.X + driftX, host.Y + driftY);
+            host.Move(finalX, finalY);
 
             // Carry all riders along
             foreach (var rider in riders)
             {
                 rider.Move(host.X + rider.RaftOffsetX, host.Y + rider.RaftOffsetY);
             }
+        }
+
+        private static bool IsRaftPassable(World world, float cx, float cy)
+        {
+            // Check center, 4 corners, and 4 edge midpoints
+            return world.Map.Contains(cx, cy) &&
+                   world.IsPassable(cx - HALF_WIDTH, cy - HALF_HEIGHT) &&
+                   world.IsPassable(cx + HALF_WIDTH, cy - HALF_HEIGHT) &&
+                   world.IsPassable(cx - HALF_WIDTH, cy + HALF_HEIGHT) &&
+                   world.IsPassable(cx + HALF_WIDTH, cy + HALF_HEIGHT) &&
+                   world.IsPassable(cx - HALF_WIDTH, cy) &&
+                   world.IsPassable(cx + HALF_WIDTH, cy) &&
+                   world.IsPassable(cx, cy - HALF_HEIGHT) &&
+                   world.IsPassable(cx, cy + HALF_HEIGHT);
         }
     }
 }

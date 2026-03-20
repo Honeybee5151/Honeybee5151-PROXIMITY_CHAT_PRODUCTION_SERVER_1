@@ -50,9 +50,21 @@ namespace WorldServer.core.net.handlers
                     // Raft: player sends desired world position, server clamps to raft bounds
                     var offsetX = Math.Clamp(newX - mount.X, -2.0f, 2.0f);
                     var offsetY = Math.Clamp(newY - mount.Y, -3.0f, 3.0f);
-                    player.RaftOffsetX = offsetX;
-                    player.RaftOffsetY = offsetY;
-                    player.Move(mount.X + offsetX, mount.Y + offsetY);
+                    var finalX = mount.X + offsetX;
+                    var finalY = mount.Y + offsetY;
+
+                    // Don't let player walk to a wall tile on the raft
+                    if (player.World.IsPassable(finalX, finalY))
+                    {
+                        player.RaftOffsetX = offsetX;
+                        player.RaftOffsetY = offsetY;
+                        player.Move(finalX, finalY);
+                    }
+                    else
+                    {
+                        // Keep previous offset, re-anchor to raft
+                        player.Move(mount.X + player.RaftOffsetX, mount.Y + player.RaftOffsetY);
+                    }
                     player.UpdateTiles();
                 }
                 else if (newX != -1 && newY != -1 && player.World.Map.Contains(newX, newY))

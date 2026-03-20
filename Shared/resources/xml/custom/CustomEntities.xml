@@ -146,11 +146,12 @@
 		<Class>Character</Class>
 		<Enemy/>
 		<Raft/>
+		<DrawUnder/>
 		<Texture>
-			<File>lofiEnvironment2</File>
-			<Index>0x45</Index>
+			<File>communitySprites32x32</File>
+			<Index>0x00</Index>
 		</Texture>
-		<Size>200</Size>
+		<Size>100</Size>
 		<MaxHitPoints>99999</MaxHitPoints>
 		<Defense>99999</Defense>
 		<Invincible/>
