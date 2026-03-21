@@ -2114,7 +2114,7 @@
 		<Enemy/>
 		<Class>Character</Class>
 		<Texture><File>invisible</File><Index>0</Index></Texture>
-		<Size>0</Size>
+		<Size>1</Size>
 		<MaxHitPoints>99999</MaxHitPoints>
 		<Defense>99999</Defense>
 		<Invincible/>
@@ -2132,7 +2132,7 @@
 		<Enemy/>
 		<Class>Character</Class>
 		<Texture><File>invisible</File><Index>0</Index></Texture>
-		<Size>0</Size>
+		<Size>1</Size>
 		<MaxHitPoints>99999</MaxHitPoints>
 		<Defense>99999</Defense>
 		<Invincible/>
