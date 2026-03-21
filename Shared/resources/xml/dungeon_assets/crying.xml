@@ -68,5 +68,27 @@
 		<MultiHit/>
 	</Projectile>
 </Object>
+<Object type="0x49D4" id="Checkerboard Pillar H">
+	<Class>Character</Class>
+	<Enemy/>
+	<Texture>
+		<File>lofiObj3</File>
+		<Index>0</Index>
+	</Texture>
+	<Size>25</Size>
+	<MaxHitPoints>99999</MaxHitPoints>
+	<Defense>99999</Defense>
+	<Invincible/>
+	<NoMiniMap/>
+	<SightRadius>60</SightRadius>
+	<Projectile id="0">
+		<ObjectId>White Bullet</ObjectId>
+		<Speed>60</Speed>
+		<Damage>150</Damage>
+		<Size>60</Size>
+		<LifetimeMS>4000</LifetimeMS>
+		<MultiHit/>
+	</Projectile>
+</Object>
 </Objects>
 </DungeonAssets>

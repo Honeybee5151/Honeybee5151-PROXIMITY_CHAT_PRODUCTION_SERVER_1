@@ -45,6 +45,20 @@ namespace WorldServer.logic
                         reversePeriodMs: 8000
                     )
                 )
+            )
+            .Init("Checkerboard Pillar H",
+                new State(
+                    new PhasedShoot(
+                        projectileIndex: 0,
+                        fixedAngle: 0,
+                        onDurationMs: 800,
+                        offDurationMs: 800,
+                        fireIntervalMs: 200,
+                        phasePerTile: 200,
+                        reversePeriodMs: 8000,
+                        useYAxis: true
+                    )
+                )
             );
     }
 }

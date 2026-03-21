@@ -9,8 +9,8 @@ namespace WorldServer.logic.behaviors
 {
     /// <summary>
     /// Fires a projectile at a fixed angle with on/off phasing.
-    /// Phase offset is derived from the entity's X position, creating
-    /// a wave pattern that drifts across a row of pillars.
+    /// Phase offset is derived from the entity's X or Y position, creating
+    /// a wave pattern that drifts across a row/column of pillars.
     /// Drift direction reverses periodically.
     /// </summary>
     internal class PhasedShoot : CycleBehavior
@@ -23,6 +23,7 @@ namespace WorldServer.logic.behaviors
         private readonly double _phasePerTile;
         private readonly int _reversePeriodMs;
         private readonly int _cycleDuration;
+        private readonly bool _useYAxis;
 
         public PhasedShoot(
             int projectileIndex = 0,
@@ -31,7 +32,8 @@ namespace WorldServer.logic.behaviors
             int offDurationMs = 800,
             int fireIntervalMs = 200,
             double phasePerTile = 200,
-            int reversePeriodMs = 8000)
+            int reversePeriodMs = 8000,
+            bool useYAxis = false)
         {
             _projectileIndex = projectileIndex;
             _fixedAngle = (float)(fixedAngle * Math.PI / 180);
@@ -41,6 +43,7 @@ namespace WorldServer.logic.behaviors
             _phasePerTile = phasePerTile;
             _reversePeriodMs = reversePeriodMs;
             _cycleDuration = onDurationMs + offDurationMs;
+            _useYAxis = useYAxis;
         }
 
         private class PhasedShootState
@@ -75,8 +78,8 @@ namespace WorldServer.logic.behaviors
             // Determine drift direction (alternates every reversePeriodMs)
             int driftSign = ((int)(s.TotalElapsed / _reversePeriodMs) % 2 == 0) ? 1 : -1;
 
-            // Phase offset based on entity X position
-            double phase = host.X * _phasePerTile * driftSign;
+            // Phase offset based on entity position
+            double phase = (_useYAxis ? host.Y : host.X) * _phasePerTile * driftSign;
 
             // Where are we in the on/off cycle?
             double cyclePos = ((s.TotalElapsed + phase) % _cycleDuration + _cycleDuration) % _cycleDuration;

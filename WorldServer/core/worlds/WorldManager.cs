@@ -205,12 +205,12 @@ namespace WorldServer.core.worlds
             else
                 Console.WriteLine("[CryingDungeon] ERROR: 'Beam Source Right' not found in IdToObjectType!");
 
-            // Spawn 12 checkerboard pillars in a horizontal row
+            // Spawn 12 vertical checkerboard pillars (top row, shoot downward)
             if (gameData.IdToObjectType.TryGetValue("Checkerboard Pillar", out var pillarType))
             {
                 float startX = 4.5f;
                 float spacing = 2.5f;
-                float y = 15.5f;
+                float y = 5.5f;
 
                 for (int i = 0; i < 12; i++)
                 {
@@ -218,10 +218,28 @@ namespace WorldServer.core.worlds
                     pillar.Move(startX + i * spacing, y);
                     world.EnterWorld(pillar);
                 }
-                Console.WriteLine($"[CryingDungeon] Spawned 12 Checkerboard Pillars at y={y}, x={startX} to {startX + 11 * spacing}");
+                Console.WriteLine($"[CryingDungeon] Spawned 12 Checkerboard Pillars (V) at y={y}, x={startX} to {startX + 11 * spacing}");
             }
             else
                 Console.WriteLine("[CryingDungeon] ERROR: 'Checkerboard Pillar' not found in IdToObjectType!");
+
+            // Spawn 12 horizontal checkerboard pillars (left column, shoot rightward)
+            if (gameData.IdToObjectType.TryGetValue("Checkerboard Pillar H", out var pillarHType))
+            {
+                float x = 4.5f;
+                float startY = 5.5f;
+                float spacing = 2.5f;
+
+                for (int i = 0; i < 12; i++)
+                {
+                    var pillar = Entity.Resolve(GameServer, pillarHType);
+                    pillar.Move(x, startY + i * spacing);
+                    world.EnterWorld(pillar);
+                }
+                Console.WriteLine($"[CryingDungeon] Spawned 12 Checkerboard Pillars (H) at x={x}, y={startY} to {startY + 11 * spacing}");
+            }
+            else
+                Console.WriteLine("[CryingDungeon] ERROR: 'Checkerboard Pillar H' not found in IdToObjectType!");
 
             Console.WriteLine($"[CryingDungeon] World enemies count: {world.Enemies.Count}");
         }
