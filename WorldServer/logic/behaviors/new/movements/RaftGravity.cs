@@ -135,23 +135,41 @@ namespace WorldServer.logic.behaviors.@new.movements
 
         private static bool IsRaftPassable(World world, float cx, float cy)
         {
-            // Check bounds of visible raft area
             float left = cx + MIN_X;
             float right = cx + MAX_X;
             float top = cy + MIN_Y;
             float bot = cy + MAX_Y;
-            float midX = cx + CENTER_X;
-            float midY = cy + CENTER_Y;
 
-            return world.Map.Contains(cx, cy) &&
-                   world.IsPassable(left, top) &&
-                   world.IsPassable(right, top) &&
-                   world.IsPassable(left, bot) &&
-                   world.IsPassable(right, bot) &&
-                   world.IsPassable(left, midY) &&
-                   world.IsPassable(right, midY) &&
-                   world.IsPassable(midX, top) &&
-                   world.IsPassable(midX, bot);
+            // Check every tile along each edge at 1-tile intervals
+            // Top and bottom edges (horizontal)
+            for (float x = left; x <= right; x += 1.0f)
+            {
+                if (!world.Map.Contains(x, top) || !world.IsPassable(x, top))
+                    return false;
+                if (!world.Map.Contains(x, bot) || !world.IsPassable(x, bot))
+                    return false;
+            }
+            // Ensure right endpoints are checked (float stepping may skip)
+            if (!world.Map.Contains(right, top) || !world.IsPassable(right, top))
+                return false;
+            if (!world.Map.Contains(right, bot) || !world.IsPassable(right, bot))
+                return false;
+
+            // Left and right edges (vertical)
+            for (float y = top; y <= bot; y += 1.0f)
+            {
+                if (!world.Map.Contains(left, y) || !world.IsPassable(left, y))
+                    return false;
+                if (!world.Map.Contains(right, y) || !world.IsPassable(right, y))
+                    return false;
+            }
+            // Ensure bottom endpoints are checked
+            if (!world.Map.Contains(left, bot) || !world.IsPassable(left, bot))
+                return false;
+            if (!world.Map.Contains(right, bot) || !world.IsPassable(right, bot))
+                return false;
+
+            return true;
         }
     }
 }
