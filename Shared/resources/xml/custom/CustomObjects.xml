@@ -2118,6 +2118,7 @@
 		<MaxHitPoints>99999</MaxHitPoints>
 		<Defense>99999</Defense>
 		<Invincible/>
+		<SightRadius>60</SightRadius>
 		<Projectile id="0">
 			<ObjectId>White Bullet</ObjectId>
 			<Speed>80</Speed>
@@ -2135,6 +2136,7 @@
 		<MaxHitPoints>99999</MaxHitPoints>
 		<Defense>99999</Defense>
 		<Invincible/>
+		<SightRadius>60</SightRadius>
 		<Projectile id="0">
 			<ObjectId>White Bullet</ObjectId>
 			<Speed>80</Speed>
