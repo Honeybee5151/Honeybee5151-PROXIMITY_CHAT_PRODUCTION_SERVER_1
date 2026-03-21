@@ -255,6 +255,7 @@ namespace WorldServer.core.objects
         // Raft: player's offset from raft center (server-only, not synced)
         public float RaftOffsetX;
         public float RaftOffsetY;
+        public bool PendingRaftSpawn;
 
         public Enemy GetRidingEnemy()
         {
@@ -558,6 +559,12 @@ namespace WorldServer.core.objects
         }
         public override void Tick(ref TickTime time)
         {
+            if (PendingRaftSpawn)
+            {
+                PendingRaftSpawn = false;
+                SpawnRaft();
+            }
+
             if (IsRiding)
             {
                 var mount = GetRidingEnemy();

@@ -61,9 +61,9 @@ namespace WorldServer.core.net.handlers
                         player.SlotTypes[i] = 0;
                 }
 
-                // Auto-spawn raft if dungeon requires it
+                // Auto-spawn raft if dungeon requires it (deferred to first tick for proper sync)
                 if (target.SpawnRaft)
-                    player.SpawnRaft();
+                    player.PendingRaftSpawn = true;
 
                 client.SendPacket(new CreateSuccessMessage(player.Id, client.Character.CharId));
 
