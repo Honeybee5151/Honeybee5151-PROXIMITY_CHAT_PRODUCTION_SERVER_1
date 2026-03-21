@@ -64,33 +64,15 @@ namespace WorldServer.logic
             )
             .Init("Checkerboard Pillar H",
                 new State(
-                    new State("MoveDown",
-                        new PhasedShoot(
-                            projectileIndex: 0,
-                            fixedAngle: 0,
-                            onDurationMs: 800,
-                            offDurationMs: 800,
-                            fireIntervalMs: 200,
-                            phasePerTile: 200,
-                            reversePeriodMs: 8000,
-                            useYAxis: true
-                        ),
-                        new MoveLine(0.5, direction: 90, distance: 10),
-                        new TimedTransition(8000, "MoveUp")
-                    ),
-                    new State("MoveUp",
-                        new PhasedShoot(
-                            projectileIndex: 0,
-                            fixedAngle: 0,
-                            onDurationMs: 800,
-                            offDurationMs: 800,
-                            fireIntervalMs: 200,
-                            phasePerTile: 200,
-                            reversePeriodMs: 8000,
-                            useYAxis: true
-                        ),
-                        new MoveLine(0.5, direction: 270, distance: 10),
-                        new TimedTransition(8000, "MoveDown")
+                    new PhasedShoot(
+                        projectileIndex: 0,
+                        fixedAngle: 0,
+                        onDurationMs: 800,
+                        offDurationMs: 800,
+                        fireIntervalMs: 200,
+                        phasePerTile: 200,
+                        reversePeriodMs: 8000,
+                        useYAxis: true
                     )
                 )
             );
