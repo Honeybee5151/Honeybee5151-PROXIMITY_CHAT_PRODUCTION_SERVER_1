@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using WorldServer.core.objects;
+using WorldServer.core.terrain;
 using WorldServer.core.worlds;
 
 namespace WorldServer.logic.behaviors.@new.movements
@@ -10,7 +11,7 @@ namespace WorldServer.logic.behaviors.@new.movements
         // Raft walkable bounds from anchor (3x4 tile raft, bottom-center anchored)
         private const float MIN_X = -1.5f;  // left edge
         private const float MAX_X = 1.5f;   // right edge
-        private const float MIN_Y = -4.0f;  // top edge
+        private const float MIN_Y = -3.0f;  // top edge
         private const float MAX_Y = 0.0f;   // bottom edge
 
         // Visual center of the raft (midpoint of walkable bounds)
@@ -52,9 +53,12 @@ namespace WorldServer.logic.behaviors.@new.movements
             if (avgOffsetX == 0 && avgOffsetY == 0)
                 return;
 
-            // Drift proportional to offset from visual center
-            float driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * time.DeltaTime;
-            float driftY = (avgOffsetY / HALF_H) * DRIFT_SPEED * time.DeltaTime;
+            // Get tile speed multiplier at raft center
+            float tileSpeed = GetTileSpeed(host.World, host.X, host.Y);
+
+            // Drift proportional to offset from visual center, scaled by tile speed
+            float driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * tileSpeed * time.DeltaTime;
+            float driftY = (avgOffsetY / HALF_H) * DRIFT_SPEED * tileSpeed * time.DeltaTime;
 
             // Try both axes, then each independently (allows sliding along walls)
             float finalX = host.X;
@@ -84,6 +88,27 @@ namespace WorldServer.logic.behaviors.@new.movements
             {
                 rider.Move(host.X + rider.RaftOffsetX, host.Y + rider.RaftOffsetY);
             }
+        }
+
+        private static float GetTileSpeed(World world, float x, float y)
+        {
+            var tx = (int)x;
+            var ty = (int)y;
+            var tile = world.Map[tx, ty];
+            if (tile == null) return 1.0f;
+
+            // Check custom ground entries first (community dungeon tiles)
+            if (world.CustomGroundEntries != null)
+            {
+                foreach (var entry in world.CustomGroundEntries)
+                {
+                    if (entry.TypeCode == tile.TileId)
+                        return entry.Speed;
+                }
+            }
+
+            // Fall back to standard tile speed
+            return tile.TileDesc?.Speed ?? 1.0f;
         }
 
         private static bool IsRaftPassable(World world, float cx, float cy)

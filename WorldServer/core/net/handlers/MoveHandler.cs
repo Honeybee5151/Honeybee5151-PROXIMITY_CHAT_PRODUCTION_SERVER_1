@@ -50,7 +50,7 @@ namespace WorldServer.core.net.handlers
                     // Raft: player sends desired world position, server clamps to raft bounds
                     // 3x4 tile raft, bottom-center anchored
                     var offsetX = Math.Clamp(newX - mount.X, -1.5f, 1.5f);
-                    var offsetY = Math.Clamp(newY - mount.Y, -4.0f, 0.0f);
+                    var offsetY = Math.Clamp(newY - mount.Y, -3.0f, 0.0f);
                     var finalX = mount.X + offsetX;
                     var finalY = mount.Y + offsetY;
 
