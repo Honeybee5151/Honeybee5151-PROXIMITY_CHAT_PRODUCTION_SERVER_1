@@ -801,4 +801,20 @@
 			<Track>alperomeresin-the-final-boss-battle-158700.mp3</Track>
 		</Music>
 	</World>
+	<World id="cavern">
+		<Width>100</Width>
+		<Height>100</Height>
+		<MapJM>Dungeons/cavern.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<PresetLevel>1</PresetLevel>
+		<PresetStats>100,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+		<Music>
+			<Track>alperomeresin-the-final-boss-battle-158700.mp3</Track>
+		</Music>
+	</World>
 </Worlds>
