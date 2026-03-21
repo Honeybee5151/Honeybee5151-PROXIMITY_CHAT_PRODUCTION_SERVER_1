@@ -757,16 +757,26 @@ namespace WorldServer.core.worlds
             }
 
             HashSet<Entity> tickedEnemies = null;
-            // Debug: one-time check for beam entities
-            if (_beamDebugLogged == false && Enemies.Count > 0 && IdName == "crying")
+            // Debug: one-time check for beam entities (wait until player present)
+            if (!_beamDebugLogged && Enemies.Count > 0 && Players.Count > 0 && IdName == "crying")
             {
                 _beamDebugLogged = true;
-                Console.WriteLine($"[CryingDungeon] Enemies in world: {Enemies.Count}");
+                Console.WriteLine($"[CryingDungeon] === TICK DEBUG (enemies={Enemies.Count}, players={Players.Count}) ===");
                 foreach (var e in Enemies)
-                    Console.WriteLine($"[CryingDungeon]   Enemy id={e.Key} type=0x{e.Value.ObjectType:X4} name='{e.Value.ObjectDesc?.IdName}' pos=({e.Value.X},{e.Value.Y}) hasState={e.Value.CurrentState != null}");
-                Console.WriteLine($"[CryingDungeon] Players in world: {Players.Count}");
+                {
+                    Console.WriteLine($"[CryingDungeon]   Enemy id={e.Key} type=0x{e.Value.ObjectType:X4} name='{e.Value.ObjectDesc?.IdName}' pos=({e.Value.X},{e.Value.Y}) hasState={e.Value.CurrentState != null} sightRadius={e.Value.ObjectDesc?.SightRadius}");
+                    foreach (var p in Players)
+                        Console.WriteLine($"[CryingDungeon]     dist to player {p.Key}: {Math.Sqrt(e.Value.SqDistTo(p.Value)):F1} tiles");
+                }
                 foreach (var p in Players)
-                    Console.WriteLine($"[CryingDungeon]   Player id={p.Key} pos=({p.Value.X},{p.Value.Y})");
+                    Console.WriteLine($"[CryingDungeon]   Player id={p.Key} pos=({p.Value.X:F1},{p.Value.Y:F1})");
+                if (EnemiesCollision != null)
+                {
+                    var testActive = EnemiesCollision.GetActiveChunks(PlayersCollision);
+                    var testSet = new HashSet<Entity>(testActive);
+                    foreach (var e in Enemies)
+                        Console.WriteLine($"[CryingDungeon]   '{e.Value.ObjectDesc?.IdName}' inActiveChunks={testSet.Contains(e.Value)}");
+                }
             }
             if (EnemiesCollision != null)
             {
