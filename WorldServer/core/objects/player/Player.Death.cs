@@ -142,9 +142,18 @@ namespace WorldServer.core.objects
             if (World == null || !World.IsCommunityDungeon)
                 return false;
 
-            // Don't restore here — Save() handles it on disconnect
-            // Just reconnect to nexus without permadeath
-            ReconnectToNexus();
+            // Respawn in the same dungeon instead of going to nexus
+            Health = Stats[0];
+            Mana = Stats[1];
+
+            Client.Reconnect(new Reconnect()
+            {
+                Host = "",
+                Port = GameServer.Configuration.serverInfo.port,
+                GameId = World.Id,
+                Name = World.IdName
+            });
+
             return true;
         }
 
