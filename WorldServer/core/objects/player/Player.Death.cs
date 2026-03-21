@@ -95,7 +95,12 @@ namespace WorldServer.core.objects
                 return;
 
             if (IsRiding)
+            {
+                var mount = GetRidingEnemy();
                 Dismount();
+                if (mount != null)
+                    World.LeaveWorld(mount);
+            }
 
             Dead = true;
 
