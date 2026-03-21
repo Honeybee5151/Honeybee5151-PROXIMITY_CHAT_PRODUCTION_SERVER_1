@@ -789,6 +789,7 @@
 		<MapJM>Dungeons/crying.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
+		<CommunityDungeon/>
 		<LockRotation/>
 		<SpawnRaft/>
 		<PresetLevel>1</PresetLevel>
