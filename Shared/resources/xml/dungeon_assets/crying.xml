@@ -6,10 +6,10 @@
 	<Class>Character</Class>
 	<Enemy/>
 	<Texture>
-		<File>lofiObj3</File>
+		<File>invisible</File>
 		<Index>0</Index>
 	</Texture>
-	<Size>25</Size>
+	<Size>1</Size>
 	<MaxHitPoints>99999</MaxHitPoints>
 	<Defense>99999</Defense>
 	<Invincible/>
@@ -28,10 +28,10 @@
 	<Class>Character</Class>
 	<Enemy/>
 	<Texture>
-		<File>lofiObj3</File>
+		<File>invisible</File>
 		<Index>0</Index>
 	</Texture>
-	<Size>25</Size>
+	<Size>1</Size>
 	<MaxHitPoints>99999</MaxHitPoints>
 	<Defense>99999</Defense>
 	<Invincible/>
@@ -50,10 +50,10 @@
 	<Class>Character</Class>
 	<Enemy/>
 	<Texture>
-		<File>lofiObj3</File>
+		<File>invisible</File>
 		<Index>0</Index>
 	</Texture>
-	<Size>25</Size>
+	<Size>1</Size>
 	<MaxHitPoints>99999</MaxHitPoints>
 	<Defense>99999</Defense>
 	<Invincible/>
@@ -72,10 +72,10 @@
 	<Class>Character</Class>
 	<Enemy/>
 	<Texture>
-		<File>lofiObj3</File>
+		<File>invisible</File>
 		<Index>0</Index>
 	</Texture>
-	<Size>25</Size>
+	<Size>1</Size>
 	<MaxHitPoints>99999</MaxHitPoints>
 	<Defense>99999</Defense>
 	<Invincible/>
