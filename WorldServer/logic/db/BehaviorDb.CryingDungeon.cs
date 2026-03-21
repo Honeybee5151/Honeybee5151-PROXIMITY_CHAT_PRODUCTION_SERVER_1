@@ -13,7 +13,7 @@ namespace WorldServer.logic
                         count: 1,
                         offset: 0,
                         projectileIndex: 0,
-                        angleToIncrement: 0.04,
+                        angleToIncrement: 0.10,
                         fixedAngle: 90,
                         coolDown: new Cooldown(100, 0)
                     )
@@ -27,7 +27,7 @@ namespace WorldServer.logic
                         count: 1,
                         offset: 0,
                         projectileIndex: 0,
-                        angleToIncrement: -0.04,
+                        angleToIncrement: -0.10,
                         fixedAngle: 90,
                         coolDown: new Cooldown(100, 0)
                     )
