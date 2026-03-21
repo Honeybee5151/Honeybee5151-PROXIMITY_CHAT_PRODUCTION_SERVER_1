@@ -157,6 +157,7 @@ namespace WorldServer.core.worlds
             world.SpawnRaft = worldResource.SpawnRaft;
 
             // Spawn beam obstacles for crying dungeon
+            Console.WriteLine($"[CryingDungeon] dungeonName='{dungeonName}' checking match...");
             if (dungeonName == "crying")
                 SpawnCryingDungeonEntities(world);
 
@@ -179,21 +180,32 @@ namespace WorldServer.core.worlds
 
         private void SpawnCryingDungeonEntities(World world)
         {
+            Console.WriteLine($"[CryingDungeon] SpawnCryingDungeonEntities called for world {world.Id} '{world.IdName}'");
             var gameData = GameServer.Resources.GameData;
 
             if (gameData.IdToObjectType.TryGetValue("Beam Source Left", out var leftType))
             {
                 var beam = Entity.Resolve(GameServer, leftType);
+                Console.WriteLine($"[CryingDungeon] Beam Source Left resolved: {beam != null}, type={leftType:X4}, id={beam?.Id}");
                 beam.Move(8.5f, 5.5f); // top-left — adjust to actual map layout
                 world.EnterWorld(beam);
+                Console.WriteLine($"[CryingDungeon] Beam Source Left entered world at (8.5, 5.5), id={beam.Id}");
             }
+            else
+                Console.WriteLine("[CryingDungeon] ERROR: 'Beam Source Left' not found in IdToObjectType!");
 
             if (gameData.IdToObjectType.TryGetValue("Beam Source Right", out var rightType))
             {
                 var beam = Entity.Resolve(GameServer, rightType);
+                Console.WriteLine($"[CryingDungeon] Beam Source Right resolved: {beam != null}, type={rightType:X4}, id={beam?.Id}");
                 beam.Move(29.5f, 5.5f); // top-right — adjust to actual map layout
                 world.EnterWorld(beam);
+                Console.WriteLine($"[CryingDungeon] Beam Source Right entered world at (29.5, 5.5), id={beam.Id}");
             }
+            else
+                Console.WriteLine("[CryingDungeon] ERROR: 'Beam Source Right' not found in IdToObjectType!");
+
+            Console.WriteLine($"[CryingDungeon] World enemies count: {world.Enemies.Count}");
         }
 
         public World GetWorld(int id) => Worlds.TryGetValue(id, out World ret) ? ret : null;
