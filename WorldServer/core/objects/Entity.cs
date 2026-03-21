@@ -382,6 +382,7 @@ namespace WorldServer.core.objects
                 catch (Exception e)
                 {
                     StaticLogger.Instance.Error(e);
+                    Console.WriteLine($"[BehaviorError] {ObjectDesc?.IdName} (0x{ObjectType:X4}): {e.GetType().Name}: {e.Message}");
                 }
                 state = state.Parent;
             }
