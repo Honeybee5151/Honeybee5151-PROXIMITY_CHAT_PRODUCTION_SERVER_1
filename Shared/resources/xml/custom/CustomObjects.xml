@@ -2110,4 +2110,38 @@
         <ConditionEffect duration="3">Sick</ConditionEffect>
     </Projectile>
 </Object>
+	<Object type="0x49D1" id="Beam Source Left">
+		<Enemy/>
+		<Class>Character</Class>
+		<Texture><File>invisible</File><Index>0</Index></Texture>
+		<Size>0</Size>
+		<MaxHitPoints>99999</MaxHitPoints>
+		<Defense>99999</Defense>
+		<Invincible/>
+		<Projectile id="0">
+			<ObjectId>White Bullet</ObjectId>
+			<Speed>80</Speed>
+			<Damage>200</Damage>
+			<Size>80</Size>
+			<LifetimeMS>2500</LifetimeMS>
+			<MultiHit/>
+		</Projectile>
+	</Object>
+	<Object type="0x49D2" id="Beam Source Right">
+		<Enemy/>
+		<Class>Character</Class>
+		<Texture><File>invisible</File><Index>0</Index></Texture>
+		<Size>0</Size>
+		<MaxHitPoints>99999</MaxHitPoints>
+		<Defense>99999</Defense>
+		<Invincible/>
+		<Projectile id="0">
+			<ObjectId>White Bullet</ObjectId>
+			<Speed>80</Speed>
+			<Damage>200</Damage>
+			<Size>80</Size>
+			<LifetimeMS>2500</LifetimeMS>
+			<MultiHit/>
+		</Projectile>
+	</Object>
 </Objects>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Shared.resources;
+using WorldServer.core.objects;
 using WorldServer.core.worlds.impl;
 using WorldServer.utils;
 
@@ -155,6 +156,10 @@ namespace WorldServer.core.worlds
             world.LockRotation = worldResource.LockRotation;
             world.SpawnRaft = worldResource.SpawnRaft;
 
+            // Spawn beam obstacles for crying dungeon
+            if (dungeonName == "crying")
+                SpawnCryingDungeonEntities(world);
+
             _ = Worlds.TryAdd(world.Id, world);
             // null parents are threaded as they get treated as the root
             if (parent == null)
@@ -170,6 +175,25 @@ namespace WorldServer.core.worlds
         {
             _ = Guilds.TryAdd(guildId, world);
             _ = WorldToGuildId.TryAdd(world.Id, guildId);
+        }
+
+        private void SpawnCryingDungeonEntities(World world)
+        {
+            var gameData = GameServer.Resources.GameData;
+
+            if (gameData.IdToObjectType.TryGetValue("Beam Source Left", out var leftType))
+            {
+                var beam = Entity.Resolve(GameServer, leftType);
+                beam.Move(8.5f, 5.5f); // top-left — adjust to actual map layout
+                world.EnterWorld(beam);
+            }
+
+            if (gameData.IdToObjectType.TryGetValue("Beam Source Right", out var rightType))
+            {
+                var beam = Entity.Resolve(GameServer, rightType);
+                beam.Move(29.5f, 5.5f); // top-right — adjust to actual map layout
+                world.EnterWorld(beam);
+            }
         }
 
         public World GetWorld(int id) => Worlds.TryGetValue(id, out World ret) ? ret : null;
