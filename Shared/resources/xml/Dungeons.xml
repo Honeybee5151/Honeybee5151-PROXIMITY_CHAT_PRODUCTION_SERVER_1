@@ -784,7 +784,7 @@
 		</Music>
 	</World>
 	<World id="crying">
-		<Width>39</Width>
+		<Width>38</Width>
 		<Height>58</Height>
 		<MapJM>Dungeons/crying.jm</MapJM>
 		<VisibilityType>1</VisibilityType>
