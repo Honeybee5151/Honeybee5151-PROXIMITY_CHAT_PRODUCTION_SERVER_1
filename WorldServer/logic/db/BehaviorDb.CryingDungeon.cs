@@ -1,4 +1,5 @@
 using WorldServer.logic.behaviors;
+using WorldServer.logic.transitions;
 
 namespace WorldServer.logic
 {
@@ -7,7 +8,6 @@ namespace WorldServer.logic
         private _ CryingDungeon = () => Behav()
             .Init("Beam Source Left",
                 new State(
-                    // Single-projectile rotating beam (clockwise)
                     new RingAttack(
                         radius: 0,
                         count: 1,
@@ -21,7 +21,6 @@ namespace WorldServer.logic
             )
             .Init("Beam Source Right",
                 new State(
-                    // Single-projectile rotating beam (counter-clockwise)
                     new RingAttack(
                         radius: 0,
                         count: 1,
@@ -35,28 +34,63 @@ namespace WorldServer.logic
             )
             .Init("Checkerboard Pillar",
                 new State(
-                    new PhasedShoot(
-                        projectileIndex: 0,
-                        fixedAngle: 90,
-                        onDurationMs: 800,
-                        offDurationMs: 600,
-                        fireIntervalMs: 200,
-                        phasePerTile: 400,
-                        reversePeriodMs: 4000
+                    new State("MoveRight",
+                        new PhasedShoot(
+                            projectileIndex: 0,
+                            fixedAngle: 90,
+                            onDurationMs: 800,
+                            offDurationMs: 600,
+                            fireIntervalMs: 200,
+                            phasePerTile: 400,
+                            reversePeriodMs: 4000
+                        ),
+                        new MoveLine(0.5, direction: 0, distance: 10),
+                        new TimedTransition(8000, "MoveLeft")
+                    ),
+                    new State("MoveLeft",
+                        new PhasedShoot(
+                            projectileIndex: 0,
+                            fixedAngle: 90,
+                            onDurationMs: 800,
+                            offDurationMs: 600,
+                            fireIntervalMs: 200,
+                            phasePerTile: 400,
+                            reversePeriodMs: 4000
+                        ),
+                        new MoveLine(0.5, direction: 180, distance: 10),
+                        new TimedTransition(8000, "MoveRight")
                     )
                 )
             )
             .Init("Checkerboard Pillar H",
                 new State(
-                    new PhasedShoot(
-                        projectileIndex: 0,
-                        fixedAngle: 0,
-                        onDurationMs: 800,
-                        offDurationMs: 800,
-                        fireIntervalMs: 200,
-                        phasePerTile: 200,
-                        reversePeriodMs: 8000,
-                        useYAxis: true
+                    new State("MoveDown",
+                        new PhasedShoot(
+                            projectileIndex: 0,
+                            fixedAngle: 0,
+                            onDurationMs: 800,
+                            offDurationMs: 800,
+                            fireIntervalMs: 200,
+                            phasePerTile: 200,
+                            reversePeriodMs: 8000,
+                            useYAxis: true
+                        ),
+                        new MoveLine(0.5, direction: 90, distance: 10),
+                        new TimedTransition(8000, "MoveUp")
+                    ),
+                    new State("MoveUp",
+                        new PhasedShoot(
+                            projectileIndex: 0,
+                            fixedAngle: 0,
+                            onDurationMs: 800,
+                            offDurationMs: 800,
+                            fireIntervalMs: 200,
+                            phasePerTile: 200,
+                            reversePeriodMs: 8000,
+                            useYAxis: true
+                        ),
+                        new MoveLine(0.5, direction: 270, distance: 10),
+                        new TimedTransition(8000, "MoveDown")
                     )
                 )
             );
