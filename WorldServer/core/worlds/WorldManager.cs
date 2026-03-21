@@ -205,6 +205,24 @@ namespace WorldServer.core.worlds
             else
                 Console.WriteLine("[CryingDungeon] ERROR: 'Beam Source Right' not found in IdToObjectType!");
 
+            // Spawn 12 checkerboard pillars in a horizontal row
+            if (gameData.IdToObjectType.TryGetValue("Checkerboard Pillar", out var pillarType))
+            {
+                float startX = 4.5f;
+                float spacing = 2.5f;
+                float y = 15.5f;
+
+                for (int i = 0; i < 12; i++)
+                {
+                    var pillar = Entity.Resolve(GameServer, pillarType);
+                    pillar.Move(startX + i * spacing, y);
+                    world.EnterWorld(pillar);
+                }
+                Console.WriteLine($"[CryingDungeon] Spawned 12 Checkerboard Pillars at y={y}, x={startX} to {startX + 11 * spacing}");
+            }
+            else
+                Console.WriteLine("[CryingDungeon] ERROR: 'Checkerboard Pillar' not found in IdToObjectType!");
+
             Console.WriteLine($"[CryingDungeon] World enemies count: {world.Enemies.Count}");
         }
 
