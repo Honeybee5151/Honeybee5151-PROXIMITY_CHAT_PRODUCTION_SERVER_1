@@ -54,18 +54,10 @@ namespace WorldServer.core.net.handlers
                     var finalX = mount.X + offsetX;
                     var finalY = mount.Y + offsetY;
 
-                    // Don't let player walk to a wall tile on the raft
-                    if (player.World.IsPassable(finalX, finalY))
-                    {
-                        player.RaftOffsetX = offsetX;
-                        player.RaftOffsetY = offsetY;
-                        player.Move(finalX, finalY);
-                    }
-                    else
-                    {
-                        // Keep previous offset, re-anchor to raft
-                        player.Move(mount.X + player.RaftOffsetX, mount.Y + player.RaftOffsetY);
-                    }
+                    // Player is on the raft — bounds clamp is sufficient, skip tile passability
+                    player.RaftOffsetX = offsetX;
+                    player.RaftOffsetY = offsetY;
+                    player.Move(finalX, finalY);
                     player.UpdateTiles();
                 }
                 else if (newX != -1 && newY != -1 && player.World.Map.Contains(newX, newY))
