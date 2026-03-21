@@ -48,8 +48,8 @@ namespace WorldServer.core.net.handlers
                 else if (mount.ObjectDesc.Raft)
                 {
                     // Raft: player sends desired world position, server clamps to raft bounds
-                    // Bounds tuned to match visible oval sprite (bottom-center anchor + glow padding)
-                    var offsetX = Math.Clamp(newX - mount.X, -1.0f, 0.0f);
+                    // 3x4 tile raft, bottom-center anchored
+                    var offsetX = Math.Clamp(newX - mount.X, -1.5f, 1.5f);
                     var offsetY = Math.Clamp(newY - mount.Y, -4.0f, 0.0f);
                     var finalX = mount.X + offsetX;
                     var finalY = mount.Y + offsetY;

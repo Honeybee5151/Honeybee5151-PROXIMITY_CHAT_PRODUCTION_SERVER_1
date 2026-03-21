@@ -39,9 +39,8 @@ namespace WorldServer.core.commands
                     raft.Id = player.World.GetNextEntityId();
                 raft.Init(player.World);
                 // Spawn raft so its visual center is at the player
-                // Sprite is bottom-center anchored, visual center is ~2 tiles above anchor
-                // (tuned bounds: X [-1.0, 0.0], Y [-4.0, 0.0], center at (-0.5, -2.0))
-                raft.Move(player.X + 0.5f, player.Y + 2.0f);
+                // 3x4 tile raft, bottom-center anchored, visual center at (0, -2.0)
+                raft.Move(player.X, player.Y + 2.0f);
                 // AddToWorld directly so entity is immediately in dictionary
                 // (EnterWorld queues for next tick → GetRidingEnemy() returns null → instant dismount)
                 player.World.AddToWorld(raft);
@@ -49,7 +48,7 @@ namespace WorldServer.core.commands
                 // Attach player to raft — player starts at visual center
                 raftEnemy.IsBeingRidden = true;
                 player.RidingEntityId = raft.Id;
-                player.RaftOffsetX = -0.5f;
+                player.RaftOffsetX = 0f;
                 player.RaftOffsetY = -2.0f;
 
                 player.SendInfo("Boarded raft! Walk to the edges to steer.");

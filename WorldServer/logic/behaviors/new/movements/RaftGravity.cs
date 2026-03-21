@@ -7,18 +7,17 @@ namespace WorldServer.logic.behaviors.@new.movements
 {
     public sealed class RaftGravity : Behavior
     {
-        // Raft walkable bounds from anchor (tuned to match visible oval sprite)
-        // Anchor is at bottom-center of sprite
-        private const float MIN_X = -1.0f;  // left edge
-        private const float MAX_X = 0.0f;   // right edge
+        // Raft walkable bounds from anchor (3x4 tile raft, bottom-center anchored)
+        private const float MIN_X = -1.5f;  // left edge
+        private const float MAX_X = 1.5f;   // right edge
         private const float MIN_Y = -4.0f;  // top edge
         private const float MAX_Y = 0.0f;   // bottom edge
 
         // Visual center of the raft (midpoint of walkable bounds)
-        private const float CENTER_X = (MIN_X + MAX_X) / 2;  // -0.5
+        private const float CENTER_X = (MIN_X + MAX_X) / 2;  // 0.0
         private const float CENTER_Y = (MIN_Y + MAX_Y) / 2;  // -2.0
 
-        private const float HALF_W = (MAX_X - MIN_X) / 2;    // 0.5
+        private const float HALF_W = (MAX_X - MIN_X) / 2;    // 1.5
         private const float HALF_H = (MAX_Y - MIN_Y) / 2;    // 2.0
 
         private const float DRIFT_SPEED = 1.5f;   // tiles/sec max drift
