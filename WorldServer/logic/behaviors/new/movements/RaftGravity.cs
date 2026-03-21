@@ -22,6 +22,7 @@ namespace WorldServer.logic.behaviors.@new.movements
         private const float HALF_H = (MAX_Y - MIN_Y) / 2;    // 2.0
 
         private const float DRIFT_SPEED = 1.5f;   // tiles/sec max drift
+        private const float CURRENT_SPEED = 2.0f;  // tiles/sec downstream current on speedy tiles
         private const float DEADZONE = 0.3f;       // center deadzone in tiles
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
@@ -50,15 +51,26 @@ namespace WorldServer.logic.behaviors.@new.movements
             if (MathF.Abs(avgOffsetX) < DEADZONE) avgOffsetX = 0;
             if (MathF.Abs(avgOffsetY) < DEADZONE) avgOffsetY = 0;
 
-            if (avgOffsetX == 0 && avgOffsetY == 0)
-                return;
-
-            // Get max tile speed across raft footprint (any speedy tile under raft boosts it)
+            // Get max tile speed across raft footprint
             float tileSpeed = GetMaxTileSpeed(host.World, host.X, host.Y);
+            bool onCurrent = tileSpeed > 1.0f;
 
-            // Drift proportional to offset from visual center, scaled by tile speed
-            float driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * tileSpeed * time.DeltaTime;
-            float driftY = (avgOffsetY / HALF_H) * DRIFT_SPEED * tileSpeed * time.DeltaTime;
+            float driftX, driftY;
+            if (onCurrent)
+            {
+                // Speedy tiles = river current: forced downward, only left/right steering
+                driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * time.DeltaTime;
+                driftY = CURRENT_SPEED * tileSpeed * time.DeltaTime; // always downstream (positive Y)
+            }
+            else
+            {
+                if (avgOffsetX == 0 && avgOffsetY == 0)
+                    return;
+
+                // Normal: drift proportional to offset from visual center
+                driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * time.DeltaTime;
+                driftY = (avgOffsetY / HALF_H) * DRIFT_SPEED * time.DeltaTime;
+            }
 
             // Try both axes, then each independently (allows sliding along walls)
             float finalX = host.X;
