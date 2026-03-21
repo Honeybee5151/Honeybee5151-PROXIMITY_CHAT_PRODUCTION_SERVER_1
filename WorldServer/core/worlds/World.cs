@@ -757,6 +757,17 @@ namespace WorldServer.core.worlds
             }
 
             HashSet<Entity> tickedEnemies = null;
+            // Debug: one-time check for beam entities
+            if (_beamDebugLogged == false && Enemies.Count > 0 && IdName == "crying")
+            {
+                _beamDebugLogged = true;
+                Console.WriteLine($"[CryingDungeon] Enemies in world: {Enemies.Count}");
+                foreach (var e in Enemies)
+                    Console.WriteLine($"[CryingDungeon]   Enemy id={e.Key} type=0x{e.Value.ObjectType:X4} name='{e.Value.ObjectDesc?.IdName}' pos=({e.Value.X},{e.Value.Y}) hasState={e.Value.CurrentState != null}");
+                Console.WriteLine($"[CryingDungeon] Players in world: {Players.Count}");
+                foreach (var p in Players)
+                    Console.WriteLine($"[CryingDungeon]   Player id={p.Key} pos=({p.Value.X},{p.Value.Y})");
+            }
             if (EnemiesCollision != null)
             {
                 var activeEnemies = EnemiesCollision.GetActiveChunks(PlayersCollision);
@@ -837,6 +848,7 @@ namespace WorldServer.core.worlds
         }
 
         private bool _forceLifetimeExpire = false;
+        private bool _beamDebugLogged = false;
 
         private bool IsPastLifetime(ref TickTime time)
         {
