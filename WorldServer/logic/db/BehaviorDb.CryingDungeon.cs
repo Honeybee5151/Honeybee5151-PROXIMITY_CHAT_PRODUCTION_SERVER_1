@@ -39,10 +39,10 @@ namespace WorldServer.logic
                         projectileIndex: 0,
                         fixedAngle: 90,
                         onDurationMs: 800,
-                        offDurationMs: 800,
+                        offDurationMs: 600,
                         fireIntervalMs: 200,
-                        phasePerTile: 200,
-                        reversePeriodMs: 8000
+                        phasePerTile: 400,
+                        reversePeriodMs: 4000
                     )
                 )
             )
