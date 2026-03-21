@@ -53,8 +53,8 @@ namespace WorldServer.logic.behaviors.@new.movements
             if (avgOffsetX == 0 && avgOffsetY == 0)
                 return;
 
-            // Get tile speed multiplier at raft center
-            float tileSpeed = GetTileSpeed(host.World, host.X, host.Y);
+            // Get max tile speed across raft footprint (any speedy tile under raft boosts it)
+            float tileSpeed = GetMaxTileSpeed(host.World, host.X, host.Y);
 
             // Drift proportional to offset from visual center, scaled by tile speed
             float driftX = (avgOffsetX / HALF_W) * DRIFT_SPEED * tileSpeed * time.DeltaTime;
@@ -90,10 +90,32 @@ namespace WorldServer.logic.behaviors.@new.movements
             }
         }
 
+        private static float GetMaxTileSpeed(World world, float cx, float cy)
+        {
+            float maxSpeed = 1.0f;
+
+            // Sample key points across the raft footprint
+            float[] xOffsets = { 0, MIN_X, MAX_X, CENTER_X };
+            float[] yOffsets = { 0, MIN_Y, MAX_Y, CENTER_Y };
+
+            foreach (var dx in xOffsets)
+            {
+                foreach (var dy in yOffsets)
+                {
+                    float speed = GetTileSpeed(world, cx + dx, cy + dy);
+                    if (speed > maxSpeed)
+                        maxSpeed = speed;
+                }
+            }
+
+            return maxSpeed;
+        }
+
         private static float GetTileSpeed(World world, float x, float y)
         {
             var tx = (int)x;
             var ty = (int)y;
+            if (!world.Map.Contains(tx, ty)) return 1.0f;
             var tile = world.Map[tx, ty];
             if (tile == null) return 1.0f;
 
