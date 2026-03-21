@@ -783,4 +783,20 @@
 			<Track>alperomeresin-the-final-boss-battle-158700.mp3</Track>
 		</Music>
 	</World>
+	<World id="crying">
+		<Width>39</Width>
+		<Height>58</Height>
+		<MapJM>Dungeons/crying.jm</MapJM>
+		<VisibilityType>1</VisibilityType>
+		<Dungeon/>
+		<CommunityDungeon/>
+		<PresetLevel>1</PresetLevel>
+		<PresetStats>100,100,10,0,10,10,10,10</PresetStats>
+		<PresetHealthPotions>0</PresetHealthPotions>
+		<PresetManaPotions>0</PresetManaPotions>
+		<PresetHasBackpack>false</PresetHasBackpack>
+		<Music>
+			<Track>alperomeresin-the-final-boss-battle-158700.mp3</Track>
+		</Music>
+	</World>
 </Worlds>
