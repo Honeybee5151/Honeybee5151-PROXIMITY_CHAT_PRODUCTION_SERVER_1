@@ -105,6 +105,9 @@ namespace WorldServer.core.objects
             if (HandleCommunityDungeon())
                 return;
 
+            if (HandleDungeonRespawn())
+                return;
+
             if (rekt)
             {
                 GenerateGravestone(true);
@@ -143,6 +146,26 @@ namespace WorldServer.core.objects
                 return false;
 
             // Respawn in the same dungeon instead of going to nexus
+            Health = Stats[0];
+            Mana = Stats[1];
+
+            Client.Reconnect(new Reconnect()
+            {
+                Host = "",
+                Port = GameServer.Configuration.serverInfo.port,
+                GameId = World.Id,
+                Name = World.IdName
+            });
+
+            return true;
+        }
+
+        private bool HandleDungeonRespawn()
+        {
+            if (World == null || World.InstanceType != WorldResourceInstanceType.Dungeon)
+                return false;
+
+            // Respawn in the same dungeon — no permadeath for official dungeons
             Health = Stats[0];
             Mana = Stats[1];
 
