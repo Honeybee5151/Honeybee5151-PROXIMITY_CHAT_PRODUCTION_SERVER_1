@@ -144,32 +144,57 @@ namespace WorldServer.logic.behaviors.@new.movements
             // Top and bottom edges (horizontal)
             for (float x = left; x <= right; x += 1.0f)
             {
-                if (!world.Map.Contains(x, top) || !world.IsPassable(x, top))
-                    return false;
-                if (!world.Map.Contains(x, bot) || !world.IsPassable(x, bot))
+                if (!IsTilePassable(world, x, top) || !IsTilePassable(world, x, bot))
                     return false;
             }
             // Ensure right endpoints are checked (float stepping may skip)
-            if (!world.Map.Contains(right, top) || !world.IsPassable(right, top))
-                return false;
-            if (!world.Map.Contains(right, bot) || !world.IsPassable(right, bot))
+            if (!IsTilePassable(world, right, top) || !IsTilePassable(world, right, bot))
                 return false;
 
             // Left and right edges (vertical)
             for (float y = top; y <= bot; y += 1.0f)
             {
-                if (!world.Map.Contains(left, y) || !world.IsPassable(left, y))
-                    return false;
-                if (!world.Map.Contains(right, y) || !world.IsPassable(right, y))
+                if (!IsTilePassable(world, left, y) || !IsTilePassable(world, right, y))
                     return false;
             }
             // Ensure bottom endpoints are checked
-            if (!world.Map.Contains(left, bot) || !world.IsPassable(left, bot))
-                return false;
-            if (!world.Map.Contains(right, bot) || !world.IsPassable(right, bot))
+            if (!IsTilePassable(world, left, bot) || !IsTilePassable(world, right, bot))
                 return false;
 
             return true;
+        }
+
+        private static bool IsTilePassable(World world, float x, float y)
+        {
+            var tx = (int)x;
+            var ty = (int)y;
+            if (!world.Map.Contains(tx, ty))
+                return false;
+
+            var tile = world.Map[tx, ty];
+            if (tile == null)
+                return false;
+
+            // Check custom ground entries first (community dungeon tiles)
+            if (world.CustomGroundEntries != null)
+            {
+                foreach (var entry in world.CustomGroundEntries)
+                {
+                    if (entry.TypeCode == tile.TileId)
+                        return !entry.NoWalk;
+                }
+            }
+
+            // Standard tile — safe lookup via TileDesc on the tile itself
+            if (tile.TileDesc != null)
+                return !tile.TileDesc.NoWalk;
+
+            // Fallback: try GameData dictionary
+            if (world.GameServer.Resources.GameData.Tiles.TryGetValue(tile.TileId, out var tileDesc))
+                return !tileDesc.NoWalk;
+
+            // Unknown tile type — treat as impassable
+            return false;
         }
     }
 }
