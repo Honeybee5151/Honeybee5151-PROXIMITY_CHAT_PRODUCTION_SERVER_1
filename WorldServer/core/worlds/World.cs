@@ -65,6 +65,8 @@ namespace WorldServer.core.worlds
         public int PresetHealthPotions { get; set; }
         public int PresetManaPotions { get; set; }
         public bool PresetHasBackpack { get; set; }
+        public bool LockRotation { get; set; }
+        public bool SpawnRaft { get; set; }
 
         //editor8182381 — Darkness zone: progressive screen darkening outside safe radius
         public float DarknessZoneCenterX { get; protected set; }

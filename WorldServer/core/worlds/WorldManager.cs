@@ -152,6 +152,9 @@ namespace WorldServer.core.worlds
                 world.PresetHasBackpack = worldResource.PresetHasBackpack;
             }
 
+            world.LockRotation = worldResource.LockRotation;
+            world.SpawnRaft = worldResource.SpawnRaft;
+
             _ = Worlds.TryAdd(world.Id, world);
             // null parents are threaded as they get treated as the root
             if (parent == null)

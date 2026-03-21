@@ -280,6 +280,29 @@ namespace WorldServer.core.objects
             RaftOffsetY = 0;
         }
 
+        public bool SpawnRaft()
+        {
+            if (World == null) return false;
+            if (!GameServer.Resources.GameData.IdToObjectType.TryGetValue("Raft", out var raftType))
+                return false;
+
+            var raft = Entity.Resolve(GameServer, raftType);
+            if (raft is not Enemy raftEnemy)
+                return false;
+
+            if (raft.Id == -1)
+                raft.Id = World.GetNextEntityId();
+            raft.Init(World);
+            raft.Move(X, Y + 1.5f);
+            World.AddToWorld(raft);
+
+            raftEnemy.IsBeingRidden = true;
+            RidingEntityId = raft.Id;
+            RaftOffsetX = 0f;
+            RaftOffsetY = -1.5f;
+            return true;
+        }
+
         public Player(GameServer gameServer, Client client, ushort objectType)
             : base(gameServer, objectType)
         {

@@ -18,6 +18,8 @@ namespace WorldServer.networking.packets.outgoing
         public bool DisableAbilities { get; set; }
         public bool CommunityDungeon { get; set; }
 
+        public bool LockRotation { get; set; }
+
         //editor8182381 — Darkness zone fields
         public float DarknessZoneCenterX { get; set; }
         public float DarknessZoneCenterY { get; set; }
@@ -41,6 +43,7 @@ namespace WorldServer.networking.packets.outgoing
             wtr.Write(DisableShooting);
             wtr.Write(DisableAbilities);
             wtr.Write(CommunityDungeon);
+            wtr.Write(LockRotation);
             //editor8182381 — Darkness zone
             wtr.Write(DarknessZoneCenterX);
             wtr.Write(DarknessZoneCenterY);

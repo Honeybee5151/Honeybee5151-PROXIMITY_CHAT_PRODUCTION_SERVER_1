@@ -215,6 +215,7 @@ namespace WorldServer.core
                     DisableShooting = world.DisableShooting,
                     DisableAbilities = world.DisableAbilities,
                     CommunityDungeon = world.IsCommunityDungeon,
+                    LockRotation = world.LockRotation,
                     //editor8182381 — Darkness zone
                     DarknessZoneCenterX = world.DarknessZoneCenterX,
                     DarknessZoneCenterY = world.DarknessZoneCenterY,

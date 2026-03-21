@@ -24,4 +24,3 @@ cookie
 cookie2
 ccc
 cccslide
-crying

@@ -63,6 +63,10 @@ namespace WorldServer.core.net.handlers
 
             var player = client.Player = target.CreateNewPlayer(client, client.Character.ObjectType, x, y);
 
+            // Auto-spawn raft if dungeon requires it
+            if (target.SpawnRaft)
+                player.SpawnRaft();
+
             client.SendPacket(new CreateSuccessMessage(player.Id, client.Character.CharId));
 
             if (target is RealmWorld realm)

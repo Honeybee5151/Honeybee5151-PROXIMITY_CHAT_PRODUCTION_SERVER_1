@@ -41,6 +41,8 @@ namespace Shared.resources
         public readonly int PresetHealthPotions;
         public readonly int PresetManaPotions;
         public readonly bool PresetHasBackpack;
+        public readonly bool LockRotation;
+        public readonly bool SpawnRaft;
 
         public WorldResource(XElement elem)
         {
@@ -84,6 +86,8 @@ namespace Shared.resources
             PresetHealthPotions = elem.GetValue("PresetHealthPotions", 0);
             PresetManaPotions = elem.GetValue("PresetManaPotions", 0);
             PresetHasBackpack = elem.HasElement("PresetHasBackpack") && elem.GetValue<string>("PresetHasBackpack", "false").Equals("true", StringComparison.OrdinalIgnoreCase);
+            LockRotation = elem.HasElement("LockRotation");
+            SpawnRaft = elem.HasElement("SpawnRaft");
 
             MapJM = new List<string>();
             foreach (var map in elem.Elements("MapJM"))

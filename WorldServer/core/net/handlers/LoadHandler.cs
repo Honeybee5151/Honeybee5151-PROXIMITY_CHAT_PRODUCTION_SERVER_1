@@ -61,6 +61,10 @@ namespace WorldServer.core.net.handlers
                         player.SlotTypes[i] = 0;
                 }
 
+                // Auto-spawn raft if dungeon requires it
+                if (target.SpawnRaft)
+                    player.SpawnRaft();
+
                 client.SendPacket(new CreateSuccessMessage(player.Id, client.Character.CharId));
 
                 if(target is RealmWorld realm)
