@@ -499,6 +499,8 @@ namespace WorldServer.core.objects
                 _ = Client.Account.FlushAsync();
             }
             ResetNewbiePeriod();
+            if (owner.InstanceType == WorldResourceInstanceType.Dungeon)
+                ApplyConditionEffect(ConditionEffectIndex.Invulnerable, 3000);
             InitializeUpdate();
         }
 
