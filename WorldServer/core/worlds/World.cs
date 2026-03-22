@@ -758,7 +758,7 @@ namespace WorldServer.core.worlds
 
             HashSet<Entity> tickedEnemies = null;
             // Debug: one-time check for beam entities (wait until player present)
-            if (!_beamDebugLogged && Enemies.Count > 0 && Players.Count > 0 && IdName == "crying")
+            if (!_beamDebugLogged && Enemies.Count > 0 && Players.Count > 0 && (IdName == "crying" || IdName == "Giant's Cavern"))
             {
                 _beamDebugLogged = true;
                 Console.WriteLine($"[CryingDungeon] === TICK DEBUG (enemies={Enemies.Count}, players={Players.Count}) ===");
