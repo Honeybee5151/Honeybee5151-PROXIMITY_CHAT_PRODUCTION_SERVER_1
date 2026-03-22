@@ -1250,8 +1250,8 @@ async function loadDungeons() {
                 <td>${date}</td>
                 <td style="white-space:nowrap;">
                     <button class="btn btn-primary btn-sm" onclick="previewDungeon('${d.id}')">Preview</button>
-                    <button class="btn btn-success btn-sm" onclick="approveDungeon('${d.id}','${esc(d.title)}')">Approve</button>
-                    <button class="btn btn-danger btn-sm" onclick="rejectDungeon('${d.id}','${esc(d.title)}')">Reject</button>
+                    <button class="btn btn-success btn-sm" onclick="approveDungeon('${d.id}','${escJs(d.title)}')">Approve</button>
+                    <button class="btn btn-danger btn-sm" onclick="rejectDungeon('${d.id}','${escJs(d.title)}')">Reject</button>
                 </td>
             </tr>`;
         }
@@ -1383,6 +1383,12 @@ function rejectDungeon(id, title) {
 function esc(s) {
     if (!s) return '';
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Escape for use inside JS string literals in onclick attributes (backslash-escape quotes)
+function escJs(s) {
+    if (!s) return '';
+    return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
 }
 
 function showFeedback(id, msg, success) {
