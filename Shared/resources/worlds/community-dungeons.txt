@@ -25,3 +25,4 @@ cookie2
 ccc
 cccslide
 cavern
+Giant Cavern
