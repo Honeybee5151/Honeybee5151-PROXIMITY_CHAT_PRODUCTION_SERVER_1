@@ -27,6 +27,9 @@
 		<VisibilityType>1</VisibilityType>
 		<DisableTeleport/>
 		<Dungeon/>
+		<Music>
+			<Track>caverns</Track>
+		</Music>
 	</World>
 	<World id="Cultist Hideout">
 		<Width>256</Width>
