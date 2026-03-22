@@ -1185,11 +1185,21 @@ namespace AdminDashboard.Controllers
                 // 5. Add World entry to Dungeons.xml
                 var (dungeonsXml, _) = await _github.FetchFile("Shared/resources/xml/Dungeons.xml");
 
-                // If dungeon already exists, remove old entry (re-approval overwrites)
+                // If dungeon already exists, extract existing music before removing (re-approval preserves music)
                 var existingWorldPattern = $@"[ \t]*<World\s+id=""{Regex.Escape(EscapeXml(safeTitle))}""[^>]*>[\s\S]*?</World>\s*\n?";
                 var isReApproval = Regex.IsMatch(dungeonsXml, existingWorldPattern);
+                string existingMusicTrack = null;
                 if (isReApproval)
+                {
+                    var existingMatch = Regex.Match(dungeonsXml, existingWorldPattern);
+                    if (existingMatch.Success)
+                    {
+                        var trackMatch = Regex.Match(existingMatch.Value, @"<Track>([^<]+)</Track>");
+                        if (trackMatch.Success)
+                            existingMusicTrack = trackMatch.Groups[1].Value;
+                    }
                     dungeonsXml = Regex.Replace(dungeonsXml, existingWorldPattern, "");
+                }
 
                 var width = mapJm["width"]?.Value<int>() ?? 256;
                 var height = mapJm["height"]?.Value<int>() ?? 256;
@@ -1250,11 +1260,14 @@ namespace AdminDashboard.Controllers
 
                 // Extract custom music URL if present
                 // Prefer fileUrl (resolved direct MP3 URL) over trackUrl (FMA page URL)
+                // Fall back to existing music track from Dungeons.xml on re-approval
                 var musicStr = "";
                 var musicObj = dungeon["music"] as JObject;
                 var musicUrl = musicObj?["fileUrl"]?.ToString();
                 if (string.IsNullOrEmpty(musicUrl))
                     musicUrl = musicObj?["trackUrl"]?.ToString();
+                if (string.IsNullOrEmpty(musicUrl) && !string.IsNullOrEmpty(existingMusicTrack))
+                    musicUrl = existingMusicTrack;
                 if (!string.IsNullOrEmpty(musicUrl))
                 {
                     musicStr = $"\t\t<Music>\n\t\t\t<Track>{EscapeXml(musicUrl)}</Track>\n\t\t</Music>\n";
