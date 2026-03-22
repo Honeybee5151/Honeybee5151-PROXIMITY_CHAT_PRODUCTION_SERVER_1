@@ -784,6 +784,7 @@
 		</Music>
 	</World>
 	<World id="crying">
+		<DisplayName>Giant's Cavern</DisplayName>
 		<Width>38</Width>
 		<Height>58</Height>
 		<MapJM>Dungeons/crying.jm</MapJM>

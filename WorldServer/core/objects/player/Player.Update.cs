@@ -113,6 +113,15 @@ namespace WorldServer.core.objects
             TickId++;
             TickTime = dt;
 
+            // Auto-transition: crying waterfall bottom → cavern dungeon
+            if (World?.IdName == "crying" && Y >= 57f)
+            {
+                var cavern = GameServer.WorldManager.CreateNewWorld("cavern", null, World);
+                if (cavern != null)
+                    Reconnect(cavern);
+                return;
+            }
+
             HandleUpdate();
             HandleNewTick();
         }

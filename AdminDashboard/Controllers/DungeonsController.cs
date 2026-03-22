@@ -1253,9 +1253,10 @@ namespace AdminDashboard.Controllers
                     }
                 }
 
-                // Add DisplayId if the safe title differs from the original title
+                // Add DisplayName if the safe title differs from the original title
+                // Note: WorldResource reads <DisplayName>, not <DisplayId>
                 var worldDisplayId = title != safeTitle
-                    ? $"\t\t<DisplayId>{EscapeXml(title)}</DisplayId>\n"
+                    ? $"\t\t<DisplayName>{EscapeXml(title)}</DisplayName>\n"
                     : "";
 
                 // Extract custom music URL if present
