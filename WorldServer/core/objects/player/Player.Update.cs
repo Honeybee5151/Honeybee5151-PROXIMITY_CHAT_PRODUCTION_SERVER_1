@@ -117,7 +117,7 @@ namespace WorldServer.core.objects
             // Check raft Y position (more reliable than player Y due to raft offset)
             if (World?.IdName == "Giant's Cavern" && IsRiding)
             {
-                var raft = GetRidingEntity();
+                var raft = GetRidingEnemy();
                 if (raft != null && raft.Y >= 56f)
                 {
                     var cavern = GameServer.WorldManager.CreateNewWorld("cavern", null, World);
