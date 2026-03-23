@@ -52,7 +52,6 @@ namespace WorldServer.networking.packets.outgoing
                         else if (entry.ObjectClass == "Decoration") classFlag = 2;
                         else if (entry.ObjectClass == "Wall") classFlag = 3;
                         else if (entry.ObjectClass == "Blocker") classFlag = 4;
-                        else if (entry.ObjectClass == "Flat") classFlag = 5;
                         bw.Write(classFlag);
 
                         // Animation: frameCount byte + extra frame pixel data
