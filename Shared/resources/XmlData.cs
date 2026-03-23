@@ -142,6 +142,9 @@ namespace Shared.resources
                     break;
                 case "Decoration": // 2D flat, walk-through
                     break;
+                case "Flat": // Ground-like, walk-through, rendered flat on ground plane
+                    xml.Add(new System.Xml.Linq.XElement("DrawOnGround"));
+                    break;
                 default: // "Object" — 2D flat, solid (blocks movement)
                     xml.Add(new System.Xml.Linq.XElement("OccupySquare"));
                     xml.Add(new System.Xml.Linq.XElement("EnemyOccupySquare"));
