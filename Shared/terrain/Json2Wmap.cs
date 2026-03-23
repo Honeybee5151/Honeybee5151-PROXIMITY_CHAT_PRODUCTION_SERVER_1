@@ -111,7 +111,8 @@ namespace Shared.terrain
                     var objClass = o.objs[0].objectClass ?? "Object";
                     byte spriteSize = (byte)(o.objs[0].objectSize > 0 ? o.objs[0].objectSize : 8);
                     int expectedBytes = spriteSize * spriteSize * 3;
-                    var dedupKey = o.objs[0].objectPixels + "|" + objClass;
+                    var hasAnimFrames = o.objs[0].objectAnimFrames != null && o.objs[0].objectAnimFrames.Length > 0;
+                    var dedupKey = o.objs[0].objectPixels + "|" + objClass + (hasAnimFrames ? "|ANIM" : "");
                     if (!customObjMap.TryGetValue(dedupKey, out _))
                     {
                         var typeCode = data.AllocateCustomObjTypeCode();
