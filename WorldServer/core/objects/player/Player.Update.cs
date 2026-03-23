@@ -113,14 +113,14 @@ namespace WorldServer.core.objects
             TickId++;
             TickTime = dt;
 
-            // Auto-transition: crying (Giant's Cavern) waterfall bottom → cavern dungeon
+            // Auto-transition: crying (Giant's Cavern) waterfall bottom → Giant Cavern dungeon
             // Check raft Y position (more reliable than player Y due to raft offset)
             if (World?.IdName == "Giant's Cavern" && IsRiding)
             {
                 var raft = GetRidingEnemy();
                 if (raft != null && raft.Y >= 56f)
                 {
-                    var cavern = GameServer.WorldManager.CreateNewWorld("cavern", null, World);
+                    var cavern = GameServer.WorldManager.CreateNewWorld("Giant Cavern", null, World);
                     if (cavern != null)
                         Reconnect(cavern);
                     return;

@@ -830,5 +830,8 @@
 		<PresetHealthPotions>0</PresetHealthPotions>
 		<PresetManaPotions>0</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
+		<Music>
+			<Track>cavern-bossfight</Track>
+		</Music>
 	</World>
 </Worlds>
