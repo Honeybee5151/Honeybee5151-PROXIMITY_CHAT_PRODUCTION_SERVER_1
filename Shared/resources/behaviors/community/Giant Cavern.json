@@ -39,7 +39,6 @@
       "charge": {
         "behaviors": [
           { "type": "SetAltTexture", "minValue": 1 },
-          { "type": "Charge", "speed": 7, "range": 8, "coolDown": 2000 },
           { "type": "Taunt", "text": ["GREG SMASH!"] },
           {
             "type": "Shoot",

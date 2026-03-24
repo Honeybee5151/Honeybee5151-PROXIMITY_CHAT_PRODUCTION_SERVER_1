@@ -31,11 +31,6 @@ namespace WorldServer.logic.db.community
                     new State("charge",
                         new SetAltTexture(1),
                         new Taunt("GREG SMASH!"),
-                        new Prioritize(
-                            new Charge(7, range: 8, coolDown: new Cooldown(2000)),
-                            new Chase(4, range: 3, sightRange: 14),
-                            new Wander(0.4)
-                        ),
                         new Shoot(6, count: 5, shootAngle: 25, projectileIndex: 0, coolDown: new Cooldown(1200)),
                         new Shoot(5, count: 2, projectileIndex: 1, coolDown: new Cooldown(2000), predictive: 0.7),
                         new HpLessTransition(0.3, "enrage")
