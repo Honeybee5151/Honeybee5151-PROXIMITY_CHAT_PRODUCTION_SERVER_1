@@ -185,14 +185,14 @@ namespace Shared.terrain
                 }
                 else
                 {
-                    tileObjId = o.objs?[0].id;
+                    tileObjId = (o.objs != null && o.objs.Length > 0) ? o.objs[0].id : null;
                 }
 
                 tileDict[(short)i] = new TerrainTile()
                 {
                     TileId = tileId,
                     TileObj = tileObjId,
-                    Name = o.objs == null ? "" : o.objs[0].name ?? "",
+                    Name = (o.objs == null || o.objs.Length == 0) ? "" : o.objs[0].name ?? "",
                     Terrain = TerrainType.None,
                     Region = o.regions == null ? TileRegion.None : (TileRegion)Enum.Parse(typeof(TileRegion), o.regions[0].id.Replace(' ', '_'))
                 };
