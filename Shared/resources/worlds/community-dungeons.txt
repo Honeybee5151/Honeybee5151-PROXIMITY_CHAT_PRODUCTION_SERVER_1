@@ -26,3 +26,4 @@ ccc
 cccslide
 cavern
 Giant Cavern
+Mammoth Map
