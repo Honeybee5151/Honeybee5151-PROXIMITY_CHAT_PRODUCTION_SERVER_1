@@ -287,6 +287,15 @@ namespace WorldServer.core.objects
 
         public void Move(float x, float y)
         {
+            // Block enemies from moving into or clipping corners of NoWalk tiles
+            if (this is Enemy && World != null)
+            {
+                const float r = 0.4f;
+                if (!World.IsPassable(x - r, y - r) || !World.IsPassable(x + r, y - r) ||
+                    !World.IsPassable(x - r, y + r) || !World.IsPassable(x + r, y + r))
+                    return;
+            }
+
             if (World != null && !(this is Pet) && (!(this is StaticObject) || (this as StaticObject).Hittestable))
                 (this is Enemy || this is StaticObject && !(this is Decoy) ? World.EnemiesCollision : World.PlayersCollision).Move(this, x, y);
 
