@@ -71,9 +71,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var effect = Effect;
             var effectDuration = EffectDuration;
             var entityId = host.Id;
-            // Capture landing position — ring expands from where boss landed
-            var originX = host.X;
-            var originY = host.Y;
 
             WorldTimer timer = null;
             timer = host.World.StartNewTimer(100, (world, t) =>
@@ -83,10 +80,13 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (elapsedMs >= totalMs)
                     return true; // done, remove timer
 
-                // Check if entity is still alive
+                // Check if entity is still alive — use its current position (visual follows entity)
                 var entity = world.GetEntity(entityId);
                 if (entity == null)
                     return true; // entity gone, remove timer
+
+                var centerX = entity.X;
+                var centerY = entity.Y;
 
                 var progress = elapsedMs / (float)totalMs;
                 var currentRadius = progress * maxRadius;
@@ -96,14 +96,14 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 var sweepInner = Math.Max(0f, prevOuterEdge - ringThickness);
                 var sweepOuter = outerEdge;
 
-                var pos = new Position(originX, originY);
+                var pos = new Position(centerX, centerY);
                 var searchRadius = maxRadius + ringThickness + 2f;
                 world.AOE(pos, searchRadius, true, p =>
                 {
                     if (p is not Player player)
                         return;
 
-                    var dist = player.DistTo(originX, originY);
+                    var dist = player.DistTo(centerX, centerY);
                     if (hitPlayers.Contains(player.Id))
                         return;
 
