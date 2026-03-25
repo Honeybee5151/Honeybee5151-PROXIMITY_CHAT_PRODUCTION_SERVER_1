@@ -57,7 +57,13 @@ namespace WorldServer.logic.db.community
                     new State("jump_land_charge",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 99f, color: 0xFFFF4400),
-                        new TimedTransition(300, "charge")
+                        new TimedTransition(300, "spin_charge")
+                    ),
+                    new State("spin_charge",
+                        new SetAltTexture(2),
+                        new BounceCharge(speed: 10, range: 15, bounces: 3, chargeTimeMs: 800),
+                        new Shoot(6, count: 5, shootAngle: 25, projectileIndex: 0, coolDown: new Cooldown(1200)),
+                        new TimedTransition(3000, "charge")
                     ),
                     new State("enrage",
                         new SetAltTexture(2),
@@ -77,7 +83,13 @@ namespace WorldServer.logic.db.community
                     new State("jump_land_enrage",
                         new SetAltTexture(2),
                         new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 99f, color: 0xFFFF0000),
-                        new TimedTransition(300, "enrage")
+                        new TimedTransition(300, "spin_enrage")
+                    ),
+                    new State("spin_enrage",
+                        new SetAltTexture(2),
+                        new BounceCharge(speed: 12, range: 15, bounces: 4, chargeTimeMs: 800),
+                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
+                        new TimedTransition(4000, "enrage")
                     )
                 )
             );
@@ -129,7 +141,13 @@ namespace WorldServer.logic.db.community
                     new State("jump_land_charge",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 99f, color: 0xFFFF4400),
-                        new TimedTransition(300, "charge")
+                        new TimedTransition(300, "spin_charge")
+                    ),
+                    new State("spin_charge",
+                        new SetAltTexture(2),
+                        new BounceCharge(speed: 10, range: 15, bounces: 3, chargeTimeMs: 800),
+                        new Shoot(6, count: 5, shootAngle: 25, projectileIndex: 0, coolDown: new Cooldown(1200)),
+                        new TimedTransition(3000, "charge")
                     ),
                     new State("enrage",
                         new SetAltTexture(2),
@@ -149,7 +167,13 @@ namespace WorldServer.logic.db.community
                     new State("jump_land_enrage",
                         new SetAltTexture(2),
                         new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 99f, color: 0xFFFF0000),
-                        new TimedTransition(300, "enrage")
+                        new TimedTransition(300, "spin_enrage")
+                    ),
+                    new State("spin_enrage",
+                        new SetAltTexture(2),
+                        new BounceCharge(speed: 12, range: 15, bounces: 4, chargeTimeMs: 800),
+                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
+                        new TimedTransition(4000, "enrage")
                     )
                 )
             );
