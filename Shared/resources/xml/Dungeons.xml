@@ -825,10 +825,11 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 		<CommunityDungeon/>
-		<PresetLevel>1</PresetLevel>
-		<PresetStats>100,100,10,0,10,10,10,10</PresetStats>
-		<PresetHealthPotions>0</PresetHealthPotions>
-		<PresetManaPotions>0</PresetManaPotions>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>720,252,50,25,75,75,40,50</PresetStats>
+		<StartingEquipment>Sword of Acclaim,Acropolis Armor,,Ring of Decades</StartingEquipment>
+		<PresetHealthPotions>6</PresetHealthPotions>
+		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 		<Music>
 			<Track>cavern-bossfight</Track>
