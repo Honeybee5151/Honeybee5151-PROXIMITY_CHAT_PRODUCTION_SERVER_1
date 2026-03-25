@@ -829,7 +829,7 @@
 		<QuestText>Kill Greg and Brog</QuestText>
 		<PresetLevel>20</PresetLevel>
 		<PresetStats>720,252,50,25,75,75,40,50</PresetStats>
-		<StartingEquipment>Sword of Acclaim,Acropolis Armor,,Ring of Decades</StartingEquipment>
+		<StartingEquipment>Golden Sword,Mithril Chainmail,,Ring of Greater Defense</StartingEquipment>
 		<PresetHealthPotions>6</PresetHealthPotions>
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
