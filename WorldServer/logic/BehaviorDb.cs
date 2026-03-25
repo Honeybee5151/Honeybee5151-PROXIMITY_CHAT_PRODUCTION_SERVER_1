@@ -52,10 +52,10 @@ namespace WorldServer.logic
             InitDb = null;
             _initializing = 0;
 
-            // Load community dungeon behaviors from JSON files (disabled — C# is primary)
-            // JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
+            // Load community dungeon behaviors from JSON files (C# takes priority for same mob name)
+            JsonBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
 
-            // Load community dungeon behaviors from C# files
+            // Load community dungeon behaviors from C# files (overwrites JSON if same mob name)
             CSharpBehaviorLoader.LoadAll(this, GameServer.Resources.ResourcePath);
         }
 
