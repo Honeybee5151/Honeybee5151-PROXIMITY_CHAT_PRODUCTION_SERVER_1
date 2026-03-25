@@ -60,6 +60,14 @@ namespace WorldServer.core.worlds
         /// <summary>Pre-encoded UTF-8 bytes of CustomDungeonAssetsXml (built once, reused per client)</summary>
         public byte[] PreEncodedDungeonAssetsBytes { get; set; }
         public bool IsCommunityDungeon { get; set; } = false;
+        public bool IsOfficialDungeon { get; set; } = false;
+        public DungeonDifficulty DungeonDifficultyLevel { get; set; } = DungeonDifficulty.Peaceful;
+        public float DifficultyDamageMultiplier => DungeonDifficultyLevel switch
+        {
+            DungeonDifficulty.Medium => 1.33f,
+            DungeonDifficulty.Hard => 1.77f,
+            _ => 1.0f
+        };
         public string[] StartingEquipment { get; set; }
         public string[] InventoryItems { get; set; }
         public int PresetLevel { get; set; } = 1;

@@ -45,14 +45,26 @@ namespace WorldServer.core.commands.player
                 return true;
             }
 
+            // Parse difficulty suffix: "DungeonName::2"
+            var difficulty = DungeonDifficulty.Peaceful;
+            var dungeonArg = args;
+            var sepIndex = args.IndexOf("::");
+            if (sepIndex >= 0)
+            {
+                var diffStr = args.Substring(sepIndex + 2);
+                dungeonArg = args.Substring(0, sepIndex);
+                if (int.TryParse(diffStr, out var diffVal) && diffVal >= 0 && diffVal <= 3)
+                    difficulty = (DungeonDifficulty)diffVal;
+            }
+
             // Find matching dungeon (case-insensitive, partial match)
-            var match = allNames.FirstOrDefault(n => n.Equals(args, StringComparison.OrdinalIgnoreCase));
+            var match = allNames.FirstOrDefault(n => n.Equals(dungeonArg, StringComparison.OrdinalIgnoreCase));
             if (match == null)
-                match = allNames.FirstOrDefault(n => n.StartsWith(args, StringComparison.OrdinalIgnoreCase));
+                match = allNames.FirstOrDefault(n => n.StartsWith(dungeonArg, StringComparison.OrdinalIgnoreCase));
 
             if (match == null)
             {
-                player.SendError($"Dungeon '{args}' not found. Use /dungeon to see the list.");
+                player.SendError($"Dungeon '{dungeonArg}' not found. Use /dungeon to see the list.");
                 return false;
             }
 
@@ -63,7 +75,18 @@ namespace WorldServer.core.commands.player
                 return false;
             }
 
-            player.SendInfo($"Entering {match}...");
+            // Set difficulty for official dungeons
+            var isOfficial = officialNames.Contains(match, StringComparer.OrdinalIgnoreCase);
+            if (isOfficial)
+            {
+                world.IsOfficialDungeon = true;
+                world.DungeonDifficultyLevel = difficulty;
+            }
+
+            var diffLabel = isOfficial && difficulty != DungeonDifficulty.Peaceful
+                ? $" [{difficulty}]"
+                : "";
+            player.SendInfo($"Entering {match}{diffLabel}...");
             var previousWorld = player.World;
             player.Reconnect(world);
             ReconnectPartyMembers(player, world, previousWorld);
@@ -72,7 +95,7 @@ namespace WorldServer.core.commands.player
 
         private void ReconnectPartyMembers(Player leader, World targetWorld, World previousWorld)
         {
-            if (!targetWorld.IsCommunityDungeon)
+            if (!targetWorld.IsCommunityDungeon && !targetWorld.IsOfficialDungeon)
                 return;
 
             var partyId = leader.Client.Account.PartyId;
@@ -85,6 +108,10 @@ namespace WorldServer.core.commands.player
 
             if (party.PartyLeader.Item1 != leader.Client.Account.Name || party.PartyLeader.Item2 != leader.Client.Account.AccountId)
                 return;
+
+            var diffLabel = targetWorld.IsOfficialDungeon
+                ? $" (Difficulty: {targetWorld.DungeonDifficultyLevel})"
+                : "";
 
             foreach (var member in party.PartyMembers)
             {
@@ -101,7 +128,7 @@ namespace WorldServer.core.commands.player
                 if (targetWorld.IsPlayersMax())
                     break;
 
-                memberClient.Player.SendInfo("Your party leader entered a dungeon!");
+                memberClient.Player.SendInfo($"Your party leader entered a dungeon!{diffLabel}");
                 memberClient.Player.Reconnect(targetWorld);
             }
         }

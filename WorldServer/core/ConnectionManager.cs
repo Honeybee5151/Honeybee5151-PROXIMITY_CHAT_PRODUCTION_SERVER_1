@@ -19,6 +19,12 @@ namespace WorldServer.core
         private const int CONNECTING_TTL = 15;
         private const int RECON_TTL = 15;
 
+        /// <summary>
+        /// Account IDs that should auto-open the dungeon browser on next Nexus load.
+        /// Value is the tab to open ("official" or "community").
+        /// </summary>
+        public static readonly ConcurrentDictionary<int, string> PendingDungeonBrowserOpen = new();
+
         private readonly GameServer GameServer;
 
         public ConcurrentDictionary<Client, PlayerInfo> Clients { get; } = new ConcurrentDictionary<Client, PlayerInfo>();
@@ -250,6 +256,10 @@ namespace WorldServer.core
             // Send dungeon quest objective text
             if (!string.IsNullOrEmpty(world.QuestText))
                 packets.Add(new GlobalNotificationMessage(0, "dungeonQuest:" + world.QuestText));
+
+            // Auto-open dungeon browser if player returned to Nexus from a dungeon
+            if (world is NexusWorld && PendingDungeonBrowserOpen.TryRemove(client.Account.AccountId, out var browserTab))
+                packets.Add(new GlobalNotificationMessage(0, "openDungeonBrowser:" + browserTab));
 
             client.SendPackets(packets.ToArray());
             client.State = ProtocolState.Handshaked;

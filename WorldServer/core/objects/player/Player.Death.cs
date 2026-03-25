@@ -173,7 +173,15 @@ namespace WorldServer.core.objects
             if (World == null || World.InstanceType != WorldResourceInstanceType.Dungeon)
                 return false;
 
-            // Respawn in the same dungeon — full reconnect to reload entities
+            // Official dungeons with non-Peaceful difficulty: 1 life → back to Nexus
+            if (World.IsOfficialDungeon && World.DungeonDifficultyLevel != DungeonDifficulty.Peaceful)
+            {
+                GenerateGravestone();
+                ReconnectToNexus();
+                return true;
+            }
+
+            // Peaceful official or non-official dungeons: infinite respawn
             Health = Stats[0];
             Mana = Stats[1];
 
@@ -195,6 +203,13 @@ namespace WorldServer.core.objects
         {
             Health = Stats[0];
             Mana = Stats[1];
+
+            // Auto-open dungeon browser on Nexus load if returning from a dungeon
+            if (World != null && (World.IsCommunityDungeon || World.IsOfficialDungeon))
+            {
+                var tab = World.IsOfficialDungeon ? "official" : "community";
+                ConnectionManager.PendingDungeonBrowserOpen[Client.Account.AccountId] = tab;
+            }
 
             Client.Reconnect(new Reconnect()
             {

@@ -410,6 +410,11 @@ namespace WorldServer.core.objects
                 return;
 
             dmg = (int)Stats.GetDefenseDamage(dmg, false);
+
+            // Apply difficulty damage multiplier for official dungeons
+            if (World?.IsOfficialDungeon == true)
+                dmg = (int)(dmg * World.DifficultyDamageMultiplier);
+
             if (!HasConditionEffect(ConditionEffectIndex.Invulnerable))
                 Health -= dmg;
 
