@@ -83,12 +83,16 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
             var progress = s.ElapsedMs / (float)totalMs;
             var currentRadius = progress * MaxRadius;
-            var innerEdge = currentRadius - RingThickness / 2f;
             var outerEdge = currentRadius + RingThickness / 2f;
 
-            // Query all players near the ring
+            // Swept area: from previous tick's inner edge to current tick's outer edge
+            // This ensures no player can pass through the ring between ticks
+            var sweepInner = Math.Max(0f, s.PrevOuterEdge - RingThickness);
+            var sweepOuter = outerEdge;
+
+            // Always search full max radius so distant players are found early
             var pos = new Position(host.X, host.Y);
-            var searchRadius = outerEdge + 2f;
+            var searchRadius = MaxRadius + RingThickness + 2f;
             host.World.AOE(pos, searchRadius, true, p =>
             {
                 if (p is not Player player)
@@ -99,7 +103,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (s.HitPlayers.Contains(player.Id))
                     return;
 
-                if (dist >= innerEdge && dist <= outerEdge)
+                if (dist >= sweepInner && dist <= sweepOuter)
                 {
                     // Send AoE message so client shows damage popup
                     var hitPos = new Position(player.X, player.Y);
@@ -112,6 +116,8 @@ namespace WorldServer.logic.behaviors.@new.attacks
                         player.ApplyConditionEffect(new ConditionEffect(Effect, EffectDuration));
                 }
             });
+
+            s.PrevOuterEdge = outerEdge;
         }
 
         class RingState
@@ -119,6 +125,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             public bool Expanding;
             public bool Fired;
             public int ElapsedMs;
+            public float PrevOuterEdge;
             public System.Collections.Generic.HashSet<int> HitPlayers = new();
         }
     }
