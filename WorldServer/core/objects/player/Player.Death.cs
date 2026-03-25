@@ -150,9 +150,12 @@ namespace WorldServer.core.objects
             if (World == null || !World.IsCommunityDungeon)
                 return false;
 
-            // Respawn in the same dungeon instead of going to nexus
+            // Respawn in the same dungeon — full reconnect to reload entities
             Health = Stats[0];
             Mana = Stats[1];
+
+            // Extend world lifetime to prevent disposal during reconnect window
+            World.ResetLifetime();
 
             Client.Reconnect(new Reconnect()
             {
@@ -170,9 +173,12 @@ namespace WorldServer.core.objects
             if (World == null || World.InstanceType != WorldResourceInstanceType.Dungeon)
                 return false;
 
-            // Respawn in the same dungeon — no permadeath for official dungeons
+            // Respawn in the same dungeon — full reconnect to reload entities
             Health = Stats[0];
             Mana = Stats[1];
+
+            // Extend world lifetime to prevent disposal during reconnect window
+            World.ResetLifetime();
 
             Client.Reconnect(new Reconnect()
             {

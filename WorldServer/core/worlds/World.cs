@@ -46,6 +46,8 @@ namespace WorldServer.core.worlds
         public bool DisableShooting { get; set; }
         public bool DisableAbilities { get; set; }
         private long Lifetime { get; set; }
+        /// <summary>Reset lifetime to 0 to prevent premature world disposal (e.g. during death reconnect).</summary>
+        public void ResetLifetime() => Lifetime = 0;
 
         public bool isWeekend { get; set; } = false;
         public List<Shared.resources.CustomGroundEntry> CustomGroundEntries { get; set; }
@@ -287,7 +289,9 @@ namespace WorldServer.core.worlds
             }
             entity.Id = GetNextEntityId();
             entity.Init(this);
-            entity.Move(x, y);
+            // Use MoveUnchecked for initial placement — map-placed entities should always
+            // spawn at their intended position regardless of NoWalk tiles nearby.
+            entity.MoveUnchecked(x, y);
             EntitiesToAdd.Add(entity);
             return entity;
         }
@@ -355,7 +359,7 @@ namespace WorldServer.core.worlds
             return null;
         }
 
-        public bool IsPassable(double x, double y, bool spawning = false)
+        public bool IsPassable(double x, double y, bool spawning = false, bool ignoreNoWalk = false)
         {
             var x_ = (int)x;
             var y_ = (int)y;
@@ -365,9 +369,12 @@ namespace WorldServer.core.worlds
 
             var tile = Map[x_, y_];
 
-            var tileDesc = GameServer.Resources.GameData.Tiles[tile.TileId];
-            if (tileDesc.NoWalk)
-                return false;
+            if (!ignoreNoWalk)
+            {
+                var tileDesc = GameServer.Resources.GameData.Tiles[tile.TileId];
+                if (tileDesc.NoWalk)
+                    return false;
+            }
 
             if (tile.ObjType != 0 && tile.ObjDesc != null)
                 if (tile.ObjDesc.FullOccupy || tile.ObjDesc.EnemyOccupySquare || spawning && tile.ObjDesc.OccupySquare)
