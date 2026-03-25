@@ -482,6 +482,9 @@ namespace WorldServer.core.objects
 
         public void ValidateAndMove(float x, float y)
         {
+            if (World != null && !World.IsPassable(x, y))
+                return;
+
             var pos = new FPoint();
             ResolveNewLocation(x, y, pos);
             Move(pos.X, pos.Y);
