@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Xml.Linq;
 using Shared.utils;
 
 namespace App.Controllers
@@ -46,9 +47,13 @@ namespace App.Controllers
 
                 var difficulty = ratingCount > 0 ? Math.Round(difficultySum / ratingCount, 1) : 0.0;
 
+                // Use DisplayName from Dungeons.xml if available, otherwise fall back to id
+                var displayName = GetDisplayName(name);
+
                 results.Add(new
                 {
                     name,
+                    displayName,
                     likes,
                     difficulty,
                     ratingCount
@@ -146,6 +151,30 @@ namespace App.Controllers
                 .Select(l => l.Trim())
                 .Where(l => !string.IsNullOrEmpty(l))
                 .ToList();
+        }
+
+        private Dictionary<string, string> _displayNameCache;
+
+        private string GetDisplayName(string idName)
+        {
+            if (_displayNameCache == null)
+            {
+                _displayNameCache = new Dictionary<string, string>();
+                var xmlPath = Path.Combine(_core.Resources.ResourcePath, "xml", "Dungeons.xml");
+                if (System.IO.File.Exists(xmlPath))
+                {
+                    var doc = XDocument.Load(xmlPath);
+                    foreach (var world in doc.Descendants("World"))
+                    {
+                        var id = world.Attribute("id")?.Value;
+                        var dn = world.Element("DisplayName")?.Value;
+                        if (id != null && dn != null)
+                            _displayNameCache[id] = dn;
+                    }
+                }
+            }
+
+            return _displayNameCache.TryGetValue(idName, out var display) ? display : idName;
         }
     }
 }
