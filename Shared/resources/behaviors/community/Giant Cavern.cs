@@ -58,7 +58,7 @@ namespace WorldServer.logic.db.community
                         new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         // Spawn 16 balls that orbit Greg in a square (one-time only)
                         new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
-                        new TimedTransition(2500, "enrage_chase")
+                        new TimedTransition(0, "enrage_chase")
                     ),
 
                     new State("enrage_chase",
@@ -90,7 +90,7 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        new TimedTransition(2500, "enrage_chase"),
+                        new TimedTransition(0, "enrage_chase"),
                         new HpLessTransition(0.15, "enrage_desperation_jump")
                     ),
 
@@ -107,7 +107,7 @@ namespace WorldServer.logic.db.community
                         // Double shockwave — fast inner ring + slower outer ring
                         new NewExpandingRing(maxRadius: 10f, expandDuration: 1.5f, ringThickness: 2f, damage: 200, color: 0xFFFF0000, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 2f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        new TimedTransition(3500, "enrage_desperation_chase")
+                        new TimedTransition(0, "enrage_desperation_chase")
                     ),
 
                     new State("enrage_desperation_chase",
@@ -159,7 +159,7 @@ namespace WorldServer.logic.db.community
                     new State("land1",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        new TimedTransition(3500, "walk1")
+                        new TimedTransition(0, "walk1")
                     ),
 
                     // --- Charge phase (HP 30-60%): walk, jump, bigger shockwave cycle ---
@@ -184,7 +184,7 @@ namespace WorldServer.logic.db.community
                     new State("land2",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        new TimedTransition(3500, "walk2")
+                        new TimedTransition(0, "walk2")
                     ),
 
                     // --- Enrage phase (HP < 30%): spin + bounce charge only ---
