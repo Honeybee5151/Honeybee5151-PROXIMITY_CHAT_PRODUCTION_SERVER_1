@@ -63,6 +63,16 @@ namespace Shared.resources
         public Dictionary<string, string> DungeonAssetsXml = new Dictionary<string, string>(); // jmPath -> pre-built dungeon assets XML
         public Dictionary<string, List<ushort>> DungeonObjectTypes = new Dictionary<string, List<ushort>>(); // jmPath -> type codes from DungeonAssets
 
+        // Global type code allocator for custom grounds (thread-safe, prevents collisions across dungeons)
+        private ushort _nextCustomGroundTypeCode = 0x8000;
+        private readonly object _customGroundLock = new object();
+
+        /// <summary>Allocate a unique type code for a custom ground tile. Thread-safe.</summary>
+        public ushort AllocateCustomGroundTypeCode()
+        {
+            lock (_customGroundLock) return _nextCustomGroundTypeCode++;
+        }
+
         // Global type code allocator for custom objects (thread-safe, prevents collisions across dungeons)
         private ushort _nextCustomObjTypeCode = 0x9000;
         private readonly object _customObjLock = new object();

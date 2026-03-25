@@ -24,7 +24,6 @@ namespace Shared.terrain
             var tileDict = new Dictionary<short, TerrainTile>();
 
             var customGroundMap = new Dictionary<string, ushort>();
-            ushort nextCustomCode = 0x8000;
             customGrounds = new List<CustomGroundEntry>();
 
             // Custom objects: dedup by (pixels + class), type codes from global allocator
@@ -69,7 +68,7 @@ namespace Shared.terrain
                         + (slideAmt != 0 ? $"|slide{slideAmt}" : "");
                     if (!customGroundMap.TryGetValue(groundKey, out tileId))
                     {
-                        tileId = nextCustomCode++;
+                        tileId = data.AllocateCustomGroundTypeCode();
                         customGroundMap[groundKey] = tileId;
                         // Decode base64 pixels once at load time
                         byte[] decodedGndPixels;

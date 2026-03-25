@@ -62,7 +62,7 @@
 		<MinDamage>400</MinDamage>
 		<MaxDamage>400</MaxDamage>
 		<Size>300</Size>
-		<LifetimeMS>2000</LifetimeMS>
+		<LifetimeMS>20000</LifetimeMS>
 	</Projectile>
 </Object>
 <Object type="0x50A1" id="Brog">
