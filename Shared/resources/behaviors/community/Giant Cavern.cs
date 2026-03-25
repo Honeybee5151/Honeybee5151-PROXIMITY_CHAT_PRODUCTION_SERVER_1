@@ -40,7 +40,7 @@ namespace WorldServer.logic.db.community
                     new State("land1",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(500, "walk1")
+                        new TimedTransition(3000, "walk1")
                     ),
 
                     // --- Charge phase (HP 30-60%): walk, jump, bigger shockwave cycle ---
@@ -63,7 +63,7 @@ namespace WorldServer.logic.db.community
                     new State("land2",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(500, "walk2")
+                        new TimedTransition(3000, "walk2")
                     ),
 
                     // --- Enrage phase (HP < 30%): spin + bounce charge only ---
@@ -121,7 +121,7 @@ namespace WorldServer.logic.db.community
                     new State("land1",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(500, "walk1")
+                        new TimedTransition(3000, "walk1")
                     ),
 
                     // --- Charge phase (HP 30-60%): walk, jump, bigger shockwave cycle ---
@@ -145,7 +145,7 @@ namespace WorldServer.logic.db.community
                     new State("land2",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(500, "walk2")
+                        new TimedTransition(3000, "walk2")
                     ),
 
                     // --- Enrage phase (HP < 30%): spin + bounce charge only ---

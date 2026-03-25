@@ -494,9 +494,9 @@ namespace WorldServer.core.objects
             if (World != null && !World.IsPassable(x, y))
                 return;
 
-            var pos = new FPoint();
-            ResolveNewLocation(x, y, pos);
-            Move(pos.X, pos.Y);
+            // Simple direct move like players — no sliding logic
+            // The bounding box check in Move() handles corner clipping
+            Move(x, y);
         }
 
         protected virtual void ExportStats(IDictionary<StatDataType, object> stats, bool isOtherPlayer)
