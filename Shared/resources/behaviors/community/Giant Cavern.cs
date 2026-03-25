@@ -36,7 +36,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_chase",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 99f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
                         new TimedTransition(300, "chase")
                     ),
                     new State("charge",
@@ -56,7 +56,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_charge",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 99f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
                         new TimedTransition(300, "spin_charge")
                     ),
                     new State("spin_charge",
@@ -82,7 +82,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_enrage",
                         new SetAltTexture(2),
-                        new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 99f, color: 0xFFFF0000),
+                        new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 0f, color: 0xFFFF0000),
                         new TimedTransition(300, "spin_enrage")
                     ),
                     new State("spin_enrage",
@@ -119,7 +119,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_chase",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 99f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
                         new TimedTransition(300, "chase")
                     ),
                     new State("charge",
@@ -140,7 +140,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_charge",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 99f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
                         new TimedTransition(300, "spin_charge")
                     ),
                     new State("spin_charge",
@@ -166,7 +166,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("jump_land_enrage",
                         new SetAltTexture(2),
-                        new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 99f, color: 0xFFFF0000),
+                        new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 0f, color: 0xFFFF0000),
                         new TimedTransition(300, "spin_enrage")
                     ),
                     new State("spin_enrage",
