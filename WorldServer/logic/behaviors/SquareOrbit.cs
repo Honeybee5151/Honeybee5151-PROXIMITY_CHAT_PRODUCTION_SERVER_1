@@ -55,13 +55,12 @@ namespace WorldServer.logic.behaviors
 
         protected override void OnStateEntry(Entity host, TickTime time, ref object state)
         {
-            // Each ball picks a random corner so they naturally spread out
-            var corner = _startCorner >= 0 ? _startCorner : Random.Next(4);
-            var edgeOffset = (float)(Random.NextDouble() * _halfSize * 2f); // random position along edge
+            // Deterministic corner assignment: each ball gets a unique corner via entity ID
+            var corner = _startCorner >= 0 ? _startCorner : (int)(host.Id % 4);
             state = new SquareOrbitState
             {
                 CurrentCorner = corner,
-                EdgeProgress = edgeOffset
+                EdgeProgress = 0f
             };
         }
 
