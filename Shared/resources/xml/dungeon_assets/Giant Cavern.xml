@@ -210,7 +210,7 @@
 		<Speed>15</Speed>
 		<MinDamage>200</MinDamage>
 		<MaxDamage>200</MaxDamage>
-		<Size>80</Size>
+		<Size>1</Size>
 		<LifetimeMS>250</LifetimeMS>
 	</Projectile>
 </Object>
