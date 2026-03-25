@@ -40,20 +40,22 @@ namespace WorldServer.logic.behaviors
                 var newX = host.X + s.DirX * dist;
                 var newY = host.Y + s.DirY * dist;
 
+                // Grace period after bounce — force move to escape the wall
+                s.GraceMs -= time.ElapsedMsDelta;
+                if (s.GraceMs > 0)
+                {
+                    // During grace, always move (even through walls) so boss escapes
+                    host.MoveUnchecked(newX, newY);
+                    Status = CycleStatus.InProgress;
+                    state = s;
+                    return;
+                }
+
                 // Only stop at NoWalk tiles and walls (FullOccupy) — plow through decorations/objects
                 var hitWall = IsHardBlock(host, newX, newY);
 
                 if (!hitWall)
                     host.MoveUnchecked(newX, newY);
-
-                // Grace period after bounce — don't check wall hits for 300ms
-                s.GraceMs -= time.ElapsedMsDelta;
-                if (s.GraceMs > 0)
-                {
-                    Status = CycleStatus.InProgress;
-                    state = s;
-                    return;
-                }
 
                 if (hitWall)
                 {
