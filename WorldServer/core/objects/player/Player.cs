@@ -252,6 +252,13 @@ namespace WorldServer.core.objects
 
         public bool IsRiding => RidingEntityId > 0;
 
+        private StatTypeValue<int> _isCrouching;
+        public int IsCrouching
+        {
+            get => _isCrouching.GetValue();
+            set => _isCrouching.SetValue(value);
+        }
+
         // Raft: player's offset from raft center (server-only, not synced)
         public float RaftOffsetX;
         public float RaftOffsetY;
@@ -341,6 +348,7 @@ namespace WorldServer.core.objects
             _partyId = new StatTypeValue<int>(this, StatDataType.PartyId, account.PartyId, true);
             _speedMult = new StatTypeValue<int>(this, StatDataType.SpeedMult, 100, true);
             _ridingEntityId = new StatTypeValue<int>(this, StatDataType.RidingEntityId, -1, true);
+            _isCrouching = new StatTypeValue<int>(this, StatDataType.IsCrouching, 0, true);
 
             Name = account.Name;
             Health = character.Health;

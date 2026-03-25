@@ -109,6 +109,7 @@
         BackPackData7 = 141,
         SpeedMult = 142,
         RidingEntityId = 143,
+        IsCrouching = 144,
         None = 255
     }
 }

@@ -99,5 +99,6 @@ public enum MessageId : byte
     VAULT_OPEN = 92,
     VAULT_DATA = 93,
     VAULT_SWAP = 94,
-    DASH = 95
+    DASH = 95,
+    CROUCH = 96
 }
