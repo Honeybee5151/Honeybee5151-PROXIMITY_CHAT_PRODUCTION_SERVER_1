@@ -48,8 +48,6 @@ namespace WorldServer.core.objects
         public override void Init(World owner)
         {
             base.Init(owner);
-            if (ObjectDesc.Quest || ObjectDesc.Hero || ObjectDesc.Encounter)
-                ClasifyEnemy();
         }
 
         public override void Tick(ref TickTime time)
