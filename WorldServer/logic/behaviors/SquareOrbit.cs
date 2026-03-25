@@ -59,8 +59,8 @@ namespace WorldServer.logic.behaviors
             var sideLength = _halfSize * 2f;
             var perimeter = sideLength * 4f;
             // Each ball gets an evenly-spaced starting position along the perimeter
-            var slot = _startCorner >= 0 ? _startCorner : (int)(host.Id % 8);
-            var startDist = (perimeter / 8f) * slot;
+            var slot = _startCorner >= 0 ? _startCorner : (int)(host.Id % 16);
+            var startDist = (perimeter / 16f) * slot;
             // Convert perimeter distance to corner + edge progress
             var corner = (int)(startDist / sideLength);
             var edgeProgress = startDist - corner * sideLength;

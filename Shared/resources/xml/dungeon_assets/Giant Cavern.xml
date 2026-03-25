@@ -198,11 +198,11 @@
 	<Invulnerable/>
 	<Projectile id="0">
 		<ObjectId>Greg Boulder</ObjectId>
-		<Speed>40</Speed>
-		<MinDamage>50</MinDamage>
-		<MaxDamage>70</MaxDamage>
-		<Size>50</Size>
-		<LifetimeMS>600</LifetimeMS>
+		<Speed>0</Speed>
+		<MinDamage>200</MinDamage>
+		<MaxDamage>200</MaxDamage>
+		<Size>80</Size>
+		<LifetimeMS>350</LifetimeMS>
 	</Projectile>
 </Object>
 </Objects>
