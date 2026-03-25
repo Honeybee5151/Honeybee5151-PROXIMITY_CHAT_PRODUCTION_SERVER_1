@@ -26,8 +26,8 @@
         "supporterOnly": false,
         "restartTime": 24,
         "whitelist": [],
-        "lootEvent": 0.25,
-        "expEvent": 0.25,
-        "wkndBoost": 0.3
+        "lootEvent": 0,
+        "expEvent": 0,
+        "wkndBoost": 0
     }
 }

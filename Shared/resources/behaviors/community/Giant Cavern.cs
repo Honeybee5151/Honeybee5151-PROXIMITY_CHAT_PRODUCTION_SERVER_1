@@ -44,7 +44,8 @@ namespace WorldServer.logic.db.community
                     new State("enrage_jump",
                         // Jump frames 1-5 cycle based on travel time; passes through no-walk tiles
                         new JumpToPlayer(speed: 8, range: 200, texMin: 1, texMax: 5),
-                        new TimedTransition(3000, "enrage_land") // safety cap
+                        new CycleTransition("enrage_land"), // fires immediately when jump completes
+                        new TimedTransition(5000, "enrage_land") // safety cap
                     ),
 
                     new State("enrage_land",
@@ -68,7 +69,8 @@ namespace WorldServer.logic.db.community
                     new State("enrage_jump_loop",
                         // Jump frames 1-5 cycle based on travel time; passes through no-walk tiles
                         new JumpToPlayer(speed: 10, range: 200, texMin: 1, texMax: 5),
-                        new TimedTransition(3000, "enrage_land_loop")
+                        new CycleTransition("enrage_land_loop"), // fires immediately when jump completes
+                        new TimedTransition(5000, "enrage_land_loop") // safety cap
                     ),
 
                     new State("enrage_land_loop",

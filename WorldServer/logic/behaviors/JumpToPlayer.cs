@@ -117,10 +117,11 @@ namespace WorldServer.logic.behaviors
 
             Status = CycleStatus.InProgress;
 
-            // Jump complete
+            // Jump complete — snap to target and reset to normal texture
             if (s.ElapsedMs >= s.TotalMs)
             {
                 host.MoveUnchecked(s.TargetX, s.TargetY);
+                host.AltTextureIndex = 0;
                 s.Phase = JumpPhase.Done;
                 Status = CycleStatus.Completed;
             }
