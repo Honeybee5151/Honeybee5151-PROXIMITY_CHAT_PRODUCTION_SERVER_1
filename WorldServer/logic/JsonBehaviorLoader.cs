@@ -263,6 +263,17 @@ namespace WorldServer.logic
                             loop: b["loop"]?.Value<bool>() ?? false
                         );
 
+                    case "RingAttack":
+                        return new RingAttack(
+                            radius: b["radius"]?.Value<double>() ?? 0,
+                            count: b["count"]?.Value<int>() ?? 8,
+                            offset: b["offset"]?.Value<double>() ?? 0,
+                            projectileIndex: b["projectileIndex"]?.Value<int>() ?? 0,
+                            angleToIncrement: b["angleToIncrement"]?.Value<double>() ?? 0,
+                            fixedAngle: b["fixedAngle"]?.Value<double>() ?? 0,
+                            coolDown: new Cooldown(b["coolDown"]?.Value<int>() ?? 1000, 0)
+                        );
+
                     default:
                         Log.Warn($"[JsonBehavior] Unknown behavior type: {type}");
                         return null;
