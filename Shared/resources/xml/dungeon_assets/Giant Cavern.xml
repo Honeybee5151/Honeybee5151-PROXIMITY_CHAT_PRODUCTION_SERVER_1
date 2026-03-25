@@ -75,14 +75,6 @@
 		<Size>300</Size>
 		<LifetimeMS>20000</LifetimeMS>
 	</Projectile>
-	<Projectile id="3">
-		<ObjectId>Greg Rock</ObjectId>
-		<Speed>70</Speed>
-		<MinDamage>90</MinDamage>
-		<MaxDamage>130</MaxDamage>
-		<Size>60</Size>
-		<LifetimeMS>1000</LifetimeMS>
-	</Projectile>
 </Object>
 <Object type="0x50A1" id="Brog">
 	<SightRadius>100</SightRadius>
@@ -119,7 +111,8 @@
 		<MinDamage>80</MinDamage>
 		<MaxDamage>120</MaxDamage>
 		<Size>80</Size>
-		<LifetimeMS>1200</LifetimeMS>
+		<LifetimeMS>2400</LifetimeMS>
+		<Boomerang/>
 	</Projectile>
 	<Projectile id="1">
 		<ObjectId>Brog Stomp</ObjectId>
@@ -129,14 +122,6 @@
 		<Size>60</Size>
 		<LifetimeMS>800</LifetimeMS>
 		<ConditionEffect duration="2">Slowed</ConditionEffect>
-	</Projectile>
-	<Projectile id="2">
-		<ObjectId>Brog Rock</ObjectId>
-		<Speed>70</Speed>
-		<MinDamage>90</MinDamage>
-		<MaxDamage>130</MaxDamage>
-		<Size>60</Size>
-		<LifetimeMS>1000</LifetimeMS>
 	</Projectile>
 </Object>
 <Object type="0x49E0" id="Greg Boulder">
@@ -179,22 +164,6 @@
 	</Texture>
 	<AngleCorrection>1</AngleCorrection>
 	<Rotation>150</Rotation>
-</Object>
-<Object type="0x49E5" id="Greg Rock">
-	<Class>Projectile</Class>
-	<Texture>
-		<File>dungeon_gc_8x8</File>
-		<Index>0</Index>
-	</Texture>
-	<AngleCorrection>1</AngleCorrection>
-</Object>
-<Object type="0x49E6" id="Brog Rock">
-	<Class>Projectile</Class>
-	<Texture>
-		<File>dungeon_gc_8x8</File>
-		<Index>0</Index>
-	</Texture>
-	<AngleCorrection>1</AngleCorrection>
 </Object>
 <Object type="0x50A2" id="Greg Imprint">
 	<Class>GameObject</Class>
