@@ -141,6 +141,11 @@ namespace WorldServer.core.worlds
 
             world.Init();
 
+            // Flush map-loaded entities into the world immediately so they exist
+            // before the first tick — prevents race where player connects before
+            // RootWorldThread processes EntitiesToAdd (especially on localhost).
+            world.FlushPendingEntities();
+
             if (worldResource.IsCommunityDungeon)
             {
                 world.IsCommunityDungeon = true;

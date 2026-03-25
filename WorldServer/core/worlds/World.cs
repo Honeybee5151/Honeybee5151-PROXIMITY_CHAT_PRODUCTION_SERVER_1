@@ -647,6 +647,16 @@ namespace WorldServer.core.worlds
 
         // BuildCustomObjectXml moved to XmlData.cs (centralized with Register/Unregister)
 
+        /// <summary>Flush queued entities into the world immediately.
+        /// Called after map loading so entities exist before the first tick
+        /// (prevents race where player connects before tick processes EntitiesToAdd).</summary>
+        public void FlushPendingEntities()
+        {
+            foreach (var entity in EntitiesToAdd)
+                AddToWorld(entity);
+            EntitiesToAdd.Clear();
+        }
+
         public virtual void Init()
         {
         }
