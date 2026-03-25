@@ -15,7 +15,6 @@ namespace WorldServer.logic.db.community
             db.RegisterCommunity("Greg",
                 new State(
                     new SpawnOnDeath("Greg Imprint"),
-                    new DestroyOnDeath("Greg Ball"),
                     new State("idle",
                         new SetAltTexture(0),
                         new ConditionalEffect(ConditionEffectIndex.Invulnerable),
@@ -55,8 +54,8 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        // Spawn 16 balls that orbit Greg in a square (one-time only)
-                        new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
+                        // Orbiting ball projectiles — 16 balls in a square pattern
+                        new SquareOrbitShoot(speed: 3, sideLength: 12, ballCount: 16, projectileIndex: 3, coolDown: 400),
                         new TimedTransition(2500, "enrage_chase")
                     ),
 
@@ -74,6 +73,8 @@ namespace WorldServer.logic.db.community
                         new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -8, coolDown: new Cooldown(1500)),
                         // 3-shot burst aimed at the player
                         new Shoot(8, count: 3, shootAngle: 10, projectileIndex: 0, predictive: 0.8, coolDown: new Cooldown(2000)),
+                        // Orbiting ball projectiles
+                        new SquareOrbitShoot(speed: 3, sideLength: 12, ballCount: 16, projectileIndex: 3, coolDown: 400),
                         new TimedTransition(4000, "enrage_jump_loop"),
                         new HpLessTransition(0.15, "enrage_desperation_jump")
                     ),
@@ -89,6 +90,8 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        // Orbiting ball projectiles
+                        new SquareOrbitShoot(speed: 3, sideLength: 12, ballCount: 16, projectileIndex: 3, coolDown: 400),
                         new TimedTransition(2500, "enrage_chase"),
                         new HpLessTransition(0.15, "enrage_desperation_jump")
                     ),
@@ -106,6 +109,8 @@ namespace WorldServer.logic.db.community
                         // Double shockwave — fast inner ring + slower outer ring
                         new NewExpandingRing(maxRadius: 10f, expandDuration: 1.5f, ringThickness: 2f, damage: 200, color: 0xFFFF0000, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 2f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        // Orbiting ball projectiles (faster in desperation)
+                        new SquareOrbitShoot(speed: 4, sideLength: 12, ballCount: 16, projectileIndex: 3, coolDown: 350),
                         new TimedTransition(3500, "enrage_desperation_chase")
                     ),
 
@@ -121,6 +126,8 @@ namespace WorldServer.logic.db.community
                         new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -4, coolDown: new Cooldown(1200)),
                         new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -8, coolDown: new Cooldown(1200)),
                         new Shoot(8, count: 3, shootAngle: 10, projectileIndex: 0, predictive: 0.9, coolDown: new Cooldown(1500)),
+                        // Orbiting ball projectiles (faster in desperation)
+                        new SquareOrbitShoot(speed: 4, sideLength: 12, ballCount: 16, projectileIndex: 3, coolDown: 350),
                         new TimedTransition(3000, "enrage_desperation_jump")
                     )
                 )
@@ -196,18 +203,6 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(2),
                         new BounceCharge(speed: 12, range: 100),
                         new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800))
-                    )
-                )
-            );
-
-            // ========== GREG BALL (orbiting minion — unkillable) ==========
-            db.RegisterCommunity("Greg Ball",
-                new State(
-                    new State("orbit",
-                        // Each ball gets a unique corner via entity ID, orbits Greg in a square
-                        new SquareOrbit(speed: 3, sideLength: 12, startCorner: -1, acquireRange: 100, target: "Greg"),
-                        // Contact damage: stationary projectile on the ball itself
-                        new Shoot(1, count: 1, projectileIndex: 0, coolDown: new Cooldown(400))
                     )
                 )
             );
