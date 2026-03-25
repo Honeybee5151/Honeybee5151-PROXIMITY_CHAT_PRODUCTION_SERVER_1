@@ -160,6 +160,7 @@ namespace WorldServer.core.worlds
 
             world.LockRotation = worldResource.LockRotation;
             world.SpawnRaft = worldResource.SpawnRaft;
+            world.QuestText = worldResource.QuestText;
 
             // Spawn beam obstacles for crying dungeon
             Console.WriteLine($"[CryingDungeon] dungeonName='{dungeonName}' checking match...");

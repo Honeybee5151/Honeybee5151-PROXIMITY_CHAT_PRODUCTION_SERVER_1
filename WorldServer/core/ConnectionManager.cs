@@ -246,6 +246,11 @@ namespace WorldServer.core
 
             packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
             packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));
+
+            // Send dungeon quest objective text
+            if (!string.IsNullOrEmpty(world.QuestText))
+                packets.Add(new GlobalNotificationMessage(0, "dungeonQuest:" + world.QuestText));
+
             client.SendPackets(packets.ToArray());
             client.State = ProtocolState.Handshaked;
 

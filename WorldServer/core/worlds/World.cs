@@ -69,6 +69,7 @@ namespace WorldServer.core.worlds
         public bool PresetHasBackpack { get; set; }
         public bool LockRotation { get; set; }
         public bool SpawnRaft { get; set; }
+        public string QuestText { get; set; }
 
         //editor8182381 — Darkness zone: progressive screen darkening outside safe radius
         public float DarknessZoneCenterX { get; protected set; }

@@ -109,6 +109,10 @@ namespace WorldServer.core.objects
 
         public void HandleQuest(TickTime time)
         {
+            // No quest indicators in community dungeons — uses custom objective text instead
+            if (World?.IsCommunityDungeon == true)
+                return;
+
             if (Quest != null && Quest.Dead)
                 Quest = null;
 

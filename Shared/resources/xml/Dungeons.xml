@@ -793,6 +793,7 @@
 		<CommunityDungeon/>
 		<LockRotation/>
 		<SpawnRaft/>
+		<QuestText>Slide down the waterfall</QuestText>
 		<PresetLevel>1</PresetLevel>
 		<PresetStats>2000,100,10,0,10,10,10,10</PresetStats>
 		<PresetHealthPotions>0</PresetHealthPotions>
@@ -825,6 +826,7 @@
 		<VisibilityType>1</VisibilityType>
 		<Dungeon/>
 		<CommunityDungeon/>
+		<QuestText>Kill Greg and Brog</QuestText>
 		<PresetLevel>20</PresetLevel>
 		<PresetStats>720,252,50,25,75,75,40,50</PresetStats>
 		<StartingEquipment>Sword of Acclaim,Acropolis Armor,,Ring of Decades</StartingEquipment>

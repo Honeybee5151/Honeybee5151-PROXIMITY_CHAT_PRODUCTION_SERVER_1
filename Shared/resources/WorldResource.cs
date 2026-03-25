@@ -43,6 +43,7 @@ namespace Shared.resources
         public readonly bool PresetHasBackpack;
         public readonly bool LockRotation;
         public readonly bool SpawnRaft;
+        public readonly string QuestText;
 
         public WorldResource(XElement elem)
         {
@@ -88,6 +89,7 @@ namespace Shared.resources
             PresetHasBackpack = elem.HasElement("PresetHasBackpack") && elem.GetValue<string>("PresetHasBackpack", "false").Equals("true", StringComparison.OrdinalIgnoreCase);
             LockRotation = elem.HasElement("LockRotation");
             SpawnRaft = elem.HasElement("SpawnRaft");
+            QuestText = elem.GetValue<string>("QuestText", null);
 
             MapJM = new List<string>();
             foreach (var map in elem.Elements("MapJM"))
