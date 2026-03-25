@@ -11,12 +11,14 @@ namespace WorldServer.logic.behaviors
         private readonly float _direction;
         private readonly float _distance;
         private readonly float _speed;
+        private readonly bool _ignoreWalls;
 
-        public MoveLine(double speed, double direction = 0, double distance = 0)
+        public MoveLine(double speed, double direction = 0, double distance = 0, bool ignoreWalls = false)
         {
             _speed = (float)speed;
             _direction = (float)direction * (float)Math.PI / 180;
             _distance = (float)distance;
+            _ignoreWalls = ignoreWalls;
         }
 
         protected override void OnStateExit(Entity host, TickTime time, ref object state) => state = null;
@@ -37,7 +39,10 @@ namespace WorldServer.logic.behaviors
                 var vect = new Vector2((float)Math.Cos(_direction), (float)Math.Sin(_direction));
                 var moveDist = host.GetSpeed(_speed) * time.BehaviourTickTime;
 
-                host.ValidateAndMove(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
+                if (_ignoreWalls)
+                    host.MoveUnchecked(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
+                else
+                    host.ValidateAndMove(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
                 Status = CycleStatus.Completed;
             }
             if (dist > 0)
@@ -47,7 +52,10 @@ namespace WorldServer.logic.behaviors
                 var moveDist = host.GetSpeed(_speed) * time.BehaviourTickTime;
                 var vect = new Vector2((float)Math.Cos(_direction), (float)Math.Sin(_direction));
 
-                host.ValidateAndMove(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
+                if (_ignoreWalls)
+                    host.MoveUnchecked(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
+                else
+                    host.ValidateAndMove(host.X + vect.X * moveDist, host.Y + vect.Y * moveDist);
                 dist -= moveDist;
             }
             else

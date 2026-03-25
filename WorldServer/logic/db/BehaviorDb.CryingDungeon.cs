@@ -44,7 +44,7 @@ namespace WorldServer.logic
                             phasePerTile: 400,
                             reversePeriodMs: 4000
                         ),
-                        new MoveLine(0.5, direction: 0, distance: 10),
+                        new MoveLine(0.5, direction: 0, distance: 10, ignoreWalls: true),
                         new TimedTransition(8000, "MoveLeft")
                     ),
                     new State("MoveLeft",
@@ -57,7 +57,7 @@ namespace WorldServer.logic
                             phasePerTile: 400,
                             reversePeriodMs: 4000
                         ),
-                        new MoveLine(0.5, direction: 180, distance: 10),
+                        new MoveLine(0.5, direction: 180, distance: 10, ignoreWalls: true),
                         new TimedTransition(8000, "MoveRight")
                     )
                 )
