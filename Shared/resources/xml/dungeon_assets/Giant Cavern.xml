@@ -10,6 +10,7 @@
 </SpriteSheets>
 <Objects>
 <Object type="0x50A0" id="Greg">
+	<SightRadius>100</SightRadius>
 	<AnimatedTexture>
 		<File>dungeon_gc_greg_move</File>
 		<Index>0</Index>
@@ -56,6 +57,7 @@
 	</Projectile>
 </Object>
 <Object type="0x50A1" id="Brog">
+	<SightRadius>100</SightRadius>
 	<AnimatedTexture>
 		<File>dungeon_gc_greg_move</File>
 		<Index>0</Index>

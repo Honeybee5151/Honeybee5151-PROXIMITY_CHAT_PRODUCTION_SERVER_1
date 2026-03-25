@@ -75,7 +75,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("spin_bounce",
                         new SetAltTexture(2),
-                        new BounceCharge(speed: 12, range: 15, bounces: 3),
+                        new BounceCharge(speed: 12, range: 100, bounces: 3),
                         new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
                         new TimedTransition(3000, "spin_pause")
                     ),
@@ -157,7 +157,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("spin_bounce",
                         new SetAltTexture(2),
-                        new BounceCharge(speed: 12, range: 15, bounces: 3),
+                        new BounceCharge(speed: 12, range: 100, bounces: 3),
                         new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
                         new TimedTransition(3000, "spin_pause")
                     ),
