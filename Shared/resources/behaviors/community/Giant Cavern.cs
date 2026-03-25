@@ -11,27 +11,28 @@ namespace WorldServer.logic.db.community
     {
         public static void Register(BehaviorDb db)
         {
-            // ========== GREG ==========
+            // ========== GREG (ranged/club thrower) ==========
             db.RegisterCommunity("Greg",
                 new State(
                     new State("idle",
                         new SetAltTexture(0),
                         new Wander(0.3),
-                        new PlayerWithinTransition(10, "walk1")
+                        new PlayerWithinTransition(15, "walk1")
                     ),
 
-                    // --- Chase phase (HP > 60%): walk, jump, shockwave cycle ---
+                    // --- Phase 1 (HP > 60%): ranged attacker, club throw, jump/shockwave ---
                     new State("walk1",
                         new SetAltTexture(0),
                         new Prioritize(
-                            new Chase(3.5, range: 4, sightRange: 12),
+                            new Chase(2.5, range: 6, sightRange: 15),
                             new Wander(0.3)
                         ),
                         new Shoot(7, count: 3, shootAngle: 15, projectileIndex: 0, coolDown: new Cooldown(1500)),
                         new Shoot(5, count: 1, projectileIndex: 1, coolDown: new Cooldown(2500), predictive: 0.5),
+                        new Shoot(10, count: 1, projectileIndex: 2, coolDown: new Cooldown(4000), predictive: 0.9),
                         new TimedTransition(5000, "jump1"),
                         new HpLessTransition(0.6, "walk2"),
-                        new NoPlayerWithinTransition(14, "idle")
+                        new NoPlayerWithinTransition(18, "idle")
                     ),
                     new State("jump1",
                         new SetAltTexture(1),
@@ -43,16 +44,17 @@ namespace WorldServer.logic.db.community
                         new TimedTransition(3000, "walk1")
                     ),
 
-                    // --- Charge phase (HP 30-60%): walk, jump, bigger shockwave cycle ---
+                    // --- Phase 2 (HP 30-60%): faster club throws, bigger shockwave ---
                     new State("walk2",
                         new SetAltTexture(0),
                         new Flash(0xFF8800, 0.5, 3),
                         new Prioritize(
-                            new Chase(4.5, range: 3, sightRange: 15),
+                            new Chase(3.5, range: 5, sightRange: 18),
                             new Wander(0.4)
                         ),
                         new Shoot(7, count: 5, shootAngle: 20, projectileIndex: 0, coolDown: new Cooldown(1200)),
                         new Shoot(5, count: 2, projectileIndex: 1, coolDown: new Cooldown(2000), predictive: 0.7),
+                        new Shoot(12, count: 1, projectileIndex: 2, coolDown: new Cooldown(3000), predictive: 1.0),
                         new TimedTransition(5000, "jump2"),
                         new HpLessTransition(0.3, "spin_start")
                     ),
@@ -62,11 +64,11 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("land2",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 20f, expandDuration: 3f, ringThickness: 2f, damage: 120, cooldown: 0f, color: 0xFFFF4400),
                         new TimedTransition(3000, "walk2")
                     ),
 
-                    // --- Enrage phase (HP < 30%): spin + bounce charge only ---
+                    // --- Enrage (HP < 30%): spin + bounce charge + club throws ---
                     new State("spin_start",
                         new SetAltTexture(2),
                         new Flash(0xFF0000, 0.5, 5),
@@ -76,7 +78,8 @@ namespace WorldServer.logic.db.community
                     new State("spin_bounce",
                         new SetAltTexture(2),
                         new BounceCharge(speed: 12, range: 100),
-                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800))
+                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
+                        new Shoot(15, count: 1, projectileIndex: 2, coolDown: new Cooldown(4000), predictive: 1.0)
                     )
                 )
             );
