@@ -56,7 +56,7 @@ namespace WorldServer.logic.db.community
                         new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF2200),
                         // Spawn 16 balls that orbit Greg in a square (one-time only)
                         new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
-                        new TimedTransition(500, "enrage_chase")
+                        new TimedTransition(2500, "enrage_chase")
                     ),
 
                     new State("enrage_chase",
@@ -65,8 +65,14 @@ namespace WorldServer.logic.db.community
                             new Chase(5, range: 3, sightRange: 100),
                             new Wander(0.5)
                         ),
-                        // Star burst — 5 shots in 5 directions (72° apart), forces dodging while circling
-                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, coolDown: new Cooldown(1500)),
+                        // Star burst — 5 arms (72° apart), 5 shots per arm (stacked with small angle offsets)
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 0, coolDown: new Cooldown(1500)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 4, coolDown: new Cooldown(1500)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 8, coolDown: new Cooldown(1500)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -4, coolDown: new Cooldown(1500)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -8, coolDown: new Cooldown(1500)),
+                        // 3-shot burst aimed at the player
+                        new Shoot(8, count: 3, shootAngle: 10, projectileIndex: 0, predictive: 0.8, coolDown: new Cooldown(2000)),
                         new TimedTransition(4000, "enrage_jump_loop")
                     ),
 
@@ -81,7 +87,7 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 120, cooldown: 0f, color: 0xFFFF2200),
-                        new TimedTransition(500, "enrage_chase")
+                        new TimedTransition(2500, "enrage_chase")
                     )
                 )
             );
