@@ -53,7 +53,7 @@ namespace WorldServer.logic.db.community
                     new State("enrage_land",
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
-                        new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         // Spawn 16 balls that orbit Greg in a square (one-time only)
                         new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
                         new TimedTransition(2500, "enrage_chase")
@@ -87,7 +87,7 @@ namespace WorldServer.logic.db.community
                     new State("enrage_land_loop",
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(2500, "enrage_chase"),
                         new HpLessTransition(0.15, "enrage_desperation_jump")
                     ),
@@ -103,8 +103,8 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.3, 6),
                         // Double shockwave — fast inner ring + slower outer ring
-                        new NewExpandingRing(maxRadius: 10f, expandDuration: 1.5f, ringThickness: 2f, damage: 200, cooldown: 99f, color: 0xFFFF0000, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 2f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 10f, expandDuration: 1.5f, ringThickness: 2f, damage: 200, color: 0xFFFF0000, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 2f, damage: 200, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(3500, "enrage_desperation_chase")
                     ),
 
@@ -155,7 +155,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("land1",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(3500, "walk1")
                     ),
 
@@ -180,7 +180,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("land2",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(3500, "walk2")
                     ),
 
