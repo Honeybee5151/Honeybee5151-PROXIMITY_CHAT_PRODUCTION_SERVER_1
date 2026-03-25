@@ -155,20 +155,20 @@
 </Object>
 <Object type="0x50A2" id="Greg Imprint">
 	<Class>GameObject</Class>
-	<Texture>
+	<AnimatedTexture>
 		<File>dungeon_gc_greg_move</File>
 		<Index>0</Index>
-	</Texture>
+	</AnimatedTexture>
 	<DrawOnGround/>
 	<Static/>
 	<Size>120</Size>
 </Object>
 <Object type="0x50A3" id="Brog Imprint">
 	<Class>GameObject</Class>
-	<Texture>
+	<AnimatedTexture>
 		<File>dungeon_gc_brog_move</File>
 		<Index>0</Index>
-	</Texture>
+	</AnimatedTexture>
 	<DrawOnGround/>
 	<Static/>
 	<Size>120</Size>
