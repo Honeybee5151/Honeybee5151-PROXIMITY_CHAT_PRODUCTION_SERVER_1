@@ -44,21 +44,31 @@ namespace WorldServer.logic.behaviors
 
                 host.ValidateAndMove(host.X + s.DirX * dist, host.Y + s.DirY * dist);
 
+                // Grace period after bounce — don't check wall hits for 300ms
+                // so the boss can move away from the wall it just bounced off
+                s.GraceMs -= time.ElapsedMsDelta;
+                if (s.GraceMs > 0)
+                {
+                    Status = CycleStatus.InProgress;
+                    state = s;
+                    return;
+                }
+
                 // Check if we hit a wall (position barely changed)
                 var dx = host.X - prevX;
                 var dy = host.Y - prevY;
                 var movedDist = MathF.Sqrt(dx * dx + dy * dy);
-                var expectedDist = dist * 0.5f; // if we moved less than half expected, we hit a wall
+                var expectedDist = dist * 0.5f;
 
                 if (movedDist < expectedDist)
                 {
-                    // Wall hit or charge time expired — bounce
-                    s.Charging = false;
+                    // Wall hit — bounce
                     s.BouncesLeft--;
 
                     if (s.BouncesLeft <= 0)
                     {
                         // Done bouncing
+                        s.Charging = false;
                         s.Active = false;
                         Status = CycleStatus.Completed;
                         state = s;
@@ -76,7 +86,7 @@ namespace WorldServer.logic.behaviors
                         {
                             s.DirX = toX / len;
                             s.DirY = toY / len;
-                            s.Charging = true;
+                            s.GraceMs = 300; // grace period to escape the wall
                         }
                     }
                 }
@@ -110,6 +120,7 @@ namespace WorldServer.logic.behaviors
                 s.Charging = true;
                 s.Active = true;
                 s.BouncesLeft = _bounces;
+                s.GraceMs = 0;
 
                 Status = CycleStatus.InProgress;
             }
@@ -124,6 +135,7 @@ namespace WorldServer.logic.behaviors
             public float DirX;
             public float DirY;
             public int BouncesLeft;
+            public int GraceMs;
         }
     }
 }
