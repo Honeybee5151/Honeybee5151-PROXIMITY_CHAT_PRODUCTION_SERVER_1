@@ -55,12 +55,19 @@ namespace WorldServer.logic.behaviors
 
         protected override void OnStateEntry(Entity host, TickTime time, ref object state)
         {
-            // Deterministic corner assignment: each ball gets a unique corner via entity ID
-            var corner = _startCorner >= 0 ? _startCorner : (int)(host.Id % 4);
+            // Distribute balls evenly along the entire square perimeter using entity ID
+            var sideLength = _halfSize * 2f;
+            var perimeter = sideLength * 4f;
+            // Each ball gets an evenly-spaced starting position along the perimeter
+            var slot = _startCorner >= 0 ? _startCorner : (int)(host.Id % 8);
+            var startDist = (perimeter / 8f) * slot;
+            // Convert perimeter distance to corner + edge progress
+            var corner = (int)(startDist / sideLength);
+            var edgeProgress = startDist - corner * sideLength;
             state = new SquareOrbitState
             {
-                CurrentCorner = corner,
-                EdgeProgress = 0f
+                CurrentCorner = corner % 4,
+                EdgeProgress = edgeProgress
             };
         }
 

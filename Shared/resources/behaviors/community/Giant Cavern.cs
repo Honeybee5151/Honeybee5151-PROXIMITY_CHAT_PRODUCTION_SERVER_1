@@ -51,8 +51,8 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF2200),
-                        // Spawn 4 balls that orbit Greg in a square (one-time only)
-                        new Spawn("Greg Ball", maxChildren: 4, initialSpawn: 1, coolDown: new Cooldown(200)),
+                        // Spawn 8 balls that orbit Greg in a square (one-time only)
+                        new Spawn("Greg Ball", maxChildren: 8, initialSpawn: 1, coolDown: new Cooldown(100)),
                         new TimedTransition(2000, "enrage_chase")
                     ),
 
@@ -157,7 +157,7 @@ namespace WorldServer.logic.db.community
                 new State(
                     new State("orbit",
                         // Each ball gets a unique corner via entity ID, orbits Greg in a square
-                        new SquareOrbit(speed: 3, sideLength: 6, startCorner: -1, acquireRange: 100, target: "Greg"),
+                        new SquareOrbit(speed: 3, sideLength: 12, startCorner: -1, acquireRange: 100, target: "Greg"),
                         // Rapid short-range shots for contact damage feel
                         new Shoot(3, count: 4, shootAngle: 90, projectileIndex: 0, coolDown: new Cooldown(800))
                     )
