@@ -14,6 +14,7 @@ namespace WorldServer.logic.db.community
             // ========== GREG (club thrower only) ==========
             db.RegisterCommunity("Greg",
                 new State(
+                    new SpawnOnDeath("Greg Imprint"),
                     new State("idle",
                         new SetAltTexture(0),
                         new Wander(0.3),
@@ -35,6 +36,7 @@ namespace WorldServer.logic.db.community
             // ========== BROG ==========
             db.RegisterCommunity("Brog",
                 new State(
+                    new SpawnOnDeath("Brog Imprint"),
                     new State("idle",
                         new SetAltTexture(0),
                         new Wander(0.3),
