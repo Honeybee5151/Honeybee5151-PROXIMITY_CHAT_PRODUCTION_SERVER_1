@@ -17,12 +17,14 @@ namespace WorldServer.logic.db.community
                     new SpawnOnDeath("Greg Imprint"),
                     new State("idle",
                         new SetAltTexture(0),
+                        new ConditionalEffect(ConditionEffectIndex.Invulnerable),
                         new Wander(0.3),
                         new PlayerWithinTransition(100, "chase")
                     ),
 
                     new State("chase",
                         new SetAltTexture(0),
+                        new ConditionalEffect(ConditionEffectIndex.Invulnerable),
                         new Prioritize(
                             new Chase(2.5, range: 6, sightRange: 100),
                             new Wander(0.3)
@@ -54,7 +56,7 @@ namespace WorldServer.logic.db.community
                         new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF2200),
                         // Spawn 16 balls that orbit Greg in a square (one-time only)
                         new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
-                        new TimedTransition(2000, "enrage_chase")
+                        new TimedTransition(500, "enrage_chase")
                     ),
 
                     new State("enrage_chase",
@@ -63,6 +65,7 @@ namespace WorldServer.logic.db.community
                             new Chase(5, range: 3, sightRange: 100),
                             new Wander(0.5)
                         ),
+                        new Shoot(10, count: 3, shootAngle: 15, projectileIndex: 3, coolDown: new Cooldown(1500), predictive: 0.7),
                         new TimedTransition(4000, "enrage_jump_loop")
                     ),
 
@@ -77,7 +80,7 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 120, cooldown: 0f, color: 0xFFFF2200),
-                        new TimedTransition(2000, "enrage_chase")
+                        new TimedTransition(500, "enrage_chase")
                     )
                 )
             );
@@ -101,6 +104,7 @@ namespace WorldServer.logic.db.community
                         ),
                         new Shoot(7, count: 3, shootAngle: 15, projectileIndex: 0, coolDown: new Cooldown(1500)),
                         new Shoot(5, count: 1, projectileIndex: 1, coolDown: new Cooldown(2500), predictive: 0.5),
+                        new Shoot(10, count: 3, shootAngle: 15, projectileIndex: 2, coolDown: new Cooldown(2000), predictive: 0.7),
                         new TimedTransition(5000, "jump1"),
                         new HpLessTransition(0.6, "walk2"),
                         new NoPlayerWithinTransition(100, "idle")
@@ -112,7 +116,7 @@ namespace WorldServer.logic.db.community
                     new State("land1",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(3000, "walk1")
+                        new TimedTransition(500, "walk1")
                     ),
 
                     // --- Charge phase (HP 30-60%): walk, jump, bigger shockwave cycle ---
@@ -126,6 +130,7 @@ namespace WorldServer.logic.db.community
                         ),
                         new Shoot(7, count: 5, shootAngle: 20, projectileIndex: 0, coolDown: new Cooldown(1200)),
                         new Shoot(5, count: 2, projectileIndex: 1, coolDown: new Cooldown(2000), predictive: 0.7),
+                        new Shoot(10, count: 3, shootAngle: 15, projectileIndex: 2, coolDown: new Cooldown(1500), predictive: 0.7),
                         new TimedTransition(5000, "jump2"),
                         new HpLessTransition(0.3, "spin_start")
                     ),
@@ -136,7 +141,7 @@ namespace WorldServer.logic.db.community
                     new State("land2",
                         new SetAltTexture(0),
                         new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
-                        new TimedTransition(3000, "walk2")
+                        new TimedTransition(500, "walk2")
                     ),
 
                     // --- Enrage phase (HP < 30%): spin + bounce charge only ---
