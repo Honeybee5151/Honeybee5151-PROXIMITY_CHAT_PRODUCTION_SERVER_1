@@ -48,6 +48,11 @@ namespace WorldServer.logic.behaviors.@new.attacks
             EffectDuration = effectDuration;
         }
 
+        protected override void OnStateEntry(Entity host, TickTime time, ref object state)
+        {
+            state = null; // Reset so ring fires fresh on each state entry
+        }
+
         protected override void TickCore(Entity host, TickTime time, ref object state)
         {
             var s = state as RingState;
