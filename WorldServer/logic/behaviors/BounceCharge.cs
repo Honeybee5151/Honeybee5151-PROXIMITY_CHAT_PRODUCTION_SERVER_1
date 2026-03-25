@@ -15,14 +15,12 @@ namespace WorldServer.logic.behaviors
         private readonly float _speed;
         private readonly float _range;
         private readonly int _bounces;
-        private readonly int _chargeTimeMs;
 
-        public BounceCharge(double speed = 8, float range = 15, int bounces = 3, int chargeTimeMs = 600)
+        public BounceCharge(double speed = 8, float range = 15, int bounces = 3)
         {
             _speed = (float)speed;
             _range = range;
             _bounces = bounces;
-            _chargeTimeMs = chargeTimeMs;
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
@@ -52,9 +50,7 @@ namespace WorldServer.logic.behaviors
                 var movedDist = MathF.Sqrt(dx * dx + dy * dy);
                 var expectedDist = dist * 0.5f; // if we moved less than half expected, we hit a wall
 
-                s.TimeInCharge += time.ElapsedMsDelta;
-
-                if (movedDist < expectedDist || s.TimeInCharge >= _chargeTimeMs)
+                if (movedDist < expectedDist)
                 {
                     // Wall hit or charge time expired — bounce
                     s.Charging = false;
@@ -81,7 +77,6 @@ namespace WorldServer.logic.behaviors
                             s.DirX = toX / len;
                             s.DirY = toY / len;
                             s.Charging = true;
-                            s.TimeInCharge = 0;
                         }
                     }
                 }
@@ -115,7 +110,6 @@ namespace WorldServer.logic.behaviors
                 s.Charging = true;
                 s.Active = true;
                 s.BouncesLeft = _bounces;
-                s.TimeInCharge = 0;
 
                 Status = CycleStatus.InProgress;
             }
@@ -130,7 +124,6 @@ namespace WorldServer.logic.behaviors
             public float DirX;
             public float DirY;
             public int BouncesLeft;
-            public int TimeInCharge;
         }
     }
 }
