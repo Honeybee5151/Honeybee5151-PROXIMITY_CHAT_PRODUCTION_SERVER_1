@@ -75,19 +75,8 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("spin_bounce",
                         new SetAltTexture(2),
-                        new BounceCharge(speed: 12, range: 100, bounces: 3),
-                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
-                        new TimedTransition(3000, "spin_pause")
-                    ),
-                    new State("spin_pause",
-                        new SetAltTexture(2),
-                        new Prioritize(
-                            new Chase(5, range: 2, sightRange: 15),
-                            new Wander(0.5)
-                        ),
-                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
-                        new Shoot(6, count: 3, projectileIndex: 1, coolDown: new Cooldown(1500), predictive: 0.8),
-                        new TimedTransition(3000, "spin_bounce")
+                        new BounceCharge(speed: 12, range: 100),
+                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800))
                     )
                 )
             );
@@ -157,19 +146,8 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("spin_bounce",
                         new SetAltTexture(2),
-                        new BounceCharge(speed: 12, range: 100, bounces: 3),
-                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
-                        new TimedTransition(3000, "spin_pause")
-                    ),
-                    new State("spin_pause",
-                        new SetAltTexture(2),
-                        new Prioritize(
-                            new Chase(5, range: 2, sightRange: 15),
-                            new Wander(0.5)
-                        ),
-                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800)),
-                        new Shoot(6, count: 3, projectileIndex: 1, coolDown: new Cooldown(1500), predictive: 0.8),
-                        new TimedTransition(3000, "spin_bounce")
+                        new BounceCharge(speed: 12, range: 100),
+                        new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800))
                     )
                 )
             );

@@ -14,13 +14,11 @@ namespace WorldServer.logic.behaviors
     {
         private readonly float _speed;
         private readonly float _range;
-        private readonly int _bounces;
 
-        public BounceCharge(double speed = 8, float range = 15, int bounces = 3)
+        public BounceCharge(double speed = 8, float range = 100)
         {
             _speed = (float)speed;
             _range = range;
-            _bounces = bounces;
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
@@ -59,20 +57,7 @@ namespace WorldServer.logic.behaviors
 
                 if (hitWall)
                 {
-                    // Wall hit — bounce
-                    s.BouncesLeft--;
-
-                    if (s.BouncesLeft <= 0)
-                    {
-                        // Done bouncing
-                        s.Charging = false;
-                        s.Active = false;
-                        Status = CycleStatus.Completed;
-                        state = s;
-                        return;
-                    }
-
-                    // Re-target player for next bounce
+                    // Wall hit — re-target player and charge again (infinite bounces)
                     var player = host.GetNearestEntity(_range, null);
                     if (player != null)
                     {
@@ -116,7 +101,6 @@ namespace WorldServer.logic.behaviors
                 s.DirY = toY / len;
                 s.Charging = true;
                 s.Active = true;
-                s.BouncesLeft = _bounces;
                 s.GraceMs = 0;
 
                 Status = CycleStatus.InProgress;
@@ -154,7 +138,6 @@ namespace WorldServer.logic.behaviors
             public bool Charging;
             public float DirX;
             public float DirY;
-            public int BouncesLeft;
             public int GraceMs;
         }
     }
