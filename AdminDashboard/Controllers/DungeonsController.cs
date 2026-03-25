@@ -646,6 +646,11 @@ namespace AdminDashboard.Controllers
                     // Scan all existing dungeon_assets for type code collision prevention
                     // Exclude the current dungeon's own file (prevents re-approval from reading stale self-data)
                     var ownDaFileName = $"Shared/resources/xml/dungeon_assets/{safeTitle}.xml";
+
+                    // Fetch existing dungeon assets for preserving manually-added entries on re-approval
+                    string existingDaXml = null;
+                    try { existingDaXml = (await _github.FetchFile(ownDaFileName)).Content; }
+                    catch { /* first approval — no existing file */ }
                     var allDungeonAssetsXmlBuilder = new StringBuilder();
                     var daFiles = await _github.ListDirectory("Shared/resources/xml/dungeon_assets");
                     foreach (var daFile in daFiles)
@@ -1145,6 +1150,46 @@ namespace AdminDashboard.Controllers
                                 xml = InjectSpriteTexture(xml, pdItemSheetName, pdItemIdx, isMob: false);
                             }
                             assetsXmlBuilder.Append(xml).Append('\n');
+                        }
+
+                        // Preserve manually-added Sheet and Object entries from existing file on re-approval
+                        if (!string.IsNullOrEmpty(existingDaXml))
+                        {
+                            var newXmlSoFar = assetsXmlBuilder.ToString();
+
+                            // Collect sheet names already in the new XML
+                            var newSheetNames = new HashSet<string>();
+                            foreach (Match sm in Regex.Matches(newXmlSoFar, @"<Sheet\s+name=""([^""]+)"""))
+                                newSheetNames.Add(sm.Groups[1].Value);
+
+                            // Collect object ids already in the new XML
+                            var newObjectIds = new HashSet<string>();
+                            foreach (Match om in Regex.Matches(newXmlSoFar, @"<Object\s[^>]*id=""([^""]+)"""))
+                                newObjectIds.Add(om.Groups[1].Value);
+
+                            // Append preserved sheets (insert before </SpriteSheets> which is already emitted)
+                            var preservedSheets = new StringBuilder();
+                            foreach (Match sm in Regex.Matches(existingDaXml, @"<Sheet\s+name=""([^""]+)""[^>]*>[^<]*</Sheet>"))
+                            {
+                                var sheetName = sm.Groups[1].Value;
+                                if (!newSheetNames.Contains(sheetName))
+                                    preservedSheets.Append(sm.Value).Append('\n');
+                            }
+                            if (preservedSheets.Length > 0)
+                            {
+                                // Insert preserved sheets before </SpriteSheets>
+                                var idx = assetsXmlBuilder.ToString().IndexOf("</SpriteSheets>");
+                                if (idx >= 0)
+                                    assetsXmlBuilder.Insert(idx, preservedSheets.ToString());
+                            }
+
+                            // Append preserved objects
+                            foreach (Match om in Regex.Matches(existingDaXml, @"<Object\s[^>]*id=""([^""]+)""[^>]*>[\s\S]*?</Object>"))
+                            {
+                                var objId = om.Groups[1].Value;
+                                if (!newObjectIds.Contains(objId))
+                                    assetsXmlBuilder.Append(om.Value).Append('\n');
+                            }
                         }
 
                         assetsXmlBuilder.Append("</Objects>\n</DungeonAssets>");
