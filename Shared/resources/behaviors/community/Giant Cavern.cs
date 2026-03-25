@@ -66,6 +66,8 @@ namespace WorldServer.logic.db.community
                             new Wander(0.5)
                         ),
                         new RedirectShoot(10, count: 3, shootAngle: 15, projectileIndex: 3, redirectDist: 4, coolDown: new Cooldown(1500)),
+                        // Rotating spiral — sweeps around Greg, punishes circling
+                        new Shoot(8, count: 3, shootAngle: 120, projectileIndex: 0, rotateAngle: 25, coolDown: new Cooldown(600)),
                         new TimedTransition(4000, "enrage_jump_loop")
                     ),
 
@@ -104,6 +106,8 @@ namespace WorldServer.logic.db.community
                         ),
                         new RedirectShoot(7, count: 3, shootAngle: 15, projectileIndex: 2, redirectDist: 4, coolDown: new Cooldown(1500)),
                         new Shoot(5, count: 1, projectileIndex: 1, coolDown: new Cooldown(2500), predictive: 0.5),
+                        // Rotating spiral — sweeps around Brog, punishes circling
+                        new Shoot(7, count: 2, shootAngle: 180, projectileIndex: 0, rotateAngle: 30, coolDown: new Cooldown(800)),
                         new TimedTransition(5000, "jump1"),
                         new HpLessTransition(0.6, "walk2"),
                         new NoPlayerWithinTransition(100, "idle")
@@ -129,6 +133,8 @@ namespace WorldServer.logic.db.community
                         ),
                         new RedirectShoot(7, count: 5, shootAngle: 20, projectileIndex: 2, redirectDist: 4, coolDown: new Cooldown(1200)),
                         new Shoot(5, count: 2, projectileIndex: 1, coolDown: new Cooldown(2000), predictive: 0.7),
+                        // Faster rotating spiral — more aggressive in phase 2
+                        new Shoot(7, count: 3, shootAngle: 120, projectileIndex: 0, rotateAngle: 20, coolDown: new Cooldown(600)),
                         new TimedTransition(5000, "jump2"),
                         new HpLessTransition(0.3, "spin_start")
                     ),
