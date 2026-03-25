@@ -53,7 +53,7 @@ namespace WorldServer.logic.db.community
                     new State("enrage_land",
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
-                        new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF2200),
+                        new NewExpandingRing(maxRadius: 12f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         // Spawn 16 balls that orbit Greg in a square (one-time only)
                         new Spawn("Greg Ball", maxChildren: 16, initialSpawn: 1, coolDown: new Cooldown(50)),
                         new TimedTransition(2500, "enrage_chase")
@@ -73,7 +73,8 @@ namespace WorldServer.logic.db.community
                         new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -8, coolDown: new Cooldown(1500)),
                         // 3-shot burst aimed at the player
                         new Shoot(8, count: 3, shootAngle: 10, projectileIndex: 0, predictive: 0.8, coolDown: new Cooldown(2000)),
-                        new TimedTransition(4000, "enrage_jump_loop")
+                        new TimedTransition(4000, "enrage_jump_loop"),
+                        new HpLessTransition(0.15, "enrage_desperation_jump")
                     ),
 
                     new State("enrage_jump_loop",
@@ -86,8 +87,40 @@ namespace WorldServer.logic.db.community
                     new State("enrage_land_loop",
                         new SetAltTexture(0),
                         new Flash(0xFF0000, 0.5, 3),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 120, cooldown: 0f, color: 0xFFFF2200),
-                        new TimedTransition(2500, "enrage_chase")
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 2f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new TimedTransition(2500, "enrage_chase"),
+                        new HpLessTransition(0.15, "enrage_desperation_jump")
+                    ),
+
+                    // --- Desperation (<15% HP): double shockwave on every landing ---
+                    new State("enrage_desperation_jump",
+                        new JumpToPlayer(speed: 12, range: 200, texMin: 1, texMax: 5),
+                        new CycleTransition("enrage_desperation_land"),
+                        new TimedTransition(5000, "enrage_desperation_land")
+                    ),
+
+                    new State("enrage_desperation_land",
+                        new SetAltTexture(0),
+                        new Flash(0xFF0000, 0.3, 6),
+                        // Double shockwave — fast inner ring + slower outer ring
+                        new NewExpandingRing(maxRadius: 10f, expandDuration: 1.5f, ringThickness: 2f, damage: 200, cooldown: 99f, color: 0xFFFF0000, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 2f, damage: 200, cooldown: 99f, color: 0xFFFF2200, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
+                        new TimedTransition(3500, "enrage_desperation_chase")
+                    ),
+
+                    new State("enrage_desperation_chase",
+                        new SetAltTexture(0),
+                        new Prioritize(
+                            new Chase(6, range: 2, sightRange: 100),
+                            new Wander(0.5)
+                        ),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 0, coolDown: new Cooldown(1200)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 4, coolDown: new Cooldown(1200)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: 8, coolDown: new Cooldown(1200)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -4, coolDown: new Cooldown(1200)),
+                        new Shoot(8, count: 5, shootAngle: 72, projectileIndex: 0, angleOffset: -8, coolDown: new Cooldown(1200)),
+                        new Shoot(8, count: 3, shootAngle: 10, projectileIndex: 0, predictive: 0.9, coolDown: new Cooldown(1500)),
+                        new TimedTransition(3000, "enrage_desperation_jump")
                     )
                 )
             );
@@ -122,7 +155,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("land1",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 80, cooldown: 0f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 15f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(3500, "walk1")
                     ),
 
@@ -147,7 +180,7 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("land2",
                         new SetAltTexture(0),
-                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 100, cooldown: 0f, color: 0xFFFF4400),
+                        new NewExpandingRing(maxRadius: 18f, expandDuration: 3f, ringThickness: 1.5f, damage: 200, cooldown: 99f, color: 0xFFFF4400, effect: ConditionEffectIndex.Slowed, effectDuration: 3000),
                         new TimedTransition(3500, "walk2")
                     ),
 
