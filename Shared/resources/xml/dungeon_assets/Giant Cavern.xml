@@ -61,7 +61,7 @@
 		<Speed>60</Speed>
 		<MinDamage>400</MinDamage>
 		<MaxDamage>400</MaxDamage>
-		<Size>100</Size>
+		<Size>300</Size>
 		<LifetimeMS>2000</LifetimeMS>
 	</Projectile>
 </Object>
