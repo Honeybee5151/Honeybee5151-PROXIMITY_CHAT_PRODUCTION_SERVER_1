@@ -15,6 +15,7 @@ namespace WorldServer.logic.db.community
             db.RegisterCommunity("Greg",
                 new State(
                     new SpawnOnDeath("Greg Imprint"),
+                    new DestroyOnDeath("Greg Ball"),
                     new State("idle",
                         new SetAltTexture(0),
                         new ConditionalEffect(ConditionEffectIndex.Invulnerable),
