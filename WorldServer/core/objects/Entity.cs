@@ -296,6 +296,15 @@ namespace WorldServer.core.objects
                     return;
             }
 
+            MoveUnchecked(x, y);
+        }
+
+        /// <summary>
+        /// Moves the entity without any passability checks.
+        /// Used by behaviors (e.g. BounceCharge) that handle their own collision.
+        /// </summary>
+        public void MoveUnchecked(float x, float y)
+        {
             if (World != null && !(this is Pet) && (!(this is StaticObject) || (this as StaticObject).Hittestable))
                 (this is Enemy || this is StaticObject && !(this is Decoy) ? World.EnemiesCollision : World.PlayersCollision).Move(this, x, y);
 

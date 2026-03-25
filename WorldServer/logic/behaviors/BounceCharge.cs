@@ -38,14 +38,17 @@ namespace WorldServer.logic.behaviors
             // Currently charging in a direction
             if (s.Charging)
             {
-                var prevX = host.X;
-                var prevY = host.Y;
                 var dist = host.GetSpeed(_speed) * time.DeltaTime;
+                var newX = host.X + s.DirX * dist;
+                var newY = host.Y + s.DirY * dist;
 
-                host.ValidateAndMove(host.X + s.DirX * dist, host.Y + s.DirY * dist);
+                // Only stop at NoWalk tiles and walls (FullOccupy) — plow through decorations/objects
+                var hitWall = IsHardBlock(host, newX, newY);
+
+                if (!hitWall)
+                    host.MoveUnchecked(newX, newY);
 
                 // Grace period after bounce — don't check wall hits for 300ms
-                // so the boss can move away from the wall it just bounced off
                 s.GraceMs -= time.ElapsedMsDelta;
                 if (s.GraceMs > 0)
                 {
@@ -54,13 +57,7 @@ namespace WorldServer.logic.behaviors
                     return;
                 }
 
-                // Check if we hit a wall (position barely changed)
-                var dx = host.X - prevX;
-                var dy = host.Y - prevY;
-                var movedDist = MathF.Sqrt(dx * dx + dy * dy);
-                var expectedDist = dist * 0.5f;
-
-                if (movedDist < expectedDist)
+                if (hitWall)
                 {
                     // Wall hit — bounce
                     s.BouncesLeft--;
@@ -126,6 +123,29 @@ namespace WorldServer.logic.behaviors
             }
 
             state = s;
+        }
+
+        /// <summary>
+        /// Only blocks on NoWalk ground tiles and FullOccupy objects (walls).
+        /// Ignores decorations, EnemyOccupySquare, etc.
+        /// </summary>
+        private static bool IsHardBlock(Entity host, float x, float y)
+        {
+            var map = host.World?.Map;
+            if (map == null) return true;
+
+            var ix = (int)x;
+            var iy = (int)y;
+            if (!map.Contains(ix, iy)) return true;
+
+            var tile = map[ix, iy];
+            var tileDesc = host.GameServer.Resources.GameData.Tiles[tile.TileId];
+            if (tileDesc.NoWalk) return true;
+
+            if (tile.ObjType != 0 && tile.ObjDesc != null && tile.ObjDesc.FullOccupy)
+                return true;
+
+            return false;
         }
 
         private class BounceState
