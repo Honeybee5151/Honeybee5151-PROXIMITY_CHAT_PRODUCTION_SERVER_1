@@ -203,18 +203,26 @@ namespace WorldServer.logic.db.community
             );
 
             // ========== BOSS GIANT (NPC — dialogue after victory) ==========
-            // Invisible entity overlapping JM decoration at (44,27). JM decoration handles visuals.
-            // Waits for both bosses to die before enabling dialogue.
-            // During dialogue, derp sprite becomes visible (Size=120) overlaying the decoration.
+            // Entity at (44,27) replaces JM decoration (removed from JM).
+            // Shows normal sprite, cycles animation. Swaps to derp during dialogue.
+            // AltTextures: 0=normal frame 0, 1-4=normal frames 1-4, 5-7=derp frames 0-2
             db.RegisterCommunity("Boss Giant",
                 new State(
+                    // Normal animation: cycle frames 0-4
                     new State("waiting",
-                        new SetSize(1),
-                        // Wait for both Greg and Brog to die
+                        new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),
+                        new State("frame1", new SetAltTexture(1), new TimedTransition(300, "frame2")),
+                        new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
+                        new State("frame3", new SetAltTexture(3), new TimedTransition(300, "frame4")),
+                        new State("frame4", new SetAltTexture(4), new TimedTransition(300, "frame0")),
                         new EntitiesNotExistsTransition(100, "idle", "Greg", "Brog")
                     ),
                     new State("idle",
-                        new SetSize(1),
+                        new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),
+                        new State("frame1", new SetAltTexture(1), new TimedTransition(300, "frame2")),
+                        new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
+                        new State("frame3", new SetAltTexture(3), new TimedTransition(300, "frame4")),
+                        new State("frame4", new SetAltTexture(4), new TimedTransition(300, "frame0")),
                         new NpcDialogue(
                             "Do you wish to engage in our party, by battling in our pit?",
                             new[] { "Yes", "No" },
@@ -224,20 +232,19 @@ namespace WorldServer.logic.db.community
                         new DialogueActiveTransition("talking")
                     ),
                     new State("talking",
-                        new SetSize(120),
-                        // Cycle derp frames: 0 → 1 → 2 → 0 ...
+                        // Derp animation: cycle frames 5-7
                         new State("derp0",
-                            new SetAltTexture(0),
+                            new SetAltTexture(5),
                             new TimedTransition(300, "derp1"),
                             new DialogueEndTransition("idle")
                         ),
                         new State("derp1",
-                            new SetAltTexture(1),
+                            new SetAltTexture(6),
                             new TimedTransition(300, "derp2"),
                             new DialogueEndTransition("idle")
                         ),
                         new State("derp2",
-                            new SetAltTexture(2),
+                            new SetAltTexture(7),
                             new TimedTransition(300, "derp0"),
                             new DialogueEndTransition("idle")
                         )

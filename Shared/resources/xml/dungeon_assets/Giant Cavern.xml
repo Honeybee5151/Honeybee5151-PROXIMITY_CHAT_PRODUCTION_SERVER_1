@@ -11,6 +11,7 @@
 <Sheet name="dungeon_gc_8x8" tileW="8" tileH="8">iVBORw0KGgoAAAANSUhEUgAAABAAAAAICAYAAADwdn+XAAAANklEQVR4AWMYcMDIAAV3Tmz5z4AEVCx8GBmQQIqb0X8GJDBn1zlGBiBgYqAQMDFQCJgYhjwAADlrCAij6Co4AAAAAElFTkSuQmCC</Sheet>
 <Sheet name="dungeon_gc_club_proj" tileW="32" tileH="16">iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAAAAXNSR0IArs4c6QAAALJJREFUSIljYBgFAwwY6WGJlYH2fxj72IWrKHbSzAFBnjb/sYm/eP4exSFUdwDMYmlRLgy5p6+/YTiChVoWw4IZZjHMMmQxaVEuFHEGBgYGih0As1hCUhCrBegAPQrIdgCyxTCAzXLkqDh76SmGPMlpAJvFuADMcnSLkXMC0Q6gtsVEO4BWFuN1ADGWwhITLoDPUqwOsDLQ/k+ML5EtJtYSvA7AZjG1LcEHWGAW0toiXAAAoQhdbIX139QAAAAASUVORK5CYII=</Sheet>
 <Sheet name="dungeon_gc_boss_giant_derp" tileW="32" tileH="32">iVBORw0KGgoAAAANSUhEUgAAAGAAAAAgCAYAAADtwH1UAAADdklEQVR4nO2YS2gTQRjHp6UFbwkSCFYsZlOrlIJiJHorKiiFqgejiAo5eFEEoUJvPQo9CAqC6MVDD4qHeFALUq2tOSg+aKwgPmiyKxUrQpHk1lvk2/Ats7Mzs7vTTaoZ/xB2dx7f77877xDyX+uqjmYDSk9u1fF+9/CFpvP+NX5LDE2cHbZNHD5zdF0+wsRfzO+KomVBvBcrXLlYz43fdNKn7z5SxbUtv5MXGH5QGVuOV6YvtVVqCCWKIVJJM76nAcz5j849DBk2MBiDa9n65gmGeSi69UHbdhgyL1ryuVMQDpXFLya3Epg0MoNC46whiBNG0xrxuQsS25J0i0KPKJ66QbaMHXBMAPz71VkydP+SPRfK6gudaMoPtAgjCAOfe3ON3Nl7mZCxRj7CsQxtLAoZbcwX9giE0UMNA7LDT5aPaUF7X1B+wsgQWivmfEv5PKnwpabYBQjnPtEcKMpT3XuXBHz4+L3b97nKLn197TRCs/lRvn/gcwC2JCxQsDtgeyDmwaLFM7FWmS5+44PTgo/fOn507y+dgti5jN4ViHYBvDKQpzIFGBrwpSOAXkQgMLQ8nYfbKwAiDK50T1iLTA34yn9F0D0g6uGuE7/TD8Jb0WWiy7D1w8rQgB9qBLAnOt4JD9Oa0SsX25Af+CCGgWVQnCNZeNgFUCe+cApiK0FwWFjohYjNp7df+G+h6kKY04QvXQOwMgbDgwbAuvsHXD9ePZXtn258V6b1ac4++VWsZSet+v4VOZQbIU8LU66T3uy7su8LpPrSJBaLOc/pVE8jfWA/15SlIV/YOmAGjdRqNWKVK75AkQEAi15ad76wJ9C9AE3YeT5GAAqiWx4U5iNYGvG5UxAr1gxtCMUONaiDQ85j0mcK0InPNTJ6Pu8Y2dyTIMdzI0RFDwpT5MfyivN8/fZkoB44qhFfuguaefHBCUQHLS18tn8ofGbL0TFUNKMBX9oA+dMH7evkvecOyE9YButgDBXlNeB7TsLZdG/95bM5+/5k/oR9HezfaQcOshPAMlAHhfEg9tvKknQayGrGl/4VUXz42L4OHTviWeV5PQLy0EBmT8Kpr6qiBnxPb4BWSsY3uNI2bXQ/B9XP36uu51/VVRKkByY14neITMCVNhLWBA0HMMjv5XXkd4nmpl1G3FUwGe8mqgLzC2bVlUYzsxrz/wCFHbb0nEpeLAAAAABJRU5ErkJggg==</Sheet>
+<Sheet name="dungeon_gc_boss_giant" tileW="32" tileH="32">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</Sheet>
 <Sheet name="dungeon_gc_ball" tileW="16" tileH="16">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAMNJREFUOI1jZMABgjxt/iPz120/wohNHYZgkKfNf2lRLjj/6etvcPaL5+8Zjl24iqKHCZ9mdCAhKchgZaCN4jK4AehOJtYQJnyakZ2PDmCGsJCiCRtgJNbpyODF8/cMDFDvMBFUjQbQA5lkA9ABSQZIi3IxnL30FNUAXCmMEJCQFGRYt/0II9EuwGY7A3JSzo1z+48ehcgBhqwZZjsDel7IjXNDiVJsNiJrxjCAASmFYdPIgCVX4gxAKwPt/zBN2DTCAABVJUbGV13EFAAAAABJRU5ErkJggg==</Sheet>
 </SpriteSheets>
 <Objects>
@@ -218,22 +219,52 @@
 <Object type="0x50A5" id="Boss Giant">
 	<Class>GameObject</Class>
 	<Texture>
-		<File>dungeon_gc_boss_giant_derp</File>
+		<File>dungeon_gc_boss_giant</File>
 		<Index>0</Index>
 	</Texture>
 	<AltTexture id="1">
 		<Texture>
-			<File>dungeon_gc_boss_giant_derp</File>
+			<File>dungeon_gc_boss_giant</File>
 			<Index>1</Index>
 		</Texture>
 	</AltTexture>
 	<AltTexture id="2">
 		<Texture>
+			<File>dungeon_gc_boss_giant</File>
+			<Index>2</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="3">
+		<Texture>
+			<File>dungeon_gc_boss_giant</File>
+			<Index>3</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="4">
+		<Texture>
+			<File>dungeon_gc_boss_giant</File>
+			<Index>4</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="5">
+		<Texture>
+			<File>dungeon_gc_boss_giant_derp</File>
+			<Index>0</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="6">
+		<Texture>
+			<File>dungeon_gc_boss_giant_derp</File>
+			<Index>1</Index>
+		</Texture>
+	</AltTexture>
+	<AltTexture id="7">
+		<Texture>
 			<File>dungeon_gc_boss_giant_derp</File>
 			<Index>2</Index>
 		</Texture>
 	</AltTexture>
-	<Size>1</Size>
+	<Size>100</Size>
 	<Static/>
 </Object>
 </Objects>
