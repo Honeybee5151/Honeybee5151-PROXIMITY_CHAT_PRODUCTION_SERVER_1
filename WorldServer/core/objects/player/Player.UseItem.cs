@@ -596,13 +596,35 @@ namespace WorldServer.core.objects
                 }
                 var shootAngle = Math.Atan2(target.Y - Y, target.X - X);
                 var prjDesc = weapon.Projectiles[0];
+                // Create a copy with 1.5x lifetime + MultiHit so server validation matches client
+                var nvDesc = new ProjectileDesc
+                {
+                    Amplitude = prjDesc.Amplitude,
+                    ArmorPiercing = prjDesc.ArmorPiercing,
+                    Boomerang = prjDesc.Boomerang,
+                    BulletType = prjDesc.BulletType,
+                    Effects = prjDesc.Effects,
+                    Frequency = prjDesc.Frequency,
+                    LifetimeMS = prjDesc.LifetimeMS * 1.5f,
+                    OrigSpeed = prjDesc.OrigSpeed,
+                    NewSpeed = prjDesc.NewSpeed,
+                    Magnitude = prjDesc.Magnitude,
+                    MaxDamage = prjDesc.MaxDamage,
+                    MinDamage = prjDesc.MinDamage,
+                    MultiHit = true,
+                    ObjectId = prjDesc.ObjectId,
+                    Parametric = prjDesc.Parametric,
+                    PassesCover = true,
+                    Speed = prjDesc.Speed,
+                    Wavy = prjDesc.Wavy
+                };
                 // Start right at the player so it travels the full distance forward
                 var startingPos = new Position { X = (float)X, Y = (float)Y };
                 var nextBulletId = GetNextBulletId(1, true);
                 var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage) * 20;
                 // Send with weapon's containerType so client renders the weapon's projectile sprite
                 // Must use ref Position overload so ServerPlayerShoot is registered in PendingShootAcknowlegements
-                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, weapon.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), ref target);
+                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, weapon.ObjectType, startingPos, (float)shootAngle, damage, nvDesc), ref target);
 
                 // Show visual effect
                 World.BroadcastIfVisible(new ShowEffect()
