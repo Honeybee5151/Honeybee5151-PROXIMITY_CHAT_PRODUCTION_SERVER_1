@@ -6,8 +6,8 @@ using WorldServer.networking.packets.outgoing;
 namespace WorldServer.logic.behaviors
 {
     /// <summary>
-    /// On state entry, sets the world's ActiveQuestText and broadcasts it to all players.
-    /// Used to advance quest objectives when an NPC becomes interactable.
+    /// On state entry, updates the world's QuestText and broadcasts it to all players.
+    /// This updates the quest objective shown in the client's top-left UI.
     /// </summary>
     internal class SetQuestText : Behavior
     {
@@ -24,8 +24,8 @@ namespace WorldServer.logic.behaviors
             if (world == null)
                 return;
 
-            world.ActiveQuestText = _questText;
-            Console.WriteLine($"[SetQuestText] Set ActiveQuestText='{_questText}' on world '{world.IdName}'");
+            world.QuestText = _questText;
+            Console.WriteLine($"[SetQuestText] Set QuestText='{_questText}' on world '{world.IdName}'");
 
             var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
             foreach (var player in world.Players.Values)
