@@ -208,6 +208,10 @@ namespace WorldServer.logic.db.community
             // AltTextures: 0=normal frame 0, 1-4=normal frames 1-4, 5-7=derp frames 0-2
             db.RegisterCommunity("Boss Giant",
                 new State(
+                    new State("warmup",
+                        new SetAltTexture(0),
+                        new TimedTransition(2000, "waiting")
+                    ),
                     // Normal animation: cycle frames 0-4
                     new State("waiting",
                         new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),
@@ -215,7 +219,7 @@ namespace WorldServer.logic.db.community
                         new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
                         new State("frame3", new SetAltTexture(3), new TimedTransition(300, "frame4")),
                         new State("frame4", new SetAltTexture(4), new TimedTransition(300, "frame0")),
-                        new EntitiesNotExistsTransition(100, "idle", "Greg", "Brog")
+                        new EntitiesNotExistsTransition(9999, "idle", "Greg", "Brog")
                     ),
                     new State("idle",
                         new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),
