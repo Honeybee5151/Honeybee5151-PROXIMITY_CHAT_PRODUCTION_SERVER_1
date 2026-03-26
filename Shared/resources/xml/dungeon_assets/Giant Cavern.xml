@@ -222,12 +222,16 @@
 		<Index>0</Index>
 	</Texture>
 	<AltTexture id="1">
-		<File>dungeon_gc_boss_giant_derp</File>
-		<Index>1</Index>
+		<Texture>
+			<File>dungeon_gc_boss_giant_derp</File>
+			<Index>1</Index>
+		</Texture>
 	</AltTexture>
 	<AltTexture id="2">
-		<File>dungeon_gc_boss_giant_derp</File>
-		<Index>2</Index>
+		<Texture>
+			<File>dungeon_gc_boss_giant_derp</File>
+			<Index>2</Index>
+		</Texture>
 	</AltTexture>
 	<Size>1</Size>
 	<Static/>
