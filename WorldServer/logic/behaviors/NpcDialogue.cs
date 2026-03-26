@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
+using NLog;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
 using WorldServer.networking.packets.outgoing;
@@ -13,7 +13,9 @@ namespace WorldServer.logic.behaviors
     /// </summary>
     internal class NpcDialogue : Behavior
     {
-        // Global tracker: accountId -> npcEntityId (so we know who has an open dialogue)
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        // Global tracker: accountId -> npcEntityId
         public static readonly ConcurrentDictionary<int, int> ActiveDialogues = new();
 
         private readonly string _text;
@@ -31,12 +33,15 @@ namespace WorldServer.logic.behaviors
 
         protected override void OnStateEntry(Entity host, TickTime time, ref object state)
         {
-            state = 0; // cooldown remaining
+            state = 0;
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
         {
-            var cd = (int)(state ?? 0);
+            if (host.World == null)
+                return;
+
+            var cd = state is int c ? c : 0;
             cd -= time.ElapsedMsDelta;
             if (cd > 0)
             {
@@ -58,12 +63,13 @@ namespace WorldServer.logic.behaviors
 
             // Build options JSON array
             var optionsJson = string.Join(",", _options.Select((o, i) => $"{{\"id\":{i},\"label\":\"{EscapeJson(o)}\"}}"));
-            var npcName = host.ObjectDesc?.DisplayId ?? host.ObjectDesc?.IdName ?? host.Name;
+            var npcName = host.ObjectDesc?.DisplayId ?? host.ObjectDesc?.IdName ?? "NPC";
             var json = $"{{\"npcId\":{host.Id},\"npcName\":\"{EscapeJson(npcName)}\",\"text\":\"{EscapeJson(_text)}\",\"options\":[{optionsJson}]}}";
 
             var msg = new GlobalNotificationMessage(0, "npcDialogue:" + json);
             player.Client.SendPacket(msg);
 
+            Log.Info($"[NpcDialogue] Sent dialogue to {player.Name} from {npcName}");
             ActiveDialogues[player.AccountId] = host.Id;
         }
 
