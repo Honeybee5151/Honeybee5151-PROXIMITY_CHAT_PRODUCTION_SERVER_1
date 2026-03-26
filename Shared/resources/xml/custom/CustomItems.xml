@@ -1318,6 +1318,7 @@
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
+        <Usable/>
         <NoTierTag/>
 
         <SlotType>6</SlotType>
@@ -1331,10 +1332,9 @@
             <MultiHit/>
             <PassesCover/>
         </Projectile>
-        <MpCost>75</MpCost>
-        <Activate effect="Blind" duration="4" cooldown="60">ConditionEffectSelf</Activate>
-        <Activate effect="NightVision" duration="4" cooldown="60">ConditionEffectSelf</Activate>
-        <Activate numShots="1">BulletCreate</Activate>
+        <Cooldown>0.5</Cooldown>
+        <MpCost>0</MpCost>
+        <Activate amount="75">NightVisionToggle</Activate>
         <ActivateOnEquip stat="21" amount="5">IncrementStat</ActivateOnEquip>
         <ActivateOnEquip stat="22" amount="5">IncrementStat</ActivateOnEquip>
         <BagType>2</BagType>

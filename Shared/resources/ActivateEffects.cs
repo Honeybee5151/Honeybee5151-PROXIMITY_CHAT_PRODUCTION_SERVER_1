@@ -56,6 +56,7 @@
         TeleportToObject,
         MysteryPortal,
         KillRealmHeroes,
-        BulletCreate 
+        BulletCreate,
+        NightVisionToggle
     }
 }

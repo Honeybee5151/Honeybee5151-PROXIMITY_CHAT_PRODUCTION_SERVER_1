@@ -30,6 +30,10 @@ namespace WorldServer.core.objects
         public const int START_USE = 1;
         public const int END_USE = 2;
 
+        // Night vision toggle state
+        private bool _nightVisionActive = false;
+        private long _nightVisionCooldownEnd = 0;
+
         public static readonly ConditionEffectIndex[] NegativeEffs = new ConditionEffectIndex[]
         {
             ConditionEffectIndex.Slowed,
@@ -357,6 +361,9 @@ namespace WorldServer.core.objects
                 case ActivateEffects.BulletCreate:
                     AEBulletCreate(item, target, eff);
                     break;
+                case ActivateEffects.NightVisionToggle:
+                    AENightVisionToggle(item, target, eff);
+                    break;
                 default:
                     StaticLogger.Instance.Warn("Activate effect {0} not implemented.", eff.Effect);
                     break;
@@ -513,6 +520,9 @@ namespace WorldServer.core.objects
                     case ActivateEffects.KillRealmHeroes:
                         SendError($"{eff.Effect} is not yet implemented");
                         break;
+                    case ActivateEffects.NightVisionToggle:
+                        AENightVisionToggle(item, target, eff);
+                        break;
                     default:
                         StaticLogger.Instance.Warn("Activate effect {0} not implemented.", eff.Effect);
                         break;
@@ -557,6 +567,79 @@ namespace WorldServer.core.objects
                 shoots.Add(new ServerPlayerShoot(Id, nextBulletId, item.ObjectType, fPos, (float)angle, damage, prjDesc));
             }
             World.BroadcastIfVisible(shoots, ref target);
+        }
+
+        private void AENightVisionToggle(Item item, Position target, ActivateEffect eff)
+        {
+            var now = Environment.TickCount64;
+
+            if (_nightVisionActive)
+            {
+                // Second press: exit night vision, fire bullet, start cooldown
+                _nightVisionActive = false;
+
+                // Remove conditions
+                RemoveCondition(ConditionEffectIndex.Blind);
+                RemoveCondition(ConditionEffectIndex.NightVision);
+
+                // Deduct MP on the shot
+                var mpCost = eff.Amount; // store MP cost in the Amount attribute
+                if (mpCost > 0 && Mana >= mpCost)
+                    Mana -= mpCost;
+
+                // Fire the big bullet (reuse BulletCreate logic)
+                var shootAngle = Math.Atan2(target.Y - Y, target.X - X);
+                var prjDesc = item.Projectiles[0];
+                var distance = Math.Max(1, Math.Min(Math.Sqrt(Math.Pow(target.X - X, 2) + Math.Pow(target.Y - Y, 2)), 6.3));
+                var adjustedTargetX = X + distance * Math.Cos(shootAngle);
+                var adjustedTargetY = Y + distance * Math.Sin(shootAngle);
+                var midway = ValidatedProjectile.GetPosition((long)(prjDesc.LifetimeMS / 2), NextAbilityBulletId, prjDesc, (float)shootAngle, 1);
+                var startingPos = new Position
+                {
+                    X = (float)(adjustedTargetX - midway.X),
+                    Y = (float)(adjustedTargetY - midway.Y),
+                };
+                var nextBulletId = GetNextBulletId(1, true);
+                var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage);
+                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, item.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), this);
+
+                // Show visual effect
+                World.BroadcastIfVisible(new ShowEffect()
+                {
+                    EffectType = EffectType.AreaBlast,
+                    TargetObjectId = Id,
+                    Color = new ARGB(0xff00ff00),
+                    Pos1 = new Position() { X = 2 }
+                }, this);
+
+                // Set 60 second cooldown
+                _nightVisionCooldownEnd = now + 60000;
+            }
+            else
+            {
+                // First press: enter night vision
+                if (now < _nightVisionCooldownEnd)
+                {
+                    var remaining = (_nightVisionCooldownEnd - now) / 1000;
+                    SendInfo($"Night vision on cooldown ({remaining}s)");
+                    return;
+                }
+
+                _nightVisionActive = true;
+
+                // Apply permanent Blind + NightVision
+                ApplyPermanentConditionEffect(ConditionEffectIndex.Blind);
+                ApplyPermanentConditionEffect(ConditionEffectIndex.NightVision);
+
+                // Show activation effect
+                World.BroadcastIfVisible(new ShowEffect()
+                {
+                    EffectType = EffectType.AreaBlast,
+                    TargetObjectId = Id,
+                    Color = new ARGB(0xff00ff00),
+                    Pos1 = new Position() { X = 1 }
+                }, this);
+            }
         }
 
         private void AEFame(TickTime time, Item item, Position target, ActivateEffect eff)
