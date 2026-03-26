@@ -587,9 +587,15 @@ namespace WorldServer.core.objects
                 if (mpCost > 0 && Mana >= mpCost)
                     Mana -= mpCost;
 
-                // Fire the big bullet (reuse BulletCreate logic)
+                // Fire a bigger version of the equipped weapon's projectile with 20x damage
+                var weapon = Inventory[0];
+                if (weapon == null || weapon.Projectiles.Length == 0)
+                {
+                    SendInfo("No weapon equipped!");
+                    return;
+                }
                 var shootAngle = Math.Atan2(target.Y - Y, target.X - X);
-                var prjDesc = item.Projectiles[0];
+                var prjDesc = weapon.Projectiles[0];
                 var distance = Math.Max(1, Math.Min(Math.Sqrt(Math.Pow(target.X - X, 2) + Math.Pow(target.Y - Y, 2)), 6.3));
                 var adjustedTargetX = X + distance * Math.Cos(shootAngle);
                 var adjustedTargetY = Y + distance * Math.Sin(shootAngle);
@@ -600,9 +606,10 @@ namespace WorldServer.core.objects
                     Y = (float)(adjustedTargetY - midway.Y),
                 };
                 var nextBulletId = GetNextBulletId(1, true);
-                var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage);
+                var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage) * 20;
+                // Send with weapon's containerType so client renders the weapon's projectile sprite
                 // Must use ref Position overload so ServerPlayerShoot is registered in PendingShootAcknowlegements
-                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, item.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), ref target);
+                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, weapon.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), ref target);
 
                 // Show visual effect
                 World.BroadcastIfVisible(new ShowEffect()
