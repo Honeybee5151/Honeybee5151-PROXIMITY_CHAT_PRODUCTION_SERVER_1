@@ -32,7 +32,11 @@ namespace WorldServer.core.objects
 
         public void AddCondition(byte effect, int duration)
         {
-            _durations[effect] = duration; // Math.Max(Durations[effect], duration);
+            // Don't overwrite permanent conditions (-1) with timed ones
+            if (_durations[effect] == -1)
+                return;
+
+            _durations[effect] = duration;
 
             var batchType = GetBatch(effect);
             _masks[batchType] |= GetBit(effect);

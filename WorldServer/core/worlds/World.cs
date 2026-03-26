@@ -415,15 +415,8 @@ namespace WorldServer.core.worlds
                 Players.TryAdd(entity.Id, player);
                 PlayersCollision.Insert(entity, entity.X, entity.Y);
                 if (PlayerConditionEffects != null)
-                {
-                    Console.WriteLine($"[AddToWorld] Applying {PlayerConditionEffects.Count} condition effects to {player.Name} in world '{IdName}'");
                     foreach (var effect in PlayerConditionEffects)
-                    {
-                        Console.WriteLine($"[AddToWorld] Applying {effect} to {player.Name}");
                         player.ApplyPermanentConditionEffect(effect);
-                        Console.WriteLine($"[AddToWorld] Player has Slowed: {player.HasConditionEffect(ConditionEffectIndex.Slowed)}");
-                    }
-                }
             }
             else if (entity is SellableObject)
                 SellableObjects.TryAdd(entity.Id, entity as SellableObject);
