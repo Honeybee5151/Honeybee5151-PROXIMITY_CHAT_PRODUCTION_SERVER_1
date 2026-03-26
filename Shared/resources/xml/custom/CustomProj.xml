@@ -13,6 +13,6 @@
 			<File>communitySprites8x8</File>
 			<Index>77</Index>
 		</Texture>
-		<AngleCorrection>1</AngleCorrection>
+		<AngleCorrection>0</AngleCorrection>
 	</Object>
 </Objects>
