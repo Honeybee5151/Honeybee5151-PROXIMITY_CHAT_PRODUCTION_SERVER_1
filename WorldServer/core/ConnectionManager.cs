@@ -253,9 +253,10 @@ namespace WorldServer.core
             packets.Add(new AccountListMessage(0, client.Account.LockList.Select(i => i.ToString()).ToArray()));
             packets.Add(new AccountListMessage(1, client.Account.IgnoreList.Select(i => i.ToString()).ToArray()));
 
-            // Send dungeon quest objective text
-            if (!string.IsNullOrEmpty(world.QuestText))
-                packets.Add(new GlobalNotificationMessage(0, "dungeonQuest:" + world.QuestText));
+            // Send dungeon quest objective text (ActiveQuestText takes priority if set by DungeonVictory)
+            var questText = world.ActiveQuestText ?? world.QuestText;
+            if (!string.IsNullOrEmpty(questText))
+                packets.Add(new GlobalNotificationMessage(0, "dungeonQuest:" + questText));
 
             // Auto-open dungeon browser if player returned to Nexus from a dungeon
             if (world is NexusWorld && PendingDungeonBrowserOpen.TryRemove(client.Account.AccountId, out var browserTab))

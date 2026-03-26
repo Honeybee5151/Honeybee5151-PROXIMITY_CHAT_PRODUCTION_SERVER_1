@@ -37,11 +37,9 @@ namespace WorldServer.logic.behaviors
             if (remaining.Count > 0)
                 return;
 
-            // Update quest text if specified
+            // Send quest text update to clients (display only — does not advance ActiveQuestText)
             if (_questText != null)
             {
-                world.ActiveQuestText = _questText;
-                Console.WriteLine($"[DungeonVictory] Set ActiveQuestText='{_questText}' on world '{world.IdName}'");
                 var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
                 foreach (var player in world.Players.Values)
                     player.Client.SendPacket(questMsg);

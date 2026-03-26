@@ -1,34 +1,41 @@
 using System;
+using System.Linq;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
 
 namespace WorldServer.logic.transitions
 {
+    /// <summary>
+    /// Transitions when all specified quest enemies in the world are dead.
+    /// Unlike EntitiesNotExistsTransition, this checks the World.Quests dictionary
+    /// directly (not collision maps), so it works regardless of distance.
+    /// </summary>
     internal class QuestTextActiveTransition : Transition
     {
-        private readonly string _questText;
-        private bool _logged;
+        private readonly string[] _entityNames;
 
-        public QuestTextActiveTransition(string questText, string targetState)
+        public QuestTextActiveTransition(string targetState, params string[] entityNames)
             : base(targetState)
         {
-            _questText = questText;
+            _entityNames = entityNames;
         }
 
         protected override bool TickCore(Entity host, TickTime time, ref object state)
         {
-            var active = host.World?.ActiveQuestText;
-            var result = active == _questText;
-            if (!_logged)
+            var world = host.World;
+            if (world == null)
+                return false;
+
+            // Check if ALL named entities are dead or removed from the world
+            foreach (var name in _entityNames)
             {
-                Console.WriteLine($"[QuestTextTransition] {host.ObjectDesc?.IdName}: checking '{_questText}' vs ActiveQuestText='{active ?? "null"}' => {result}");
-                _logged = true;
+                var alive = world.Enemies.Values
+                    .Any(e => e.ObjectDesc?.IdName == name && !e.Dead);
+                if (alive)
+                    return false;
             }
-            if (result && _logged)
-            {
-                Console.WriteLine($"[QuestTextTransition] {host.ObjectDesc?.IdName}: TRANSITIONING to idle! ActiveQuestText='{active}'");
-            }
-            return result;
+
+            return true;
         }
     }
 }
