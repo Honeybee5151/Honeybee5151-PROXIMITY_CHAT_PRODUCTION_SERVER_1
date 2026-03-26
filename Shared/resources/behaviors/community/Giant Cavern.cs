@@ -16,7 +16,7 @@ namespace WorldServer.logic.db.community
                 new State(
                     new SpawnOnDeath("Greg Imprint"),
                     new DestroyOnDeath("Greg Ball"),
-                    new DungeonVictory(),
+                    new DungeonVictorySpawn("Boss Giant", 46, 29, "Talk to Boss Giant"),
                     new State("idle",
                         new SetAltTexture(0),
                         new ConditionalEffect(ConditionEffectIndex.Invulnerable),
@@ -131,7 +131,7 @@ namespace WorldServer.logic.db.community
             db.RegisterCommunity("Brog",
                 new State(
                     new SpawnOnDeath("Brog Imprint"),
-                    new DungeonVictory(),
+                    new DungeonVictorySpawn("Boss Giant", 46, 29, "Talk to Boss Giant"),
                     new State("idle",
                         new SetAltTexture(0),
                         new Wander(0.3),
@@ -198,6 +198,20 @@ namespace WorldServer.logic.db.community
                         new SetAltTexture(2),
                         new BounceCharge(speed: 12, range: 100),
                         new Shoot(8, count: 8, shootAngle: 45, projectileIndex: 0, coolDown: new Cooldown(800))
+                    )
+                )
+            );
+
+            // ========== BOSS GIANT (NPC — dialogue after victory) ==========
+            db.RegisterCommunity("Boss Giant",
+                new State(
+                    new State("idle",
+                        new NpcDialogue(
+                            "Do you wish to engage in our party, by battling in our pit?",
+                            new[] { "Yes", "No" },
+                            range: 3f,
+                            cooldown: new Cooldown(1000)
+                        )
                     )
                 )
             );

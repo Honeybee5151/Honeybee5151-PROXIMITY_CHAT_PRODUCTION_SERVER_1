@@ -214,5 +214,14 @@
 		<LifetimeMS>250</LifetimeMS>
 	</Projectile>
 </Object>
+<Object type="0x50A5" id="Boss Giant">
+	<Class>GameObject</Class>
+	<Texture>
+		<File>dungeon_gc_boss_giant</File>
+		<Index>0</Index>
+	</Texture>
+	<Size>120</Size>
+	<Static/>
+</Object>
 </Objects>
 </DungeonAssets>
