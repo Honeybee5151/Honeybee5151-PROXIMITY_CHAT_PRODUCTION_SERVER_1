@@ -601,7 +601,8 @@ namespace WorldServer.core.objects
                 };
                 var nextBulletId = GetNextBulletId(1, true);
                 var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage);
-                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, item.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), this);
+                // Must use ref Position overload so ServerPlayerShoot is registered in PendingShootAcknowlegements
+                World.BroadcastIfVisible(new ServerPlayerShoot(Id, nextBulletId, item.ObjectType, startingPos, (float)shootAngle, damage, prjDesc), ref target);
 
                 // Show visual effect
                 World.BroadcastIfVisible(new ShowEffect()
