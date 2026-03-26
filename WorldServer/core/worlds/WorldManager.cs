@@ -165,7 +165,11 @@ namespace WorldServer.core.worlds
             // Spawn beam obstacles for crying dungeon
             Console.WriteLine($"[CryingDungeon] dungeonName='{dungeonName}' checking match...");
             if (dungeonName == "crying")
+            {
                 SpawnCryingDungeonEntities(world);
+                // Permanent Slow for all players in Giant's Cavern
+                world.PlayerConditionEffects = new List<ConditionEffectIndex> { ConditionEffectIndex.Slowed };
+            }
 
             // Spawn Boss Giant NPC for Giant's Cavern
             if (dungeonName == "Giant Cavern")

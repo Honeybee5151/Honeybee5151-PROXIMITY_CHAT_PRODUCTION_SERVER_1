@@ -78,6 +78,7 @@ namespace WorldServer.core.worlds
         public bool LockRotation { get; set; }
         public bool SpawnRaft { get; set; }
         public string QuestText { get; set; }
+        public List<ConditionEffectIndex> PlayerConditionEffects { get; set; }
 
         //editor8182381 — Darkness zone: progressive screen darkening outside safe radius
         public float DarknessZoneCenterX { get; protected set; }
@@ -407,10 +408,13 @@ namespace WorldServer.core.worlds
 
         public virtual void AddToWorld(Entity entity)
         {
-            if (entity is Player)
+            if (entity is Player player)
             {
-                Players.TryAdd(entity.Id, entity as Player);
+                Players.TryAdd(entity.Id, player);
                 PlayersCollision.Insert(entity, entity.X, entity.Y);
+                if (PlayerConditionEffects != null)
+                    foreach (var effect in PlayerConditionEffects)
+                        player.ApplyPermanentConditionEffect(effect);
             }
             else if (entity is SellableObject)
                 SellableObjects.TryAdd(entity.Id, entity as SellableObject);
