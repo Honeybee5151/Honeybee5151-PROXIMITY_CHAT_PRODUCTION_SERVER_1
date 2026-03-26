@@ -225,7 +225,22 @@ namespace WorldServer.logic.db.community
                     ),
                     new State("talking",
                         new SetSize(120),
-                        new DialogueEndTransition("idle")
+                        // Cycle derp frames: 0 → 1 → 2 → 0 ...
+                        new State("derp0",
+                            new SetAltTexture(0),
+                            new TimedTransition(300, "derp1"),
+                            new DialogueEndTransition("idle")
+                        ),
+                        new State("derp1",
+                            new SetAltTexture(1),
+                            new TimedTransition(300, "derp2"),
+                            new DialogueEndTransition("idle")
+                        ),
+                        new State("derp2",
+                            new SetAltTexture(2),
+                            new TimedTransition(300, "derp0"),
+                            new DialogueEndTransition("idle")
+                        )
                     )
                 )
             );
