@@ -28,7 +28,7 @@ namespace WorldServer.core.commands.player
                 var targetX = 44.5f;
                 var targetY = 41.5f;
 
-                TeleportPlayer(player, targetX, targetY);
+                TeleportPlayer(player, time, targetX, targetY);
 
                 // Also teleport party members in the same world
                 var partyId = player.Client.Account.PartyId;
@@ -46,7 +46,7 @@ namespace WorldServer.core.commands.player
                             if (memberClient?.Player == null || memberClient.Player.World != world)
                                 continue;
 
-                            TeleportPlayer(memberClient.Player, targetX, targetY);
+                            TeleportPlayer(memberClient.Player, time, targetX, targetY);
                         }
                     }
                 }
@@ -60,10 +60,9 @@ namespace WorldServer.core.commands.player
             return true;
         }
 
-        private void TeleportPlayer(Player player, float x, float y)
+        private void TeleportPlayer(Player player, TickTime time, float x, float y)
         {
-            player.Client.SendPacket(new GotoMessage(player.Id, new Position(x, y)));
-            player.Move(x, y);
+            player.TeleportPosition(time, x, y, ignoreRestrictions: true);
         }
     }
 }
