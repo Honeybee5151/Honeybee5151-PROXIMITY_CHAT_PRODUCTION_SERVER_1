@@ -205,19 +205,27 @@ namespace WorldServer.logic.db.community
             // ========== BOSS GIANT (NPC — dialogue after victory) ==========
             // Invisible entity overlapping JM decoration at (44,27). JM decoration handles visuals.
             // Waits for both bosses to die before enabling dialogue.
+            // During dialogue, derp sprite becomes visible (Size=120) overlaying the decoration.
             db.RegisterCommunity("Boss Giant",
                 new State(
                     new State("waiting",
+                        new SetSize(1),
                         // Wait for both Greg and Brog to die
                         new EntitiesNotExistsTransition(100, "idle", "Greg", "Brog")
                     ),
                     new State("idle",
+                        new SetSize(1),
                         new NpcDialogue(
                             "Do you wish to engage in our party, by battling in our pit?",
                             new[] { "Yes", "No" },
                             range: 5f,
                             cooldown: new Cooldown(2000)
-                        )
+                        ),
+                        new DialogueActiveTransition("talking")
+                    ),
+                    new State("talking",
+                        new SetSize(120),
+                        new DialogueEndTransition("idle")
                     )
                 )
             );
