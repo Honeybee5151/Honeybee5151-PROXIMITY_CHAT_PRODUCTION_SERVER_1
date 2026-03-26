@@ -167,6 +167,10 @@ namespace WorldServer.core.worlds
             if (dungeonName == "crying")
                 SpawnCryingDungeonEntities(world);
 
+            // Spawn Boss Giant NPC for Giant's Cavern
+            if (dungeonName == "cavern")
+                SpawnCavernBossGiant(world);
+
             _ = Worlds.TryAdd(world.Id, world);
             // null parents are threaded as they get treated as the root
             if (parent == null)
@@ -248,6 +252,17 @@ namespace WorldServer.core.worlds
                 Console.WriteLine("[CryingDungeon] ERROR: 'Checkerboard Pillar H' not found in IdToObjectType!");
 
             Console.WriteLine($"[CryingDungeon] World enemies count: {world.Enemies.Count}");
+        }
+
+        private void SpawnCavernBossGiant(World world)
+        {
+            var gameData = GameServer.Resources.GameData;
+            if (gameData.IdToObjectType.TryGetValue("Boss Giant", out var bossType))
+            {
+                var boss = Entity.Resolve(GameServer, bossType);
+                boss.Move(46.5f, 29.5f);
+                world.EnterWorld(boss);
+            }
         }
 
         public World GetWorld(int id) => Worlds.TryGetValue(id, out World ret) ? ret : null;

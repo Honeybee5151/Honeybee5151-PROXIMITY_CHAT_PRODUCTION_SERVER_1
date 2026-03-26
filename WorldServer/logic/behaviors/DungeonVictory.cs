@@ -7,10 +7,17 @@ namespace WorldServer.logic.behaviors
 {
     /// <summary>
     /// On death, checks if all Quest enemies in the world are dead.
-    /// If so, broadcasts a "dungeonVictory" GlobalNotification to all players.
+    /// If so, updates quest text and broadcasts a "dungeonVictory" notification.
     /// </summary>
     internal class DungeonVictory : Behavior
     {
+        private readonly string _questText;
+
+        public DungeonVictory(string questText = null)
+        {
+            _questText = questText;
+        }
+
         public override void OnDeath(Entity host, ref TickTime time)
         {
             var world = host.World;
@@ -25,10 +32,18 @@ namespace WorldServer.logic.behaviors
             if (remaining > 0)
                 return;
 
-            // All bosses dead — broadcast victory to all players
-            var msg = new GlobalNotificationMessage(0, "dungeonVictory");
+            // Update quest text if specified
+            if (_questText != null)
+            {
+                var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
+                foreach (var player in world.Players.Values)
+                    player.Client.SendPacket(questMsg);
+            }
+
+            // Broadcast victory
+            var victoryMsg = new GlobalNotificationMessage(0, "dungeonVictory");
             foreach (var player in world.Players.Values)
-                player.Client.SendPacket(msg);
+                player.Client.SendPacket(victoryMsg);
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
