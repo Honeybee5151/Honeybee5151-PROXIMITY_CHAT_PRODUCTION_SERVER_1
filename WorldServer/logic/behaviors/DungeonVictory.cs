@@ -37,14 +37,6 @@ namespace WorldServer.logic.behaviors
             if (remaining.Count > 0)
                 return;
 
-            // Send quest text update to clients (display only — does not advance ActiveQuestText)
-            if (_questText != null)
-            {
-                var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
-                foreach (var player in world.Players.Values)
-                    player.Client.SendPacket(questMsg);
-            }
-
             // Broadcast victory
             var victoryMsg = new GlobalNotificationMessage(0, "dungeonVictory");
             foreach (var player in world.Players.Values)

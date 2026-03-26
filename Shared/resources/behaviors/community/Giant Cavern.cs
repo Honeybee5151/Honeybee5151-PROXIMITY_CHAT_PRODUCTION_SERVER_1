@@ -16,7 +16,8 @@ namespace WorldServer.logic.db.community
                 new State(
                     new SpawnOnDeath("Greg Imprint"),
                     new DestroyOnDeath("Greg Ball"),
-                    new DungeonVictory("Talk to Boss Giant"),
+                    new DungeonVictory(),
+                    new OnDeathSetQuestText("Talk to Boss Giant", "Greg", "Brog"),
                     new State("idle",
                         new SetAltTexture(0),
                         new ConditionalEffect(ConditionEffectIndex.Invulnerable),
@@ -131,7 +132,8 @@ namespace WorldServer.logic.db.community
             db.RegisterCommunity("Brog",
                 new State(
                     new SpawnOnDeath("Brog Imprint"),
-                    new DungeonVictory("Talk to Boss Giant"),
+                    new DungeonVictory(),
+                    new OnDeathSetQuestText("Talk to Boss Giant", "Greg", "Brog"),
                     new State("idle",
                         new SetAltTexture(0),
                         new Wander(0.3),
@@ -219,10 +221,9 @@ namespace WorldServer.logic.db.community
                         new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
                         new State("frame3", new SetAltTexture(3), new TimedTransition(300, "frame4")),
                         new State("frame4", new SetAltTexture(4), new TimedTransition(300, "frame0")),
-                        new QuestTextActiveTransition("idle", "Greg", "Brog")
+                        new QuestTextActiveTransition("idle", "Talk to Boss Giant")
                     ),
                     new State("idle",
-                        new SetQuestText("Talk to Boss Giant"),
                         new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),
                         new State("frame1", new SetAltTexture(1), new TimedTransition(300, "frame2")),
                         new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
