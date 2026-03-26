@@ -596,15 +596,8 @@ namespace WorldServer.core.objects
                 }
                 var shootAngle = Math.Atan2(target.Y - Y, target.X - X);
                 var prjDesc = weapon.Projectiles[0];
-                var distance = Math.Max(1, Math.Min(Math.Sqrt(Math.Pow(target.X - X, 2) + Math.Pow(target.Y - Y, 2)), 6.3));
-                var adjustedTargetX = X + distance * Math.Cos(shootAngle);
-                var adjustedTargetY = Y + distance * Math.Sin(shootAngle);
-                var midway = ValidatedProjectile.GetPosition((long)(prjDesc.LifetimeMS / 2), NextAbilityBulletId, prjDesc, (float)shootAngle, 1);
-                var startingPos = new Position
-                {
-                    X = (float)(adjustedTargetX - midway.X),
-                    Y = (float)(adjustedTargetY - midway.Y),
-                };
+                // Start right at the player so it travels the full distance forward
+                var startingPos = new Position { X = (float)X, Y = (float)Y };
                 var nextBulletId = GetNextBulletId(1, true);
                 var damage = Random.Shared.Next(prjDesc.MinDamage, prjDesc.MaxDamage) * 20;
                 // Send with weapon's containerType so client renders the weapon's projectile sprite
