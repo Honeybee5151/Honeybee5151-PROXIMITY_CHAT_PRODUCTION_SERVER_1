@@ -1295,7 +1295,6 @@
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
-        <Untiered/>
         
         <SlotType>1</SlotType>
         <Description>A suppressed carbine issued to elite cave-clearing units. Its burst-fire mechanism delivers devastating precision in close quarters.</Description>
@@ -1318,7 +1317,6 @@
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
-        <Untiered/>
         
         <SlotType>6</SlotType>
         <Description>A reinforced ballistic helmet with night-vision mount. Standard issue for deep cave assault operations.</Description>
@@ -1334,7 +1332,6 @@
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
-        <Untiered/>
         
         <SlotType>7</SlotType>
         <Description>Military-grade body armor with ceramic plate inserts. Rated to stop high-velocity projectiles from hostile cavern dwellers.</Description>
@@ -1348,7 +1345,6 @@
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
-        <Untiered/>
         
         <SlotType>9</SlotType>
         <Description>Tungsten-core ammunition designed to punch through the thickest giant hide. Each round is precision-machined for maximum penetration.</Description>
