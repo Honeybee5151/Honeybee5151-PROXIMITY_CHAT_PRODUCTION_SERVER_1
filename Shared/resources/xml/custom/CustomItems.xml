@@ -1290,8 +1290,8 @@
     </Object>
 	<Object type="0x5073" id="Shadow Ops M4">
 	<Texture>
-		<File>cavernSprites8x8</File>
-		<Index>0</Index>
+		<File>communitySprites8x8</File>
+		<Index>73</Index>
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
@@ -1312,8 +1312,8 @@
     </Object>
 	<Object type="0x5074" id="Nighthawk Combat Helmet">
 	<Texture>
-		<File>cavernSprites8x8</File>
-		<Index>1</Index>
+		<File>communitySprites8x8</File>
+		<Index>74</Index>
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
@@ -1327,8 +1327,8 @@
     </Object>
 	<Object type="0x5075" id="Ironplate Tactical Vest">
 	<Texture>
-		<File>cavernSprites8x8</File>
-		<Index>2</Index>
+		<File>communitySprites8x8</File>
+		<Index>75</Index>
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
@@ -1340,8 +1340,8 @@
     </Object>
 	<Object type="0x5076" id="Armor-Piercing Rounds">
 	<Texture>
-		<File>cavernSprites8x8</File>
-		<Index>3</Index>
+		<File>communitySprites8x8</File>
+		<Index>76</Index>
 	</Texture>
         <Class>Equipment</Class>
         <Item/>
