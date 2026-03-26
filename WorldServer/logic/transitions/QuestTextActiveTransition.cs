@@ -1,3 +1,4 @@
+using System;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
 
@@ -10,6 +11,7 @@ namespace WorldServer.logic.transitions
     internal class QuestTextActiveTransition : Transition
     {
         private readonly string _questText;
+        private bool _loggedOnce;
 
         public QuestTextActiveTransition(string targetState, string questText)
             : base(targetState)
@@ -23,7 +25,15 @@ namespace WorldServer.logic.transitions
             if (world == null)
                 return false;
 
-            return world.QuestText == _questText;
+            var match = world.QuestText == _questText;
+            if (!_loggedOnce)
+            {
+                Console.WriteLine($"[QuestTextActive] host={host.ObjectDesc?.IdName} world.QuestText='{world.QuestText}' target='{_questText}' match={match}");
+                _loggedOnce = true;
+            }
+            if (match)
+                Console.WriteLine($"[QuestTextActive] TRANSITIONING {host.ObjectDesc?.IdName} to idle");
+            return match;
         }
     }
 }
