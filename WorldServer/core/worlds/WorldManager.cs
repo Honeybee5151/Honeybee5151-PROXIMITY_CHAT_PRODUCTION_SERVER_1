@@ -168,7 +168,7 @@ namespace WorldServer.core.worlds
                 SpawnCryingDungeonEntities(world);
 
             // Spawn Boss Giant NPC for Giant's Cavern
-            if (dungeonName == "cavern")
+            if (dungeonName == "Giant Cavern")
                 SpawnCavernBossGiant(world);
 
             _ = Worlds.TryAdd(world.Id, world);
@@ -262,6 +262,11 @@ namespace WorldServer.core.worlds
                 var boss = Entity.Resolve(GameServer, bossType);
                 boss.Move(44.5f, 27.5f);
                 world.EnterWorld(boss);
+                StaticLogger.Instance.Info($"[BossGiant] Spawned Boss Giant (Id={boss.Id}) at (44.5, 27.5)");
+            }
+            else
+            {
+                StaticLogger.Instance.Error("[BossGiant] 'Boss Giant' not found in IdToObjectType!");
             }
         }
 

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using WorldServer.core.objects;
@@ -10,13 +11,17 @@ namespace WorldServer.logic.behaviors
     /// <summary>
     /// When the nearest player comes within range, sends a dialogue GlobalNotification
     /// with the NPC's text and options. Tracks which players have an open dialogue to avoid spam.
+    /// Players who dismiss dialogue must leave range and return before it triggers again.
     /// </summary>
     internal class NpcDialogue : Behavior
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        // Global tracker: accountId -> npcEntityId
+        // Global tracker: accountId -> npcEntityId (player has dialogue open)
         public static readonly ConcurrentDictionary<int, int> ActiveDialogues = new();
+
+        // Global tracker: accountId -> npcEntityId (player dismissed, must leave range first)
+        public static readonly ConcurrentDictionary<int, int> DismissedDialogues = new();
 
         private readonly string _text;
         private readonly string[] _options;
@@ -51,10 +56,23 @@ namespace WorldServer.logic.behaviors
 
             state = _cooldown.Next(Random);
 
-            // Find nearest player within range who doesn't already have an active dialogue
+            // Clear dismissed players who have left range
+            foreach (var kvp in DismissedDialogues)
+            {
+                if (kvp.Value != host.Id)
+                    continue;
+
+                var dismissedPlayer = host.World.Players.Values.FirstOrDefault(p => p.AccountId == kvp.Key);
+                if (dismissedPlayer == null || host.DistTo(dismissedPlayer) > _range)
+                    DismissedDialogues.TryRemove(kvp.Key, out _);
+            }
+
+            // Find nearest player within range who doesn't have active or dismissed dialogue
             var player = host.World.PlayersCollision.HitTest(host.X, host.Y, _range)
                 .OfType<Player>()
-                .Where(p => host.DistTo(p) <= _range && !ActiveDialogues.ContainsKey(p.AccountId))
+                .Where(p => host.DistTo(p) <= _range
+                    && !ActiveDialogues.ContainsKey(p.AccountId)
+                    && !DismissedDialogues.ContainsKey(p.AccountId))
                 .OrderBy(p => host.DistTo(p))
                 .FirstOrDefault();
 

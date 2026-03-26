@@ -20,8 +20,8 @@ namespace WorldServer.core.commands.player
             if (world == null)
                 return false;
 
-            // Clear the dialogue state so the NPC can re-trigger later
-            NpcDialogue.ActiveDialogues.TryRemove(player.AccountId, out _);
+            // Clear the active dialogue state
+            NpcDialogue.ActiveDialogues.TryRemove(player.AccountId, out var npcEntityId);
 
             if (optionId == 0) // "Yes" — teleport party to Greg's spawn position
             {
@@ -51,7 +51,11 @@ namespace WorldServer.core.commands.player
                     }
                 }
             }
-            // Option 1 ("No") — just dismiss, player can walk back and trigger dialogue again
+            else
+            {
+                // "No" or any other option — mark as dismissed so player must leave range first
+                NpcDialogue.DismissedDialogues[player.AccountId] = npcEntityId;
+            }
 
             return true;
         }
