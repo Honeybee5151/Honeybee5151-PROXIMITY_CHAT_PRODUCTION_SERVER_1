@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using WorldServer.core.objects;
 using WorldServer.core.worlds;
@@ -24,18 +25,23 @@ namespace WorldServer.logic.behaviors
             if (world == null)
                 return;
 
+            Console.WriteLine($"[DungeonVictory] {host.ObjectDesc?.IdName} died. Checking remaining quests...");
+
             // Check if any other Quest enemies remain (exclude self — we're dying)
             var remaining = world.Quests.Values
                 .Where(e => e.Id != host.Id && !e.Dead)
-                .Count();
+                .ToList();
 
-            if (remaining > 0)
+            Console.WriteLine($"[DungeonVictory] Remaining quest enemies: {remaining.Count} ({string.Join(", ", remaining.Select(e => e.ObjectDesc?.IdName ?? "?"))})");
+
+            if (remaining.Count > 0)
                 return;
 
             // Update quest text if specified
             if (_questText != null)
             {
                 world.ActiveQuestText = _questText;
+                Console.WriteLine($"[DungeonVictory] Set ActiveQuestText='{_questText}' on world '{world.IdName}'");
                 var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
                 foreach (var player in world.Players.Values)
                     player.Client.SendPacket(questMsg);
