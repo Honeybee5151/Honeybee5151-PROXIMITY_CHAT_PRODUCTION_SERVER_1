@@ -35,6 +35,7 @@ namespace WorldServer.logic.behaviors
             // Update quest text if specified
             if (_questText != null)
             {
+                world.ActiveQuestText = _questText;
                 var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:" + _questText);
                 foreach (var player in world.Players.Values)
                     player.Client.SendPacket(questMsg);

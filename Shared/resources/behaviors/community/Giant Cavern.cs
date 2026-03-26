@@ -219,7 +219,7 @@ namespace WorldServer.logic.db.community
                         new State("frame2", new SetAltTexture(2), new TimedTransition(300, "frame3")),
                         new State("frame3", new SetAltTexture(3), new TimedTransition(300, "frame4")),
                         new State("frame4", new SetAltTexture(4), new TimedTransition(300, "frame0")),
-                        new EntitiesNotExistsTransition(9999, "idle", "Greg", "Brog")
+                        new QuestTextActiveTransition("Talk to Boss Giant", "idle")
                     ),
                     new State("idle",
                         new State("frame0", new SetAltTexture(0), new TimedTransition(300, "frame1")),

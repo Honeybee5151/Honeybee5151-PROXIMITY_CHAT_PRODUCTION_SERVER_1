@@ -79,6 +79,8 @@ namespace WorldServer.core.worlds
         public bool SpawnRaft { get; set; }
         public string QuestText { get; set; }
         public List<ConditionEffectIndex> PlayerConditionEffects { get; set; }
+        /// <summary>Set by DungeonVictory when quest enemies are cleared. Used to gate NPC interactions.</summary>
+        public string ActiveQuestText { get; set; }
 
         //editor8182381 — Darkness zone: progressive screen darkening outside safe radius
         public float DarknessZoneCenterX { get; protected set; }
