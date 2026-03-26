@@ -7,4 +7,12 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
+	<Object type="0x507A" id="Shadow Ops Round">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>77</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+	</Object>
 </Objects>
