@@ -794,10 +794,11 @@
 		<LockRotation/>
 		<SpawnRaft/>
 		<QuestText>Slide down the waterfall</QuestText>
-		<PresetLevel>1</PresetLevel>
-		<PresetStats>2000,100,10,0,10,10,10,10</PresetStats>
-		<PresetHealthPotions>0</PresetHealthPotions>
-		<PresetManaPotions>0</PresetManaPotions>
+		<StartingEquipment>Shadow Ops M4,Nighthawk Combat Helmet,Ironplate Tactical Vest,Armor-Piercing Rounds</StartingEquipment>
+		<PresetLevel>20</PresetLevel>
+		<PresetStats>720,252,50,25,75,75,40,50</PresetStats>
+		<PresetHealthPotions>6</PresetHealthPotions>
+		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
 		<Music>
 			<Track>alperomeresin-the-final-boss-battle-158700.mp3</Track>
@@ -829,7 +830,7 @@
 		<QuestText>Kill Greg and Brog</QuestText>
 		<PresetLevel>20</PresetLevel>
 		<PresetStats>720,252,50,25,75,75,40,50</PresetStats>
-		<StartingEquipment>Golden Sword,Mithril Chainmail,,Ring of Greater Defense</StartingEquipment>
+		<StartingEquipment>Shadow Ops M4,Nighthawk Combat Helmet,Ironplate Tactical Vest,Armor-Piercing Rounds</StartingEquipment>
 		<PresetHealthPotions>6</PresetHealthPotions>
 		<PresetManaPotions>6</PresetManaPotions>
 		<PresetHasBackpack>false</PresetHasBackpack>
