@@ -1319,10 +1319,22 @@
         <Class>Equipment</Class>
         <Item/>
         <NoTierTag/>
-        
+
         <SlotType>6</SlotType>
-        <Description>A reinforced ballistic helmet with night-vision mount. Standard issue for deep cave assault operations.</Description>
-        <Activate stat="1" amount="100" cooldown="6" duration="4">GenericActivate</Activate>
+        <Description>A reinforced ballistic helmet with night-vision mount. Activate to engage night-vision: fires a devastating blast while limiting visibility to a focused cone.</Description>
+        <Projectile>
+            <ObjectId>Nighthawk Blast</ObjectId>
+            <Speed>120</Speed>
+            <MinDamage>2000</MinDamage>
+            <MaxDamage>4000</MaxDamage>
+            <LifetimeMS>600</LifetimeMS>
+            <MultiHit/>
+            <PassesCover/>
+        </Projectile>
+        <MpCost>75</MpCost>
+        <Activate effect="Blind" duration="4" cooldown="60">ConditionEffectSelf</Activate>
+        <Activate effect="NightVision" duration="4" cooldown="60">ConditionEffectSelf</Activate>
+        <Activate numShots="1">BulletCreate</Activate>
         <ActivateOnEquip stat="21" amount="5">IncrementStat</ActivateOnEquip>
         <ActivateOnEquip stat="22" amount="5">IncrementStat</ActivateOnEquip>
         <BagType>2</BagType>

@@ -15,4 +15,13 @@
 		</Texture>
 		<AngleCorrection>6</AngleCorrection>
 	</Object>
+	<Object type="0x507B" id="Nighthawk Blast">
+		<Class>Projectile</Class>
+		<Texture>
+			<File>communitySprites8x8</File>
+			<Index>74</Index>
+		</Texture>
+		<AngleCorrection>1</AngleCorrection>
+		<Size>400</Size>
+	</Object>
 </Objects>

@@ -66,6 +66,7 @@ namespace Shared.resources
         DexDebuff = 58,
         Inspired = 59,
         ManaDeplete = 60,
+        NightVision = 61,
         ConditionCount
     }
 }
