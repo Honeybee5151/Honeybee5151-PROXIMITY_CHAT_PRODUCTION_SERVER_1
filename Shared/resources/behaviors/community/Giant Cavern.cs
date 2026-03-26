@@ -203,28 +203,21 @@ namespace WorldServer.logic.db.community
             );
 
             // ========== BOSS GIANT (NPC — dialogue after victory) ==========
-            // Already in JM map; waits for both bosses to die before enabling dialogue
-            // 5-frame animation (indices 0-4), pauses on frame 0 during dialogue
+            // Invisible entity overlapping JM decoration at (44,27). JM decoration handles visuals.
+            // Waits for both bosses to die before enabling dialogue.
             db.RegisterCommunity("Boss Giant",
                 new State(
                     new State("waiting",
-                        new SetAltTexture(0, 4, new Cooldown(200), loop: true),
-                        // Transition to dialogue-ready once both Greg and Brog are dead
+                        // Wait for both Greg and Brog to die
                         new EntitiesNotExistsTransition(100, "idle", "Greg", "Brog")
                     ),
                     new State("idle",
-                        new SetAltTexture(0, 4, new Cooldown(200), loop: true),
                         new NpcDialogue(
                             "Do you wish to engage in our party, by battling in our pit?",
                             new[] { "Yes", "No" },
                             range: 5f,
                             cooldown: new Cooldown(2000)
-                        ),
-                        new DialogueActiveTransition("talking")
-                    ),
-                    new State("talking",
-                        new SetAltTexture(0),
-                        new DialogueEndTransition("idle")
+                        )
                     )
                 )
             );

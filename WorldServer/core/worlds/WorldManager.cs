@@ -260,7 +260,7 @@ namespace WorldServer.core.worlds
             if (gameData.IdToObjectType.TryGetValue("Boss Giant", out var bossType))
             {
                 var boss = Entity.Resolve(GameServer, bossType);
-                boss.Move(46.5f, 29.5f);
+                boss.Move(44.5f, 27.5f);
                 world.EnterWorld(boss);
             }
         }
