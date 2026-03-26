@@ -30,7 +30,7 @@ namespace WorldServer.core
         public ConcurrentDictionary<Client, PlayerInfo> Clients { get; } = new ConcurrentDictionary<Client, PlayerInfo>();
         private ConcurrentDictionary<Client, DateTime> Connecting { get; } = new ConcurrentDictionary<Client, DateTime>();
         private ConcurrentDictionary<int, ReconnectInfo> ReconnectInfo { get; } = new ConcurrentDictionary<int, ReconnectInfo>();
-
+//test
         private long LastTickTime { get; set; }
         public int MaxPlayerCount { get; set; }
 
