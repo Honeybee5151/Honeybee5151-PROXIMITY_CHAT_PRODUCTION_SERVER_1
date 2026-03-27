@@ -59,7 +59,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var color = _color;
 
             var hitCooldowns = new Dictionary<int, int>();
-            var visualCooldown = 0;
 
             void OrbTick(World w, TickTime t)
             {
@@ -75,15 +74,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (leftOrbY <= topY) { leftOrbY = topY; leftDir = 1f; }
                 if (rightOrbY >= bottomY) { rightOrbY = bottomY; rightDir = -1f; }
                 if (rightOrbY <= topY) { rightOrbY = topY; rightDir = 1f; }
-
-                // Visual (every 500ms, not every tick)
-                visualCooldown -= t.ElapsedMsDelta;
-                if (visualCooldown <= 0)
-                {
-                    visualCooldown = 500;
-                    BroadcastOrbVisual(w, entity, leftX, leftOrbY, color);
-                    BroadcastOrbVisual(w, entity, rightX, rightOrbY, color);
-                }
 
                 // Touch damage
                 var now = Environment.TickCount;
@@ -107,19 +97,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
         protected override void TickCore(Entity host, TickTime time, ref object state) { }
 
-        private static void BroadcastOrbVisual(World w, Entity entity, float x, float y, uint color)
-        {
-            var pos = new Position(x, y);
-            w.BroadcastIfVisible(new ShowEffect()
-            {
-                EffectType = EffectType.AreaBlast,
-                TargetObjectId = entity.Id,
-                Pos1 = new Position() { X = 1.5f },
-                Color = new ARGB(color),
-                Duration = 500
-            }, ref pos);
-        }
-
         private static void CheckTouchDamage(World w, Entity entity, float x, float y, int damage, uint color, Dictionary<int, int> hitCooldowns, int now)
         {
             w.AOE(new Position(x, y), 1.5f, true, p =>
@@ -134,16 +111,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
         internal static void DamageLineHorizontal(World w, Entity source, float fromX, float fromY, float towardX, int damage, uint color, ConditionEffectIndex effect = 0, int effectDuration = 0)
         {
-            var fromPos = new Position(fromX, fromY);
-            w.BroadcastIfVisible(new ShowEffect()
-            {
-                EffectType = EffectType.Stream,
-                TargetObjectId = source.Id,
-                Pos1 = new Position() { X = towardX, Y = fromY },
-                Color = new ARGB(color),
-                Duration = 400
-            }, ref fromPos);
-
             var minX = Math.Min(fromX, towardX);
             var maxX = Math.Max(fromX, towardX);
             var searchRadius = (maxX - minX) / 2f + 2f;

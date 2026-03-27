@@ -63,7 +63,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
             var hitCooldowns = new Dictionary<int, int>();
             var shootCooldown = 0;
-            var visualCooldown = 0;
 
             void BounceTick(World w, TickTime t)
             {
@@ -79,22 +78,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (orbX >= maxX) { orbX = maxX; velX = -Math.Abs(velX); }
                 if (orbY <= minY) { orbY = minY; velY = Math.Abs(velY); }
                 if (orbY >= maxY) { orbY = maxY; velY = -Math.Abs(velY); }
-
-                // Visual (every 500ms)
-                visualCooldown -= t.ElapsedMsDelta;
-                if (visualCooldown <= 0)
-                {
-                    visualCooldown = 500;
-                    var visPos = new Position(orbX, orbY);
-                    w.BroadcastIfVisible(new ShowEffect()
-                    {
-                        EffectType = EffectType.AreaBlast,
-                        TargetObjectId = entity.Id,
-                        Pos1 = new Position() { X = 1.5f },
-                        Color = new ARGB(color),
-                        Duration = 500
-                    }, ref visPos);
-                }
 
                 // Touch damage
                 var now = Environment.TickCount;

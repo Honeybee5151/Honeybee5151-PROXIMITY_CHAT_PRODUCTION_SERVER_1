@@ -12,7 +12,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
 {
     /// <summary>
     /// Checks HP thresholds every tick. When a 10% threshold is crossed,
-    /// spawns a golden bonus orb that travels top→bottom shooting L/R with Hallucination.
+    /// spawns a bonus orb that travels top→bottom shooting L/R with Hallucination.
     /// </summary>
     public sealed class DwarfBonusOrb : Behavior
     {
@@ -37,7 +37,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
         protected override void OnStateEntry(Entity host, TickTime time, ref object state)
         {
-            // Reset thresholds on state entry
             state = new HashSet<int>();
         }
 
@@ -73,7 +72,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
             var hitCooldowns = new Dictionary<int, int>();
             var shootCooldown = 0;
-            var visualCooldown = 0;
 
             void BonusOrbTick(World w, TickTime t)
             {
@@ -84,22 +82,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 orbY += orbSpeed * dt;
 
                 if (orbY >= targetY) return;
-
-                // Visual — golden orb (every 500ms)
-                visualCooldown -= t.ElapsedMsDelta;
-                if (visualCooldown <= 0)
-                {
-                    visualCooldown = 500;
-                    var visPos = new Position(orbX, orbY);
-                    w.BroadcastIfVisible(new ShowEffect()
-                    {
-                        EffectType = EffectType.AreaBlast,
-                        TargetObjectId = entity.Id,
-                        Pos1 = new Position() { X = 2f },
-                        Color = new ARGB(color),
-                        Duration = 500
-                    }, ref visPos);
-                }
 
                 // Touch damage + Hallucination
                 var now = Environment.TickCount;
