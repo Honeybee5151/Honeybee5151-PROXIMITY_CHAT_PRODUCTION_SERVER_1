@@ -12,8 +12,8 @@ using WorldServer.utils;
 namespace WorldServer.logic.behaviors.@new.attacks
 {
     /// <summary>
-    /// Expanding ring attack — fires once on state entry, expands outward, damages players on the ring edge.
-    /// Damage checking runs via world timers so it persists even if the state transitions away immediately.
+    /// Expanding ring attack — fires visual on state entry, then TickCore expands the ring
+    /// and damages players when the ring edge crosses them.
     /// </summary>
     public sealed class NewExpandingRing : Behavior
     {
@@ -45,9 +45,28 @@ namespace WorldServer.logic.behaviors.@new.attacks
             EffectDuration = effectDuration;
         }
 
+        // State object per-entity
+        private class RingState
+        {
+            public float OriginX;
+            public float OriginY;
+            public int ElapsedMs;
+            public int TotalMs;
+            public HashSet<int> HitPlayers = new();
+            public bool Done;
+        }
+
         protected override void OnStateEntry(Entity host, TickTime time, ref object state)
         {
-            state = null; // no state needed — damage runs via world timers
+            var rs = new RingState
+            {
+                OriginX = host.X,
+                OriginY = host.Y,
+                ElapsedMs = 0,
+                TotalMs = (int)(ExpandDurationSec * 1000),
+                Done = false
+            };
+            state = rs;
 
             // Broadcast visual to clients
             host.World.BroadcastIfVisible(new ShowEffect()
@@ -56,81 +75,59 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 TargetObjectId = host.Id,
                 Pos1 = new Position() { X = MaxRadius, Y = RingThickness },
                 Color = new ARGB(Color),
-                Duration = (int)(ExpandDurationSec * 1000)
+                Duration = rs.TotalMs
             }, host);
-
-            // Schedule damage checks via world timers (survives state transitions)
-            var totalMs = (int)(ExpandDurationSec * 1000);
-            var hitPlayers = new HashSet<int>();
-            var elapsedMs = 0;
-            var maxRadius = MaxRadius;
-            var ringThickness = RingThickness;
-            var damage = Damage;
-            var color = Color;
-            var effect = Effect;
-            var effectDuration = EffectDuration;
-            var entityId = host.Id;
-            // Capture position at creation time — client visual is anchored here
-            var originX = host.X;
-            var originY = host.Y;
-
-            WorldTimer timer = null;
-            timer = host.World.StartNewTimer(100, (world, t) =>
-            {
-                elapsedMs += t.ElapsedMsDelta;
-
-                if (elapsedMs >= totalMs)
-                    return true; // done, remove timer
-
-                // Check if entity is still alive
-                var entity = world.GetEntity(entityId);
-                if (entity == null)
-                    return true; // entity gone, remove timer
-
-                // Use original position (matches client visual which is anchored at creation pos)
-                var centerX = originX;
-                var centerY = originY;
-
-                var progress = elapsedMs / (float)totalMs;
-                var currentRadius = progress * maxRadius;
-
-                // Only damage players on the ring band itself (not inside it)
-                var ringInner = Math.Max(0f, currentRadius - ringThickness / 2f);
-                var ringOuter = currentRadius + ringThickness / 2f;
-
-                var pos = new Position(centerX, centerY);
-                var searchRadius = maxRadius + ringThickness + 2f;
-                world.AOE(pos, searchRadius, true, p =>
-                {
-                    if (p is not Player player)
-                        return;
-
-                    if (hitPlayers.Contains(player.Id))
-                        return;
-
-                    var dist = player.DistTo(centerX, centerY);
-
-                    if (dist >= ringInner && dist <= ringOuter)
-                    {
-                        var hitPos = new Position(player.X, player.Y);
-                        world.BroadcastIfVisible(new AoeMessage(hitPos, 1f, damage, effect, effectDuration / 1000f, entity.ObjectType, new ARGB(color)), player);
-
-                        (p as IPlayer).Damage(damage, entity);
-                        hitPlayers.Add(player.Id);
-
-                        if (effect != 0 && !player.HasConditionEffect(ConditionEffectIndex.Invincible) && !player.HasConditionEffect(ConditionEffectIndex.Invulnerable))
-                            player.ApplyConditionEffect(new ConditionEffect(effect, effectDuration));
-                    }
-                });
-
-                timer.Reset(); // schedule next tick
-                return false; // keep timer alive
-            });
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
         {
-            // Damage checking is handled by world timers — nothing to do here
+            if (state is not RingState rs || rs.Done)
+                return;
+
+            rs.ElapsedMs += time.ElapsedMsDelta;
+
+            if (rs.ElapsedMs >= rs.TotalMs)
+            {
+                rs.Done = true;
+                return;
+            }
+
+            var progress = rs.ElapsedMs / (float)rs.TotalMs;
+            var currentRadius = progress * MaxRadius;
+
+            // Ring band = the hitbox area
+            var ringInner = Math.Max(0f, currentRadius - RingThickness / 2f);
+            var ringOuter = currentRadius + RingThickness / 2f;
+
+            var centerX = rs.OriginX;
+            var centerY = rs.OriginY;
+
+            // Check all players within max possible range
+            var searchRadius = MaxRadius + RingThickness + 2f;
+            var pos = new Position(centerX, centerY);
+
+            host.World.AOE(pos, searchRadius, true, p =>
+            {
+                if (p is not Player player)
+                    return;
+
+                if (rs.HitPlayers.Contains(player.Id))
+                    return;
+
+                var dist = player.DistTo(centerX, centerY);
+
+                if (dist >= ringInner && dist <= ringOuter)
+                {
+                    var hitPos = new Position(player.X, player.Y);
+                    host.World.BroadcastIfVisible(new AoeMessage(hitPos, 1f, Damage, Effect, EffectDuration / 1000f, host.ObjectType, new ARGB(Color)), player);
+
+                    (p as IPlayer).Damage(Damage, host);
+                    rs.HitPlayers.Add(player.Id);
+
+                    if (Effect != 0 && !player.HasConditionEffect(ConditionEffectIndex.Invincible) && !player.HasConditionEffect(ConditionEffectIndex.Invulnerable))
+                        player.ApplyConditionEffect(new ConditionEffect(Effect, EffectDuration));
+                }
+            });
         }
     }
 }
