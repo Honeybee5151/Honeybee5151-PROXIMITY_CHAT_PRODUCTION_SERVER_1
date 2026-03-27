@@ -32,18 +32,9 @@ namespace WorldServer.core.commands.player
                 var targetX = 44.5f;
                 var targetY = 41.5f;
 
-                // Spawn the Dwarfism Giant in the pit
-                SpawnDwarfismGiant(player, world);
-
-                // Set quest text
-                world.QuestText = "Defeat Dwarfism Giant";
-                var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:Defeat Dwarfism Giant");
-                foreach (var p in world.Players.Values)
-                    p.Client.SendPacket(questMsg);
-
+                // Teleport players FIRST so they're in range when boss spawns
                 TeleportPlayer(player, time, targetX, targetY);
 
-                // Also teleport party members in the same world
                 var partyId = player.Client.Account.PartyId;
                 if (partyId > 0)
                 {
@@ -63,6 +54,18 @@ namespace WorldServer.core.commands.player
                         }
                     }
                 }
+
+                // Set quest text
+                world.QuestText = "Defeat Dwarfism Giant";
+                var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:Defeat Dwarfism Giant");
+                foreach (var p in world.Players.Values)
+                    p.Client.SendPacket(questMsg);
+
+                // Spawn boss AFTER teleport, use a short delay so the next tick picks it up
+                world.StartNewTimer(500, (w, t) =>
+                {
+                    SpawnDwarfismGiant(player, w);
+                });
             }
             // "No" just dismisses; dismissed state is already set above
 
@@ -102,9 +105,9 @@ namespace WorldServer.core.commands.player
                 return;
             }
 
-            boss.Move(44.5f, 55.5f);
+            boss.Move(44.5f, 47.5f);
             world.EnterWorld(boss);
-            Console.WriteLine($"[DialogueCommand] Dwarfism Giant spawned at (44.5, 55.5), Id={boss.Id}");
+            Console.WriteLine($"[DialogueCommand] Dwarfism Giant spawned at (44.5, 47.5), Id={boss.Id}");
         }
     }
 }
