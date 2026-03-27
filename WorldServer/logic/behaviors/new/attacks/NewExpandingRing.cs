@@ -74,18 +74,13 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var originX = host.X;
             var originY = host.Y;
 
-            Log.Info($"[ExpandingRing] Started: origin=({originX:F1},{originY:F1}) maxR={maxRadius} thickness={ringThickness} duration={totalMs}ms");
-
             // Use Action overload — timer auto-removes after callback, we re-add manually
             void TimerTick(World world, TickTime t)
             {
                 elapsedMs += t.ElapsedMsDelta;
 
                 if (elapsedMs >= totalMs)
-                {
-                    Log.Info($"[ExpandingRing] Finished after {elapsedMs}ms, hit {hitPlayers.Count} players");
                     return; // done — timer auto-removes
-                }
 
                 var entity = world.GetEntity(entityId);
                 if (entity == null)
@@ -111,8 +106,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
                     if (dist >= ringInner && dist <= ringOuter)
                     {
-                        Log.Info($"[ExpandingRing] HIT {player.Name} dist={dist:F2} ring=[{ringInner:F2},{ringOuter:F2}] progress={progress:F2}");
-
                         var hitPos = new Position(player.X, player.Y);
                         world.BroadcastIfVisible(new AoeMessage(hitPos, 1f, damage, effect, effectDuration / 1000f, entity.ObjectType, new ARGB(color)), player);
 
