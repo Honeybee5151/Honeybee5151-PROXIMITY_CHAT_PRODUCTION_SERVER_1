@@ -71,6 +71,9 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var effect = Effect;
             var effectDuration = EffectDuration;
             var entityId = host.Id;
+            // Capture position at creation time — client visual is anchored here
+            var originX = host.X;
+            var originY = host.Y;
 
             WorldTimer timer = null;
             timer = host.World.StartNewTimer(100, (world, t) =>
@@ -80,13 +83,14 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (elapsedMs >= totalMs)
                     return true; // done, remove timer
 
-                // Check if entity is still alive — use its current position (visual follows entity)
+                // Check if entity is still alive
                 var entity = world.GetEntity(entityId);
                 if (entity == null)
                     return true; // entity gone, remove timer
 
-                var centerX = entity.X;
-                var centerY = entity.Y;
+                // Use original position (matches client visual which is anchored at creation pos)
+                var centerX = originX;
+                var centerY = originY;
 
                 var progress = elapsedMs / (float)totalMs;
                 var currentRadius = progress * maxRadius;
