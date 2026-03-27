@@ -277,17 +277,13 @@
 		<File>dungeon_gc_dwarf_normal</File>
 		<Index>0</Index>
 	</AnimatedTexture>
-	<AltTexture id="1">
-		<AnimatedTexture>
-			<File>dungeon_gc_dwarf_fours</File>
-			<Index>0</Index>
-		</AnimatedTexture>
-	</AltTexture>
+	<FrameCycle>200</FrameCycle>
 	<AltTexture id="2">
 		<AnimatedTexture>
 			<File>dungeon_gc_dwarf_pooping</File>
 			<Index>0</Index>
 		</AnimatedTexture>
+		<FrameCycle>200</FrameCycle>
 	</AltTexture>
 	<Enemy/>
 	<Quest/>
