@@ -18,6 +18,7 @@ namespace WorldServer.logic.db.community
                 new State(
                     new SpawnOnDeath("Greg Imprint"),
                     new DestroyOnDeath("Greg Ball"),
+                    new DungeonVictory(),
                     new OnDeathSetQuestText("Talk to Boss Giant", "Greg", "Brog"),
                     new State("idle",
                         new SetAltTexture(0),
@@ -133,6 +134,7 @@ namespace WorldServer.logic.db.community
             db.RegisterCommunity("Brog",
                 new State(
                     new SpawnOnDeath("Brog Imprint"),
+                    new DungeonVictory(),
                     new OnDeathSetQuestText("Talk to Boss Giant", "Greg", "Brog"),
                     new State("idle",
                         new SetAltTexture(0),

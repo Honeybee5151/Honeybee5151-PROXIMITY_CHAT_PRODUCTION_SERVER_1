@@ -8,7 +8,8 @@ namespace WorldServer.logic.behaviors
 {
     /// <summary>
     /// On death, checks if all Quest enemies in the world are dead.
-    /// If so, updates quest text and broadcasts a "dungeonVictory" notification.
+    /// Delays the check so OnDeathSetQuestText can fire first — if quest text
+    /// changed (new stage started), victory is suppressed automatically.
     /// </summary>
     internal class DungeonVictory : Behavior
     {
@@ -25,22 +26,39 @@ namespace WorldServer.logic.behaviors
             if (world == null)
                 return;
 
-            Console.WriteLine($"[DungeonVictory] {host.ObjectDesc?.IdName} died. Checking remaining quests...");
+            // Snapshot current quest text before OnDeathSetQuestText runs
+            var questTextBefore = world.QuestText ?? "";
 
-            // Check if any other Quest enemies remain (exclude self — we're dying)
-            var remaining = world.Quests.Values
-                .Where(e => e.Id != host.Id && !e.Dead)
-                .ToList();
+            Console.WriteLine($"[DungeonVictory] {host.ObjectDesc?.IdName} died. QuestText='{questTextBefore}'. Scheduling delayed check...");
 
-            Console.WriteLine($"[DungeonVictory] Remaining quest enemies: {remaining.Count} ({string.Join(", ", remaining.Select(e => e.ObjectDesc?.IdName ?? "?"))})");
+            // Delay check so OnDeathSetQuestText and other OnDeath behaviors finish first
+            world.StartNewTimer(500, (w, t) =>
+            {
+                var questTextAfter = w.QuestText ?? "";
 
-            if (remaining.Count > 0)
-                return;
+                // If quest text changed, a new stage started (e.g., "Talk to Boss Giant") — skip victory
+                if (questTextAfter != questTextBefore)
+                {
+                    Console.WriteLine($"[DungeonVictory] QuestText changed from '{questTextBefore}' to '{questTextAfter}' — new stage, skipping victory.");
+                    return;
+                }
 
-            // Broadcast victory
-            var victoryMsg = new GlobalNotificationMessage(0, "dungeonVictory");
-            foreach (var player in world.Players.Values)
-                player.Client.SendPacket(victoryMsg);
+                // Check if any Quest enemies remain
+                var remaining = w.Quests.Values
+                    .Where(e => !e.Dead)
+                    .ToList();
+
+                Console.WriteLine($"[DungeonVictory] Remaining quest enemies: {remaining.Count} ({string.Join(", ", remaining.Select(e => e.ObjectDesc?.IdName ?? "?"))})");
+
+                if (remaining.Count > 0)
+                    return;
+
+                // All clear — broadcast victory
+                Console.WriteLine("[DungeonVictory] All quest enemies dead, no new stages — broadcasting victory!");
+                var victoryMsg = new GlobalNotificationMessage(0, "dungeonVictory");
+                foreach (var player in w.Players.Values)
+                    player.Client.SendPacket(victoryMsg);
+            });
         }
 
         protected override void TickCore(Entity host, TickTime time, ref object state)
