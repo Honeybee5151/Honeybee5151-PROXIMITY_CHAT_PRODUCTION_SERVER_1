@@ -26,6 +26,7 @@ namespace WorldServer.logic
             "WorldServer.logic.behaviors",
             "WorldServer.logic.transitions",
             "WorldServer.logic.loot",
+            "WorldServer.logic.data",
         };
 
         // Allowed individual types (fully qualified)
