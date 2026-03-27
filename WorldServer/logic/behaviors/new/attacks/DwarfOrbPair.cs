@@ -59,6 +59,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var color = _color;
 
             var hitCooldowns = new Dictionary<int, int>();
+            var visualCooldown = 0;
 
             void OrbTick(World w, TickTime t)
             {
@@ -75,9 +76,14 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 if (rightOrbY >= bottomY) { rightOrbY = bottomY; rightDir = -1f; }
                 if (rightOrbY <= topY) { rightOrbY = topY; rightDir = 1f; }
 
-                // Visual
-                BroadcastOrbVisual(w, entity, leftX, leftOrbY, color);
-                BroadcastOrbVisual(w, entity, rightX, rightOrbY, color);
+                // Visual (every 500ms, not every tick)
+                visualCooldown -= t.ElapsedMsDelta;
+                if (visualCooldown <= 0)
+                {
+                    visualCooldown = 500;
+                    BroadcastOrbVisual(w, entity, leftX, leftOrbY, color);
+                    BroadcastOrbVisual(w, entity, rightX, rightOrbY, color);
+                }
 
                 // Touch damage
                 var now = Environment.TickCount;
@@ -110,7 +116,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
                 TargetObjectId = entity.Id,
                 Pos1 = new Position() { X = 1.5f },
                 Color = new ARGB(color),
-                Duration = 150
+                Duration = 500
             }, ref pos);
         }
 

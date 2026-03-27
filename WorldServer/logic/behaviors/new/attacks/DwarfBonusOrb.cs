@@ -73,6 +73,7 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
             var hitCooldowns = new Dictionary<int, int>();
             var shootCooldown = 0;
+            var visualCooldown = 0;
 
             void BonusOrbTick(World w, TickTime t)
             {
@@ -84,16 +85,21 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
                 if (orbY >= targetY) return;
 
-                // Visual — golden orb
-                var visPos = new Position(orbX, orbY);
-                w.BroadcastIfVisible(new ShowEffect()
+                // Visual — golden orb (every 500ms)
+                visualCooldown -= t.ElapsedMsDelta;
+                if (visualCooldown <= 0)
                 {
-                    EffectType = EffectType.AreaBlast,
-                    TargetObjectId = entity.Id,
-                    Pos1 = new Position() { X = 2f },
-                    Color = new ARGB(color),
-                    Duration = 150
-                }, ref visPos);
+                    visualCooldown = 500;
+                    var visPos = new Position(orbX, orbY);
+                    w.BroadcastIfVisible(new ShowEffect()
+                    {
+                        EffectType = EffectType.AreaBlast,
+                        TargetObjectId = entity.Id,
+                        Pos1 = new Position() { X = 2f },
+                        Color = new ARGB(color),
+                        Duration = 500
+                    }, ref visPos);
+                }
 
                 // Touch damage + Hallucination
                 var now = Environment.TickCount;
