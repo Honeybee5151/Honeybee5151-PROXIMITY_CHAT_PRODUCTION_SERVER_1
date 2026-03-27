@@ -285,36 +285,13 @@ namespace WorldServer.logic.db.community
                         new PlayerWithinTransition(100, "normal1")
                     ),
 
-                    // ===== NORMAL PHASE 1 (100% -> 70%) — texture 0 =====
+                    // ===== NORMAL PHASE (100% -> 20%) — texture 0 =====
                     new State("normal1",
                         new SetAltTexture(0),
                         new Taunt("Grrrr... You dare enter MY cavern?!"),
                         new Prioritize(
                             new Chase(3.5, range: 3, sightRange: 100),
                             new Wander(0.3)
-                        ),
-                        new HpLessTransition(0.70, "wolf")
-                    ),
-
-                    // ===== WOLF PHASE (70% -> 50%) — texture 1 =====
-                    new State("wolf",
-                        new SetAltTexture(1),
-                        new Flash(0xFF8800, 0.5, 3),
-                        new Taunt("AWOOOOOO!"),
-                        new Prioritize(
-                            new Chase(4, range: 2, sightRange: 100),
-                            new Wander(0.4)
-                        ),
-                        new HpLessTransition(0.50, "normal2")
-                    ),
-
-                    // ===== NORMAL PHASE 2 (50% -> 20%) — texture 0 =====
-                    new State("normal2",
-                        new SetAltTexture(0),
-                        new Taunt("You'll PAY for that!"),
-                        new Prioritize(
-                            new Chase(4.5, range: 2, sightRange: 100),
-                            new Wander(0.4)
                         ),
                         new HpLessTransition(0.20, "poop")
                     ),
