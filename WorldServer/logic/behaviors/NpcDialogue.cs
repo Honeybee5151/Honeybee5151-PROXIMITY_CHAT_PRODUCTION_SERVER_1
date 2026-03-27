@@ -67,12 +67,12 @@ namespace WorldServer.logic.behaviors
                     DismissedDialogues.TryRemove(kvp.Key, out _);
             }
 
-            // Find nearest player within range who doesn't have active or dismissed dialogue
+            // Find nearest player within range who doesn't have active or dismissed dialogue with THIS NPC
             var player = host.World.PlayersCollision.HitTest(host.X, host.Y, _range)
                 .OfType<Player>()
                 .Where(p => host.DistTo(p) <= _range
-                    && !ActiveDialogues.ContainsKey(p.AccountId)
-                    && !DismissedDialogues.ContainsKey(p.AccountId))
+                    && !(ActiveDialogues.TryGetValue(p.AccountId, out var activeNpc) && activeNpc == host.Id)
+                    && !(DismissedDialogues.TryGetValue(p.AccountId, out var dismissedNpc) && dismissedNpc == host.Id))
                 .OrderBy(p => host.DistTo(p))
                 .FirstOrDefault();
 

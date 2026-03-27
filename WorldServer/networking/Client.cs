@@ -227,6 +227,10 @@ namespace WorldServer.networking
                 return;
             }
 
+            // Clean up NPC dialogue state when switching worlds
+            logic.behaviors.NpcDialogue.ActiveDialogues.TryRemove(Account.AccountId, out _);
+            logic.behaviors.NpcDialogue.DismissedDialogues.TryRemove(Account.AccountId, out _);
+
             //Log.Trace("Reconnecting client ({0}) @ {1} to {2}...", Account.Name, IP, pkt.Name);
             GameServer.ConnectionManager.AddReconnect(Account.AccountId, pkt);
             SendPacket(pkt);
@@ -249,6 +253,7 @@ namespace WorldServer.networking
 #endif
 
                 if (Account != null)
+                {
                     try
                     {
                         Save();
@@ -258,6 +263,10 @@ namespace WorldServer.networking
                         var msg = $"{e.Message}\n{e.StackTrace}";
                         Log.Error(msg);
                     }
+                    // Clean up NPC dialogue state to prevent stale entries blocking future dialogues
+                    logic.behaviors.NpcDialogue.ActiveDialogues.TryRemove(Account.AccountId, out _);
+                    logic.behaviors.NpcDialogue.DismissedDialogues.TryRemove(Account.AccountId, out _);
+                }
                 //StopTask_ = true;
                 GameServer.ConnectionManager.Disconnect(this);
 
