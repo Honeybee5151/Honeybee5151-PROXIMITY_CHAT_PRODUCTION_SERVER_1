@@ -63,7 +63,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
             var totalMs = (int)(ExpandDurationSec * 1000);
             var hitPlayers = new HashSet<int>();
             var elapsedMs = 0;
-            var prevOuterEdge = 0f;
             var maxRadius = MaxRadius;
             var ringThickness = RingThickness;
             var damage = Damage;
@@ -94,11 +93,10 @@ namespace WorldServer.logic.behaviors.@new.attacks
 
                 var progress = elapsedMs / (float)totalMs;
                 var currentRadius = progress * maxRadius;
-                var outerEdge = currentRadius + ringThickness / 2f;
 
-                // Swept area: from previous tick's inner edge to current tick's outer edge
-                var sweepInner = Math.Max(0f, prevOuterEdge - ringThickness);
-                var sweepOuter = outerEdge;
+                // Only damage players on the ring band itself (not inside it)
+                var ringInner = Math.Max(0f, currentRadius - ringThickness / 2f);
+                var ringOuter = currentRadius + ringThickness / 2f;
 
                 var pos = new Position(centerX, centerY);
                 var searchRadius = maxRadius + ringThickness + 2f;
@@ -107,11 +105,12 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     if (p is not Player player)
                         return;
 
-                    var dist = player.DistTo(centerX, centerY);
                     if (hitPlayers.Contains(player.Id))
                         return;
 
-                    if (dist >= sweepInner && dist <= sweepOuter)
+                    var dist = player.DistTo(centerX, centerY);
+
+                    if (dist >= ringInner && dist <= ringOuter)
                     {
                         var hitPos = new Position(player.X, player.Y);
                         world.BroadcastIfVisible(new AoeMessage(hitPos, 1f, damage, effect, effectDuration / 1000f, entity.ObjectType, new ARGB(color)), player);
@@ -124,7 +123,6 @@ namespace WorldServer.logic.behaviors.@new.attacks
                     }
                 });
 
-                prevOuterEdge = outerEdge;
                 timer.Reset(); // schedule next tick
                 return false; // keep timer alive
             });
