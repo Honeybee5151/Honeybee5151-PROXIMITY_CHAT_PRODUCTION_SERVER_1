@@ -24,6 +24,8 @@ namespace Shared.resources
         public float Speed;
         public bool Wavy;
 
+        public ProjectileDesc() { }
+
         public ProjectileDesc(XElement e)
         {
             BulletType = e.GetAttribute<int>("id");
