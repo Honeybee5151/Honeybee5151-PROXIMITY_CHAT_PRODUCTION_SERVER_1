@@ -1,3 +1,4 @@
+using System;
 using Shared.database.party;
 using WorldServer.core.objects;
 using WorldServer.core.structures;
@@ -23,6 +24,8 @@ namespace WorldServer.core.commands.player
             // Clear the active dialogue state and prevent re-trigger
             NpcDialogue.ActiveDialogues.TryRemove(player.AccountId, out var npcEntityId);
             NpcDialogue.DismissedDialogues[player.AccountId] = npcEntityId;
+
+            Console.WriteLine($"[DialogueCommand] Process called: optionId={optionId}, player={player.Name}, npcEntityId={npcEntityId}");
 
             if (optionId == 0) // "Yes"
             {
@@ -73,19 +76,35 @@ namespace WorldServer.core.commands.player
 
         private void SpawnDwarfismGiant(Player player, World world)
         {
+            Console.WriteLine("[DialogueCommand] SpawnDwarfismGiant called");
+
             // Check if one already exists to prevent duplicates
             foreach (var entity in world.Quests.Values)
             {
                 if (entity.ObjectDesc?.IdName == "Dwarfism Giant" && !entity.Dead)
+                {
+                    Console.WriteLine("[DialogueCommand] Dwarfism Giant already exists, skipping spawn");
                     return;
+                }
             }
 
             if (!player.GameServer.Resources.GameData.IdToObjectType.TryGetValue("Dwarfism Giant", out var objType))
+            {
+                Console.WriteLine("[DialogueCommand] ERROR: 'Dwarfism Giant' not found in IdToObjectType!");
                 return;
+            }
 
+            Console.WriteLine($"[DialogueCommand] Resolved type 0x{objType:X4}, creating entity...");
             var boss = Entity.Resolve(player.GameServer, objType);
+            if (boss == null)
+            {
+                Console.WriteLine("[DialogueCommand] ERROR: Entity.Resolve returned null!");
+                return;
+            }
+
             boss.Move(44.5f, 55.5f);
             world.EnterWorld(boss);
+            Console.WriteLine($"[DialogueCommand] Dwarfism Giant spawned at (44.5, 55.5), Id={boss.Id}");
         }
     }
 }
