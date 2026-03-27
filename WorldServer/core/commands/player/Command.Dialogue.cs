@@ -24,10 +24,19 @@ namespace WorldServer.core.commands.player
             NpcDialogue.ActiveDialogues.TryRemove(player.AccountId, out var npcEntityId);
             NpcDialogue.DismissedDialogues[player.AccountId] = npcEntityId;
 
-            if (optionId == 0) // "Yes" — teleport party to Greg's spawn position
+            if (optionId == 0) // "Yes"
             {
                 var targetX = 44.5f;
                 var targetY = 41.5f;
+
+                // Spawn the Dwarfism Giant in the pit
+                SpawnDwarfismGiant(player, world);
+
+                // Set quest text
+                world.QuestText = "Defeat Dwarfism Giant";
+                var questMsg = new GlobalNotificationMessage(0, "dungeonQuest:Defeat Dwarfism Giant");
+                foreach (var p in world.Players.Values)
+                    p.Client.SendPacket(questMsg);
 
                 TeleportPlayer(player, time, targetX, targetY);
 
@@ -60,6 +69,23 @@ namespace WorldServer.core.commands.player
         private void TeleportPlayer(Player player, TickTime time, float x, float y)
         {
             player.TeleportPosition(time, x, y, ignoreRestrictions: true);
+        }
+
+        private void SpawnDwarfismGiant(Player player, World world)
+        {
+            // Check if one already exists to prevent duplicates
+            foreach (var entity in world.Quests.Values)
+            {
+                if (entity.ObjectDesc?.IdName == "Dwarfism Giant" && !entity.Dead)
+                    return;
+            }
+
+            if (!player.GameServer.Resources.GameData.IdToObjectType.TryGetValue("Dwarfism Giant", out var objType))
+                return;
+
+            var boss = Entity.Resolve(player.GameServer, objType);
+            boss.Move(44.5f, 55.5f);
+            world.EnterWorld(boss);
         }
     }
 }
