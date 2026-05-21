@@ -1,4 +1,4 @@
-﻿{
+{
     "dbInfo": {
         "host": "redis",
         "port": 6379,
@@ -8,7 +8,7 @@
     "serverInfo": {
         "type": "World",
         "name": "Netherlands",
-        "address": "89.167.53.217",
+        "address": "204.168.137.39",
         "port": 2050,
         "coordinates": {
             "latitude": 0,

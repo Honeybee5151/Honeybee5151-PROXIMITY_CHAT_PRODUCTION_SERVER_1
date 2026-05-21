@@ -142,7 +142,7 @@ namespace WorldServer.core.worlds
                 var rawMusic = resource.Music[Random.Shared.Next(0, resource.Music.Count)];
                 // Rewrite external URLs to go through music proxy (Flash can't load cross-domain audio)
                 if (rawMusic.StartsWith("http"))
-                    Music = $"http://89.167.53.217:8889/api/music/proxy?url={Uri.EscapeDataString(rawMusic)}";
+                    Music = $"http://204.168.137.39:8889/api/music/proxy?url={Uri.EscapeDataString(rawMusic)}";
                 else
                     Music = rawMusic;
                 StaticLogger.Instance.Info($"[Music] World '{IdName}' music: {Music}");
